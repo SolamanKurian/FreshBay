@@ -1,0 +1,258 @@
+
+
+
+
+<%-include('../layouts/header')-%>
+<%-include('../layouts/logednavbar')-%><br>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Orders</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a href="/customerHome">Home</a></li>
+        <li class="breadcrumb-item"><a href="/profile">Profile</a></li>
+        <li class="breadcrumb-item active text-white">Orders</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+
+
+<!-- Cart Page Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Product</th>
+                    <th scope="col">OrderId</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Action</th>
+                    <th scope="col">Payment</th>
+                    <th scope="col">Details</th>
+                  </tr>
+                </thead>
+                <tbody id="cart-body">
+                    
+                    
+                </tbody>
+            </table>
+        </div>
+       
+        
+    </div>
+</div>
+<!-- Cart Page End -->
+
+
+
+
+
+
+
+
+
+
+<%-include('../layouts/footer')-%>
+
+
+<script>
+   
+    let total=0
+    let shipping=0
+    let gtotal=0
+    //to load cart at first
+const table=document.getElementById("cart-body")
+document.addEventListener('DOMContentLoaded',async function(){
+try {
+axios.get(`http://localhost:3000/order/insertOrders`).then((response)=>{
+
+const orderData=response.data
+if (orderData.order.length>0) {
+for(let i=0;i<orderData.order.length;i++){
+    let price=0
+    const row = document.createElement('tr');
+    const dateOnly = new Date(orderData.order[i].date).toLocaleDateString()
+    //to find total price of order
+    for(let j=0;j<orderData.order[i].items.length;j++){
+        // price=price+(orderData.order[i].items[j].quantity*orderData.order[i].items[j].price)
+        price=orderData.order[i].orderPrice;
+    }
+
+    let buttonHtml;
+       
+       if (orderData.order[i].status === 'Ordered') {
+           buttonHtml = `<button  class="btn btn-md rounded-circle bg-light border mt-4" onclick="cancelOrder('${orderData.order[i]._id}')">
+                                <i class="fa fa-times text-danger"></i>
+                            </button>`;
+       } else {
+           buttonHtml = ` `;
+       };
+
+    let payButton;
+    if(orderData.order[i].paymentStatus === 'Pending' && orderData.order[i].paymentMethod === 'ONLINE' && orderData.order[i].status === 'Ordered' ){
+       payButton = `<button class="btn btn-md rounded-pill bg-warning  mt-4" onclick="payNow('${orderData.order[i]._id}')">
+     Pay Now
+</button>
+`;
+    }else if (orderData.order[i].paymentStatus === 'Completed'){
+        payButton=`<button class="btn btn-md rounded-pill bg-white  mt-4" >
+    PAID <i class="fa fa-check text-success"></i>
+
+</button>`
+    }
+    else if (orderData.order[i].paymentStatus === 'Refunded'){
+        payButton=`<button class="btn btn-md rounded-pill bg-white  mt-4" >
+    Refunded <i class="fa fa-check text-success"></i>
+
+</button>`
+    }else{
+        payButton = `<button class="btn btn-md rounded-pill bg-white  mt-4">
+    COD
+</button>
+
+`;
+    }
+    row.innerHTML = `
+                            <td>
+                                <img src="/productimages/${orderData.order[i].items[0].image}" class="img-fluid  rounded-circle" style="width: 80px; height: 80px;" alt="">
+                        </td>
+                            <td class="align-middle">
+                                ${orderData.order[i].orderId}
+                                </td>
+                                <td class="align-middle">
+                                ${dateOnly}
+                                </td>
+                                <td class="align-middle">
+                                ${price}
+                                </td>
+                                <td class="align-middle" id="${orderData.order[i]._id}">
+                                    ${orderData.order[i].status}
+                                </td>
+                                <td id="button${orderData.order[i]._id}">
+                            ${ buttonHtml}
+                        </td>
+                        <td id="button${orderData.order[i]._id}">
+                            ${payButton}
+                        </td>
+                        <td>
+                            <button onclick="location.href='/order/viewOrder?viewOid=${orderData.order[i]._id}'" class="btn btn-md rounded-circle bg-light border mt-4" title="View">
+    <i class="fa fa-eye text-primary"></i>
+</button>
+                        </td>
+                        
+                         `;
+                      
+    table.appendChild(row);
+
+
+}
+} else{
+      const row = document.createElement('tr');
+      row.innerHTML = `<td colspan="5" class="text-center"style="color:red">You don't have order history</td>`;
+      table.appendChild(row);
+    }
+})
+ } catch (error) {
+      console.log(error.message);
+    }
+  })
+
+
+
+//to cancel order
+
+async function cancelOrder(Oid){
+// confirmation sweet alert
+Swal.fire({
+        title: 'Are you sure to cancel the order?',
+        text: '',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) { 
+            axios.get(`http://localhost:3000/order/cancelOrder?Oid=${Oid}`).then((response)=>{
+
+                const divId=response.data.order._id
+                
+                const statusdiv = document.getElementById(`${divId}`);
+                
+            if (statusdiv) {
+                
+                statusdiv.innerHTML = response.data.order.status;            
+            }
+
+                const buttondiv=document.getElementById(`button${divId}`)
+                if (buttondiv) {
+                
+                    buttondiv.innerHTML = '';            
+            }
+
+            })   
+            
+            
+        }
+    })
+}
+
+function payNow(oid){
+    
+
+axios.get(`http://localhost:3000/order/payNow?oid=${oid}`).then(response => {
+
+        if (response.data.success) {
+            let options = {
+                "key": response.data.key_id,
+                "amount": response.data.amount,
+                "currency": "INR",
+                "order_id": response.data.order_id,
+                "handler": function (response) {
+                    // Handler for successful payment
+                   
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Order Placed',
+                        text: 'Payment Success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = `/order/nowPaid?oid=${oid}`;
+                    });
+                },
+                "theme": {
+                    "color": "#2300a3"
+                }
+            };
+          
+            let raz1= new Razorpay(options);
+            raz1.on('payment.failed',function(response){
+                Swal.fire({
+                        icon: 'warning',
+                        title: 'Order pending',
+                        text: 'Payment pending',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = `/order/myOrders`;
+                    });
+
+
+            })
+
+            raz1.open();
+
+        }
+    })
+ }
+
+
+
+
+
+
+</script>
+

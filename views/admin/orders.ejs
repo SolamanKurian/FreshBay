@@ -1,0 +1,319 @@
+
+
+<%-include('../layouts/adminHead')-%>
+
+<%-include('../layouts/adminSidebar')-%>
+
+<!--Side bar end-->
+
+
+    <!-- users  -->
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="row">
+          <div class="col-12 grid-margin">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Orders</h4>
+                <div class="table-responsive">
+                  <table class="table" id="tbl">
+                    <thead>
+                      <tr>
+                        <th >OrderId</th>
+                        <th >Date</th>
+                        <th >Customer Name</th>
+                        <th >Order Status</th>
+                        <th >Method</th>
+                        <th >Payment Status</th>
+                        <th >View in detail</th>
+                        <th ></th>
+                        
+                      </tr>
+                    </thead>
+                    <tbody id="srch-table">
+
+<!-- the dynamic contents will update here-->
+
+                    </tbody>
+                  </table>
+                  <div id="pagination" class="text-center mt-4">
+                    <button id="prevPage" class="btn btn-success me-1">&lt; Prev</button>
+                    <span id="currentPage">1</span>
+                    <button id="nextPage" class="btn btn-success ms-1">Next &gt;</button>
+                </div>
+                </div>
+               
+              </div>
+              
+            </div>
+
+          </div>
+        </div>
+        
+      
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--product list-->
+
+  <script>
+   
+//pagination setup
+const prevPageBtn = document.getElementById("prevPage");
+  const nextPageBtn = document.getElementById("nextPage");
+  const currentPageSpan = document.getElementById("currentPage");
+  let srch="";
+  let currentPage =Number(currentPageSpan.innerHTML);
+  prevPageBtn.addEventListener('click', async () => {
+  
+  if (currentPage > 1) {
+  
+    currentPage=currentPage - 1;
+    
+    currentPageSpan.innerHTML=currentPage
+  }
+goToPage(currentPage)
+});
+nextPageBtn.addEventListener('click', async () => {
+  
+  
+  if (currentPage >= 1) {
+
+    currentPage=currentPage + 1;
+    currentPageSpan.innerHTML=currentPage
+    
+  }
+  
+  goToPage(currentPage)
+});
+
+
+//  search specific order
+
+  const form=document.getElementById("srch-form")
+  const ipfield=document.getElementById("searchInput")
+  const table=document.getElementById("srch-table")
+ 
+  ipfield.addEventListener('keypress',(event)=>{
+    
+    if(event.key==='Enter'){
+      event.preventDefault();
+       srch=ipfield.value;
+     
+    axios.get(`http://localhost:3000/admin/orderSearch?q=${srch}`).then((response)=>{
+
+        let price=0;
+      const orderdata = response.data;
+      
+      
+// Clear existing rows
+table.innerHTML = '';
+
+
+if (orderdata.orders.length > 0) {
+    orderdata.orders.forEach((order) => {
+        const dateOnly = new Date(order.date).toLocaleDateString()
+        let noUser="User not exists"
+      let userName=order.userId?order.userId.Name:noUser;
+
+        for(let j=0;j<order.items.length;j++){
+        price=price+(order.items[j].quantity*order.items[j].price)
+    }
+
+
+ 
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td> ${order.orderId}</td>
+      <td> ${dateOnly}</td>
+        <td> ${userName}</td>
+        <td> ${order.status}</td>
+        <td> ${order.paymentMethod}</td>
+      <td> ${order.paymentStatus}</td>
+      <td>
+                            <button onclick="location.href='/admin/viewOrder?viewOid=${order._id}'" class="btn btn-md rounded-circle " title="View">
+    <i class="fa fa-eye text-primary"></i>
+</button>
+                        </td>
+                       
+      
+
+      
+      `;
+    table.appendChild(row);
+  });
+} else {
+  const row = document.createElement('tr');
+  row.innerHTML = `<td colspan="5" class="text-center">Order not found</td>`;
+  table.appendChild(row);
+}
+}).catch((error)=>{console.log(error.message);})
+   
+  }
+  })
+
+
+// load users before searching
+
+document.addEventListener('DOMContentLoaded',async function(){
+try {
+  let buttonHtml;
+  let status=0
+axios.get(`http://localhost:3000/admin/orderSearch`).then((response)=>{
+
+    let price=0;
+      const orderdata = response.data;
+     
+
+// Clear existing rows
+table.innerHTML = '';
+let productTable;
+if (orderdata.orders.length > 0) {
+  orderdata.orders.forEach(order => {
+    
+    const dateOnly = new Date(order.date).toLocaleDateString()
+      let noUser="User not exists"
+      let userName=order.userId?order.userId.Name:noUser;
+    
+
+        for(let j=0;j<order.items.length;j++){
+        price=price+(order.items[j].quantity*order.items[j].price)
+        
+    }
+    for(let j=0;j<order.items.length;j++){
+      if(itemStatus=order.items[j].itemStatus==="Return requested"){
+         status=1;
+         break;
+        }else{
+          status=0;
+        }
+
+    }
+ 
+    buttonHtml=status==1?`<button onclick="location.href='/admin/viewOrder?viewOid=${order._id}'" class="btn btn-md rounded-circle" title="View">
+    ⚠️
+</button>`:' '
+
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td> ${order.orderId}</td>
+      <td> ${dateOnly}</td>
+        <td> ${userName}</td>
+        <td> ${order.status}</td>
+        <td> ${order.paymentMethod}</td>
+      <td> ${order.paymentStatus}</td>
+      <td>
+                            <button onclick="location.href='/admin/viewOrder?viewOid=${order._id}'" class="btn btn-md rounded-circle " title="View">
+    <i class="fa fa-eye text-primary"></i>
+</button>
+                        </td>
+                        <td> ${buttonHtml}</td>
+      
+
+      
+      `;
+    table.appendChild(row);
+  });
+} else {
+  const row = document.createElement('tr');
+  row.innerHTML = `<td colspan="5" class="text-center">Order not found</td>`;
+  table.appendChild(row);
+}
+})
+
+      
+    } catch (error) {
+      console.log(error.message);
+    }
+
+
+  })
+
+
+  async function goToPage(currentPage){
+    try {
+  let buttonHtml;
+  let status=0
+axios.get(`http://localhost:3000/admin/orderSearch?&cp=${currentPage}&q=${srch}`).then((response)=>{
+
+    let price=0;
+      const orderdata = response.data;
+     
+
+// Clear existing rows
+table.innerHTML = '';
+let productTable;
+if (orderdata.orders.length > 0) {
+  orderdata.orders.forEach(order => {
+    
+    const dateOnly = new Date(order.date).toLocaleDateString()
+      let noUser="User not exists"
+      let userName=order.userId?order.userId.Name:noUser;
+    
+
+        for(let j=0;j<order.items.length;j++){
+        price=price+(order.items[j].quantity*order.items[j].price)
+        
+    }
+    for(let j=0;j<order.items.length;j++){
+      if(itemStatus=order.items[j].itemStatus==="Return requested"){
+         status=1;
+         break;
+        }else{
+          status=0;
+        }
+
+    }
+ 
+    buttonHtml=status==1?`<button onclick="location.href='/admin/viewOrder?viewOid=${order._id}'" class="btn btn-md rounded-circle" title="View">
+    ⚠️
+</button>`:' '
+
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td> ${order.orderId}</td>
+      <td> ${dateOnly}</td>
+        <td> ${userName}</td>
+        <td> ${order.status}</td>
+        <td> ${order.paymentMethod}</td>
+      <td> ${order.paymentStatus}</td>
+      <td>
+                            <button onclick="location.href='/admin/viewOrder?viewOid=${order._id}'" class="btn btn-md rounded-circle " title="View">
+    <i class="fa fa-eye text-primary"></i>
+</button>
+                        </td>
+                        <td> ${buttonHtml}</td>
+      
+
+      
+      `;
+    table.appendChild(row);
+  });
+} else {
+  const row = document.createElement('tr');
+  row.innerHTML = `<td colspan="5" class="text-center">Order not found</td>`;
+  table.appendChild(row);
+}
+})
+
+      
+    } catch (error) {
+      console.log(error.message);
+    }
+
+
+  }
+
+</script>
+
+
+
+ 
+
+<%-include('../layouts/adminFooter')-%>

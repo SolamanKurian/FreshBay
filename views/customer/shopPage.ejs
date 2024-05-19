@@ -1,0 +1,581 @@
+
+<%-include('../layouts/header')-%>
+      
+<%-include('../layouts/logednavbar')-%>
+
+    
+
+
+        <!-- Single Page Header start -->
+        <div class="container-fluid page-header py-5">
+            <h1 class="text-center text-white display-6">Shop</h1>
+            <ol class="breadcrumb justify-content-center mb-0">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+               
+                <li class="breadcrumb-item active text-white">Shop</li>
+            </ol>
+        </div>
+        <!-- Single Page Header End -->
+
+
+        <!-- Fruits Shop Start-->
+        <div class="container-fluid fruite py-5">
+            <div class="container py-5">
+                <h1 class="mb-4">FreshBay Shop</h1>
+                <div class="row g-4">
+                    <div class="col-lg-12">
+                        <div class="row g-4">
+                            <div class="col-xl-3">
+                                <form id="srch-form">
+                                <div class="input-group w-100 mx-auto d-flex">
+                                    <input type="search" class="form-control p-3" placeholder="Search" aria-describedby="search-icon-1"id="searchInput">
+                                    <span id="search-icon-1" class="input-group-text p-3"><i id="search-icon" class="fa fa-search"></i></span>
+                                </div>
+                            </form>
+                            </div>
+                            <div class="col-6"></div>
+                            <div class="col-xl-3">
+                                <div class="bg-light ps-3 py-3 rounded d-flex justify-content-between mb-4">
+                                    
+                                    <select id="sort-selection" name="sort-selection" class="border-0 form-select-sm bg-light me-3">
+                                      <option class="bg-light ps-3 py-3 rounded  mb-4">Sort by</option>
+                                      <option value="atoz">A to Z</option>
+                                      <option value="ztoa">Z to A</option>
+                                      <option value="htol">Price High to low</option>
+                                      <option value="ltoh">Price Low to high</option>
+                                  </select>
+                                </div>
+                            </div>
+                        </div>    
+                        <div class="cont d-flex ">
+                          <div id="sort-selection" class="border-0 bg-light ">
+                            <h4>Filter</h4>
+                            <%for(let i=0;i<category.length;i++){%>
+                            <div class="form-check"  >
+                                <input class="form-check-input" type="checkbox" name="cat" id="sort-a-z" value="<%=category[i]._id%>  ">
+                                <label class="form-check-label" for="sort-a-z" style="  width: 100px;">
+                                  <%=category[i].Name%>  
+                                </label>
+                            </div>
+                            <%}%>
+                        </div>
+
+                        
+                            <div class="col-lg-12"id="product-card"style="display: flex;flex-wrap: wrap;justify-content:center">                              
+                                        <!--inserting product-->
+                            </div>
+                           
+                        </div>
+                        <div id="pagination" class="text-center mt-4">
+                          <button id="prevPage" class="btn btn-primary me-2">&lt; Prev</button>
+                          <span id="currentPage">1</span>
+                          <button id="nextPage" class="btn btn-primary ms-2">Next &gt;</button>
+                           
+                      </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Fruits Shop End-->
+        <%-include('../layouts/footer')-%>
+<script>
+
+const sortSelect = document.getElementById('sort-selection');
+let wishButton;
+
+const filter=document.querySelectorAll("input[name='cat']")
+
+const prevPageBtn = document.getElementById("prevPage");
+  const nextPageBtn = document.getElementById("nextPage");
+  const currentPageSpan = document.getElementById("currentPage");
+
+let currentPage =Number(currentPageSpan.innerHTML); // Current page number
+let filtercategory=[];
+let sortWith;
+sortSelect.addEventListener('change', () => {
+    
+   sortWith = sortSelect.value;
+   
+  
+});
+filter.forEach((filt)=>{
+  filt.addEventListener('change', async () => {
+    if(filt.checked){
+      filtercategory.push(filt.value);
+    }else{
+      const index=filtercategory.indexOf(filt.value)
+      if(index>-1){
+        filtercategory.splice(index,1);
+      }
+    }
+});
+})
+//when click on the prev button
+prevPageBtn.addEventListener('click', async () => {
+  
+    if (currentPage > 1) {
+    
+      currentPage=currentPage - 1;
+      
+      currentPageSpan.innerHTML=currentPage
+    }
+goToPage(currentPage)
+  });
+
+
+
+nextPageBtn.addEventListener('click', async () => {
+  
+  
+    if (currentPage >= 1) {
+
+      currentPage=currentPage + 1;
+      currentPageSpan.innerHTML=currentPage
+      
+    }
+    
+    goToPage(currentPage)
+  });
+
+  
+
+const table=document.getElementById("product-card")
+document.addEventListener('DOMContentLoaded',async function(){
+  let wisharr=[]
+try {
+axios.get(`http://localhost:3000/productSearch`).then((response)=>{
+
+      const productdata = response.data;
+
+if(productdata.wish){
+  productdata.wish.items.forEach(item=>{
+    wisharr.push(item.productId._id)
+   
+  })
+}
+
+// Clear existing rows
+table.innerHTML = '';
+
+if (productdata.products.length > 0) {
+  productdata.products.forEach(product => {
+    const row = document.createElement('div');
+    row.setAttribute('class', 'col-md-6 col-lg-3 col-xl-3 m-2');
+    
+    if(!product.Is_delete){
+        if(product.Quantity>0){
+            
+            button=` <a href="#" onclick="addToCart('${product._id}')" class="btn border border-secondary rounded-pill px-3 text-primary">
+  <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
+</a>`
+            
+        }else{
+            button=` <div class="text-danger mt-3"> Out of Stock</div>`
+        };
+if(wisharr.includes(product._id)){
+  
+  wishButton=`<a href="#" onclick="removeFromWish('${product._id}')">
+  <i class="fa fa-heart fa-lg me-3  mt-2 ml-3 text-danger"></i> 
+</a>`
+}else{
+  
+  wishButton=`<a href="#" onclick="addToWishlist('${product._id}')">
+  <i class="fa fa-heart fa-lg me-3  mt-2 ml-3 "></i> 
+</a>`
+};
+if(product.Offerprice>0){
+  priceplace=`<p class="text-dark fs-5 fw-bold mb-0"><s>Rs:${product.Price}</s></p>
+  <p class="text-dark fs-5 fw-bold mb-0">Rs:${product.Offerprice}</p>`
+
+}else{
+  priceplace=`<p class="text-dark fs-5 fw-bold mb-0">Rs:${product.Price}</p>
+  <p class="text-dark fs-5 fw-bold mb-0"></p>`
+};
+
+
+    row.innerHTML = `
+    
+     
+      <div class="border border-primary rounded position-relative vesitable-item"><a href="/productpage?pid=${product._id}" > 
+            
+        <div class="vesitable-img">
+                            <img src="/productimages/${product.Image[0]}" class="img-fluid w-100 rounded-top" alt="">
+                        </div>    
+                                                               
+                            <div class="text-white px-3 py-1 bg-secondary ; rounded position-absolute" style="top: 10px; left: 10px; ">
+                                ${product.Category.Name}
+                                
+                            </div>   
+                            
+                        <div class="p-4 rounded-bottom">
+                            <h4>${product.Name}</h4>
+                            <p class="truncate">${product.Pdesc}</p>
+                            <p class="text-dark fs-5 fw-bold mb-0">${priceplace}</p>
+                            <div class="d-flex justify-content-between">
+                              
+                                   ${button} <div id="${product._id}">${wishButton}</div> 
+                            </div>
+                        </div>
+                    </div> `;
+    table.appendChild(row);
+    }
+    
+  });
+} else {
+  const row = document.createElement('tr');
+  row.innerHTML = `<td colspan="5" class="text-center">Product not found</td>`;
+  table.appendChild(row);
+}
+})
+
+      
+    } catch (error) {
+      console.log(error.message);
+    }
+  })
+
+
+  async function  addToCart(proId){
+   
+      const response = await axios.get(`http://localhost:3000/addToCart?proId=${proId}`)
+      .then((response)=>{
+          if(response.data.success){
+               Swal.fire({
+  icon: 'success',
+  title: 'Success',
+  showConfirmButton: false,
+  timer: 1300,
+  text: response.data.message
+});
+
+          }else{
+              Swal.fire({
+  icon: 'info',
+  title: 'Already in Cart',
+  showConfirmButton: false,
+  timer: 1300,
+  text: response.data.message
+})
+              
+          }
+
+      })
+    }
+
+// at to wish list
+
+
+
+async function  addToWishlist(proId){
+   
+   const response = await axios.get(`http://localhost:3000/addToWish?proId=${proId}`)
+   .then((response)=>{
+
+       if(response.data.success){
+            Swal.fire({
+icon: 'success',
+title: 'Added',
+showConfirmButton: false,
+timer: 1300,
+text: response.data.message
+});const wishdiv = document.getElementById(proId);
+    if (wishdiv) {
+              wishdiv.innerHTML =`<a href="#" onclick="removeFromWish('${proId}')">
+  <i class="fa fa-heart fa-lg me-3  mt-2 ml-3 text-danger"></i> 
+</a>`   
+            }
+   
+       }else{
+           Swal.fire({
+icon: 'info',
+
+showConfirmButton: false,
+timer: 1300,
+text: response.data.message
+})
+           
+       }
+
+   })
+ }
+
+//to remove from wishlist
+async function  removeFromWish(proId){
+   
+   const response = await axios.get(`http://localhost:3000/removeFromWish?proId=${proId}`)
+   .then((response)=>{
+
+       if(response.data.success){
+            Swal.fire({
+icon: 'success',
+title: 'Removed',
+showConfirmButton: false,
+timer: 1300,
+text: response.data.message
+});
+const wishdiv = document.getElementById(proId);
+    if (wishdiv) {
+              wishdiv.innerHTML =`<a href="#" onclick="addToWishlist('${proId}')">
+  <i class="fa fa-heart fa-lg me-3  mt-2 ml-3 "></i> 
+</a>`  
+            }
+       }else{
+           Swal.fire({
+icon: 'info',
+showConfirmButton: false,
+timer: 1300,
+text: response.data.message
+})
+           
+       }
+
+   })
+ }
+
+
+    // load with search
+
+    const form=document.getElementById("srch-form")
+  const ipfield=document.getElementById("searchInput")
+  
+  const searchIcon=document.getElementById("search-icon-1");
+  let flag;
+  searchIcon.addEventListener('click',()=>{
+    searchProduct();
+  })
+
+  document.addEventListener('keypress',(event)=>{
+    
+    if(event.key==='Enter'){
+      searchProduct();
+  }
+  });
+let srch='';
+  function searchProduct(){
+    event.preventDefault();
+       srch=ipfield.value;
+      
+       let wisharr=[]
+    axios.get(`http://localhost:3000/productSearch?q=${srch}&filter=${filtercategory}&sort=${sortWith}&cp=${currentPage}`).then((response)=>{
+     
+        const productdata = response.data
+        if(productdata.wish){
+  productdata.wish.items.forEach(item=>{
+    wisharr.push(item.productId._id)
+  })
+}
+// Clear existing rows
+table.innerHTML = '';
+
+if (productdata.products.length > 0) {
+  productdata.products.forEach(product => {
+    const row = document.createElement('div');
+    row.setAttribute('class', 'col-md-6 col-lg-3 col-xl-3 m-2');
+    if(!product.Is_delete){
+        if(product.Quantity>0){
+            button=` <a href="#" onclick="addToCart('${product._id}')" class="btn border border-secondary rounded-pill px-3 text-primary">
+  <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
+</a>` 
+        }else{
+            button=` <div class="text-danger mt-3"> Out of Stock</div>`
+        };
+
+        if(wisharr.includes(product._id)){
+  
+  wishButton=`<a href="#" onclick="removeFromWish('${product._id}')">
+  <i class="fa fa-heart fa-lg me-3  mt-2 ml-3 text-danger"></i> 
+</a>`
+}else{
+  
+  wishButton=`<a href="#" onclick="addToWishlist('${product._id}')">
+  <i class="fa fa-heart fa-lg me-3  mt-2 ml-3 "></i> 
+</a>`
+};
+if(product.Offerprice){
+  priceplace=`<p class="text-dark fs-5 fw-bold mb-0"><s>Rs:${product.Price}</s></p>
+  <p class="text-dark fs-5 fw-bold mb-0">Rs:${product.Offerprice}</p>`
+
+}else{
+  priceplace=`<p class="text-dark fs-5 fw-bold mb-0">Rs:${product.Price}</p>
+  <p class="text-dark fs-5 fw-bold mb-0"></p>`
+};
+
+
+
+    row.innerHTML =  `
+    
+     
+    <div class="border border-primary rounded position-relative vesitable-item"><a href="/productpage?pid=${product._id}" > 
+          
+      <div class="vesitable-img">
+                          <img src="/productimages/${product.Image[0]}" class="img-fluid w-100 rounded-top" alt="">
+                      </div>    
+                                                             
+                          <div class="text-white px-3 py-1 bg-secondary ; rounded position-absolute" style="top: 10px; left: 10px; ">
+                              ${product.Category.Name}
+                              
+                          </div>   
+                          
+                      <div class="p-4 rounded-bottom">
+                          <h4>${product.Name}</h4>
+                          <p class="truncate">${product.Pdesc}</p>
+                          <p class="text-dark fs-5 fw-bold mb-0">${priceplace}</p>
+                          <div class="d-flex justify-content-between">
+                            
+                                 ${button} <div id="${product._id}">${wishButton}</div> 
+                          </div>
+                      </div>
+                  </div> `
+
+      ;
+      
+    table.appendChild(row);
+    }
+    
+  });
+} else {
+  const row = document.createElement('tr');
+  row.innerHTML = `<td colspan="5" class="text-center">Product not found</td>`;
+  table.appendChild(row);
+}
+})
+
+    
+.catch((error)=>{console.log(error.message);})
+  
+  }
+
+
+
+
+
+async function goToPage(currentPage){
+  
+ 
+let wisharr=[]
+
+axios.get(`http://localhost:3000/productSearch?q=${srch}&filter=${filtercategory}&sort=${sortWith}&cp=${currentPage}`).then((response)=>{
+
+  console.log(response.data);
+const productdata = response.data
+if(productdata.wish){
+  productdata.wish.items.forEach(item=>{
+    wisharr.push(item.productId._id)
+   
+  })
+}
+
+// Clear existing rows
+table.innerHTML = '';
+
+if (productdata.products.length > 0) {
+productdata.products.forEach(product => {
+const row = document.createElement('div');
+row.setAttribute('class', 'col-md-6 col-lg-3 col-xl-3 m-2');
+
+if(!product.Is_delete){
+if(product.Quantity>0){
+    
+    button=` <a href="#" onclick="addToCart('${product._id}')" class="btn border border-secondary rounded-pill px-3 text-primary">
+<i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
+</a>`
+    
+}else{
+    button=` <div class="text-danger mt-3"> Out of Stock</div>`
+};
+if(wisharr.includes(product._id)){
+  
+  wishButton=`<a href="#" onclick="removeFromWish('${product._id}')">
+  <i class="fa fa-heart fa-lg me-3  mt-2 ml-3 text-danger"></i> 
+</a>`
+}else{
+  
+  wishButton=`<a href="#" onclick="addToWishlist('${product._id}')">
+  <i class="fa fa-heart fa-lg me-3  mt-2 ml-3 "></i> 
+</a>`
+};
+if(product.Offerprice){
+  priceplace=`<p class="text-dark fs-5 fw-bold mb-0"><s>Rs:${product.Price}</s></p>
+  <p class="text-dark fs-5 fw-bold mb-0">Rs:${product.Offerprice}</p>`
+
+}else{
+  priceplace=`<p class="text-dark fs-5 fw-bold mb-0">Rs:${product.Price}</p>
+  <p class="text-dark fs-5 fw-bold mb-0"></p>`
+};
+row.innerHTML =  `
+    
+     
+    <div class="border border-primary rounded position-relative vesitable-item"><a href="/productpage?pid=${product._id}" > 
+          
+      <div class="vesitable-img">
+                          <img src="/productimages/${product.Image[0]}" class="img-fluid w-100 rounded-top" alt="">
+                      </div>    
+                                                             
+                          <div class="text-white px-3 py-1 bg-secondary ; rounded position-absolute" style="top: 10px; left: 10px; ">
+                              ${product.Category.Name}
+                              
+                          </div>   
+                          
+                      <div class="p-4 rounded-bottom">
+                          <h4>${product.Name}</h4>
+                          <p class="truncate">${product.Pdesc}</p>
+                          <p class="text-dark fs-5 fw-bold mb-0">${priceplace}</p>
+                          <div class="d-flex justify-content-between">
+                            
+                                 ${button} <div id="${product._id}">${wishButton}</div> 
+                          </div>
+                      </div>
+                  </div> `
+
+;
+
+table.appendChild(row);
+}
+
+});
+} else {
+const row = document.createElement('tr');
+row.innerHTML = `<td colspan="5" class="text-center">Product not found</td>`;
+table.appendChild(row);
+}
+})
+
+
+.catch((error)=>{console.log(error.message);})
+
+
+
+
+
+
+}
+
+
+
+
+
+</script>
+
+
+<style>
+  .truncate {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; 
+    -webkit-box-orient: vertical;
+  }
+
+
+</style>
+
+
+
+
+
+
+
+
+

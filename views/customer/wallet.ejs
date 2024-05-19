@@ -1,0 +1,120 @@
+
+
+
+
+<%-include('../layouts/header')-%>
+<%-include('../layouts/logednavbar')-%><br>
+<br>
+<br>
+<br><div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <!-- User Profile Information -->
+                    <div class="text-center mb-4">
+                        <h3 class="mt-3"> Wallet</h3>
+                    </div>
+
+                    <div class="testimonial-item img-border-radius bg-light rounded p-4">
+                        
+                            
+                            <div class="mb-4 pb-4 border-bottom border-secondary">
+                                <p class="mb-0"><%= customer.Name %></p>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="ms-4 d-block">
+                                    <h4 class="text-dark">Available Balance</h4>
+                                    <p class="m-0 pb-3">Rs: <%=wallet.balance%></p>
+                                </div>
+                                <div class="bg-secondary rounded">
+                                    <a onclick="addMoney('<%= wallet._id %>')" class="btn btn-primary btn-sm">Add Money</a>
+
+                                    <a href="/wallet/history" class="btn btn-secondary btn-sm ms-2">Show History</a>
+                                </div>
+                            </div>
+                            
+                            
+                       
+                    </div>
+                    
+                  
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<%-include('../layouts/footer')-%>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+
+function addMoney(wid){
+let amount;
+    Swal.fire({
+        title: 'Enter Amount',
+        input: 'text',
+        inputLabel: 'Amount',
+        inputPlaceholder: 'Enter the amount to add',
+        inputAttributes: {
+            autocapitalize: 'off'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Add',
+        cancelButtonText: 'Cancel',
+        showLoaderOnConfirm: true,
+        preConfirm: (money) => {
+            
+            if (!isNaN(parseFloat(money)) && parseFloat(money) > 0) {
+               amount=money 
+               
+            }else{
+                Swal.showValidationMessage('Please enter a valid amount')
+            }
+ } }).then(()=>{
+    return axios.get(`http://localhost:3000/wallet/addMoney?wid=${wid}&amount=${amount}`).then(response => {
+
+        if (response.data.success) {
+            let options = {
+                "key": response.data.key_id,
+                "amount": response.data.amount,
+                "currency": "INR",
+                "order_id": response.data.order_id,
+                "handler": function (response) {
+                    // Handler for successful payment
+                 
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Money added!',
+                        text: 'Wallet is credited',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = `/wallet/addMoneyToWallet?amount=${options.amount}&${wid}`;
+                    });
+                },
+                "theme": {
+                    "color": "#2300a3"
+                }
+            };
+          
+            let raz1= new Razorpay(options);
+            raz1.on('payment.failed',function(response){
+                Swal.fire({
+                        icon: 'warning',
+                        title: 'Order pending',
+                        text: 'Payment pending',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = `/order/myOrders`;
+                    });
+
+
+            })
+
+            raz1.open();
+
+        }
+    })
+ })
+}
+
+</script>

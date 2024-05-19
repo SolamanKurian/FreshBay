@@ -1,0 +1,117 @@
+<%-include('../layouts/header')-%>
+
+
+<%-include('../layouts/navbar.ejs')-%><br><br><br>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+       
+        <%-include('../layouts/carosal')-%>
+
+        <div class="col-lg-6"> <!-- opt enter form -->
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">Verify OTP</h3><br>
+                    
+                    <form id="signupForm" class="needs-validation" novalidate>
+                        <!-- Getting OTP -->
+                        <div class="mb-3">
+                            <label for="otp" class="form-label">Enter OTP</label><br>
+                            <label for="otp" class="form-label text-danger">
+                                <% if(locals.message) { %>
+                                    <%= message %>
+                                <% } %>
+                            </label>
+                            <input type="text" class="form-control" id="otp" minlength="4" pattern="[0-9]+" name="otp" required>
+                            <div class="invalid-feedback">Please enter the OTP.</div>
+                        </div>
+                    
+                        <!-- Timer -->
+                        <div class="mb-3" id="timerSection" style="display: none;">
+                            <span id="timer"></span> seconds remaining
+                        </div>
+                    
+                        <a href="/otp">
+                            <button type="button" class="btn btn-secondary mb-3 ms-2" id="resendButton" style="display: none;">Resend OTP</button>
+                        </a>
+                    
+                        <button type="submit" class="btn btn-primary w-100" id="signupButton">Proceed</button>
+                    </form>
+                    <div class="text-center mt-3">
+                        <p>Already have an account? <a href="/login">Login</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- otp enter form end -->
+    </div>
+</div>
+
+
+
+       <%-include('../layouts/footer')-%>
+     <!-- timer -->
+       <script>
+        const timerSection = document.getElementById('timerSection');
+        const timerSpan = document.getElementById('timer');
+        const resendButton = document.getElementById('resendButton');
+        const signupButton = document.getElementById('signupButton'); 
+    
+        let timerDuration = 60; // in seconds
+        let timerInterval;
+    
+        function startTimer() {
+            timerSection.style.display = 'block';
+            resendButton.style.display = 'none';
+            signupButton.style.display = 'block'; 
+    
+            timerInterval = setInterval(() => {
+                if (timerDuration <= 0) {
+                    clearInterval(timerInterval);
+                    resendButton.style.display = 'block';
+                    timerSection.style.display = 'none';
+                    signupButton.style.display = 'block'; 
+                } else {
+                    timerSpan.textContent = timerDuration;
+                    timerDuration--;
+                }
+            }, 1000);
+        }
+    
+        //  to begin the timer when the page loads
+        startTimer();
+     
+
+
+
+    document.getElementById('signupForm').onsubmit = function(event) {
+        event.preventDefault(); 
+
+        const otpInput = document.getElementById('otp');
+        const otp = otpInput.value;
+
+        if (otp.length >= 4 && /^[0-9]+$/.test(otp)) { 
+            axios.post('/otp', {
+                otp: otp
+            })
+            .then(function (response) {
+                if(response.data.success==true){
+                    window.location.href = '/login'; 
+                }else{
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Invalid OTP',
+                        text: 'The OTP you entered is incorrect. Please try again.',
+                    });
+                }
+            })
+            .catch(function (error) { 
+                console.error(error);
+            });
+        } else {
+            otpInput.classList.add('is-invalid');
+        }
+    };
+</script>
+    
+    

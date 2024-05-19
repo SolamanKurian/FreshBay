@@ -1,0 +1,108 @@
+
+
+<%-include('../layouts/adminHead')-%>
+
+<%-include('../layouts/adminSidebar')-%>
+
+
+    <!-- Product   -->
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="row">
+          <div class="col-12 grid-margin">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Coupons</h4>
+                <div class="table-responsive">
+                 <a href="/admin/addCoupon"> <label class="badge badge-gradient-success">Add+</label></a>
+                
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th> Coupon Code </th>
+                        <th> Offer Percentage</th>
+                        <th> Expiry Date</th>
+                        <th> Maximum limit</th>
+                        <th> Min order limit</th>
+                        <th> Action</th>
+                      </tr>
+                    </thead>
+                    <% if(coupons.length > 0 ) { %>
+                        
+                      <% for(let i=0; i<coupons.length; i++) { %>
+                      
+                    <tr>
+                                         
+                      <td> <%=coupons[i].couponcode %> </td>  
+                      <td> <%=coupons[i].percentage %> </td>   
+                      <td> <%=coupons[i].date.toLocaleDateString()%> </td> 
+                      <td> <%=coupons[i].maxlimit%> </td>   
+                      <td> <%=coupons[i].minlimit%> </td>                                                                          
+                      <td> 
+
+                          <a  onclick="deleteCoupon('<%= coupons[i]._id %>')"><label class="badge badge-gradient-danger">Remove</label></a>
+    
+                       
+
+                        <a href="/admin/editCoupon?couponId=<%= coupons[i]._id %>"><label class="badge badge-gradient-success">Edit</label></a> 
+                      </td>                       
+                    </tr>
+                    <% } %>
+                    <% } %>
+                    
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--product list-->
+
+<script>
+   
+   async function deleteCoupon(couponId) {
+    const confirmation = await Swal.fire({
+        icon: 'warning',
+        title: 'Confirmation',
+        text: 'Are you sure you want to delete this Coupon?',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (confirmation.isConfirmed) {
+        // User confirmed deletion
+        const response = await axios.post('http://localhost:3000/admin/deleteCoupon', {couponId});
+        if (response.data.success) {
+            await Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                showConfirmButton: false,
+                timer: 1300,
+                text: response.data.message
+            });
+            window.location.href = "/admin/coupons";
+        } else {
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: response.data.message
+            });
+            window.location.href = "/admin/coupons";
+        }
+    }
+}
+
+  
+    </script>
+   
+
+  <%-include('../layouts/adminFooter')-%>

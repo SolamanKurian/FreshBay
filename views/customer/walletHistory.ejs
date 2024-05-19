@@ -1,0 +1,89 @@
+
+
+
+
+<%-include('../layouts/header')-%>
+<%-include('../layouts/logednavbar')-%><br>
+<br>
+<br>
+<br><div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <!-- User Profile Information -->
+                    <div class="text-center mb-4">
+                        <h3 class="mt-3">Transaction History </h3>
+                    </div>
+
+                    <div class="testimonial-item img-border-radius bg-light rounded p-4">
+                        
+                            
+                            <div class="mb-4 pb-4 border-bottom border-secondary">
+                                <p class="mb-0"><%= customer.Name %></p>
+                            </div>
+                           
+
+                            <table class="table">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Amount</th>
+                                    <th scope="col">Type</th>
+                                    <th scope="col">Balance</th>
+                                    <th scope="col">Remarks</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                    <% if(wallet.history.length > 0) { %>
+                                        <% for(let i = wallet.history.length - 1; i >= 0; i--) { %>
+                                            <tr>
+                                                <td>
+                                                    <p class="mb-0 mt-4"><%= wallet.history[i].date.toLocaleDateString() %></p>
+                                                </td>
+                                                <td>
+                                                    <% if(wallet.history[i].type == 'Credit') { %>
+                                                        <p class="mb-0 mt-4" style="color: rgb(23, 202, 6);"><%= wallet.history[i].amount %></p>
+                                                    <% } else { %>
+                                                        <p class="mb-0 mt-4" style="color: red;"><%= wallet.history[i].amount %></p>
+                                                    <% } %>
+                                                </td>
+                                                <td>
+                                                    <p class="mb-0 mt-4"><%= wallet.history[i].type %></p>
+                                                </td>
+                                                <td>
+                                                    <p class="mb-0 mt-4"><%= wallet.history[i].balance %></p>
+                                                </td>
+                                                <td>
+                                                    <p class="mb-0 mt-4"><%= wallet.history[i].about %></p>
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                    <% } else { %>
+                                        <tr class="mb-0 mt-4" style="color: red;">No wallet history available</tr>
+                                    <% } %>
+                                </tbody>
+                                
+                                    </table>
+
+
+
+
+
+
+
+
+
+
+                            
+                            
+                       
+                    </div>
+                    
+                  
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<%-include('../layouts/footer')-%>

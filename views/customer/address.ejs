@@ -1,0 +1,213 @@
+
+
+
+
+<%-include('../layouts/header')-%>
+<%-include('../layouts/logednavbar')-%><br>
+<br>
+<br>
+<br>
+<br>
+<div class="container mt-5">
+    <div class=" d-flex" style="justify-content: space-between;">
+        <div class="text-center">
+            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#addAddressModal">Add New Address</button>
+            
+        </div>
+
+        <div class="col-lg-6 ">
+            <h1 class="text-primary display-6">Address</h1>
+            <div id="addressInsert" >
+                
+            <!--address inserting here-->
+        </div>
+     
+            <!-- Add New Address Modal -->
+<div class="modal fade" id="addAddressModal" tabindex="-1" role="dialog" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAddressModalLabel">Add New Address</h5>
+                <button type="button" class="close" aria-label="Close" data-dismiss="modal" style="border-radius: 50%;background-color: orange; border-color: orange; ">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addAddressForm" method="POST" action="/address/addAddress">
+                    <div id="validationAlerts" class="alert alert-danger" style="display: none;"></div>
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" >
+                    </div>
+                    <div class="form-group">
+                        <label for="mobile">Mobile Number</label>
+                        <input type="text" class="form-control" id="mobile" name="mobile" >
+                    </div>
+                    <div class="form-group">
+                        <label for="pincode">Pincode</label>
+                        <input type="text" class="form-control" id="pincode" name="pincode" >
+                    </div>
+                    <div class="form-group">
+                        <label for="house">House/Flat</label>
+                        <input type="text" class="form-control" id="house" name="house" >
+                    </div>
+                    <div class="form-group">
+                        <label for="street">Street</label>
+                        <input type="text" class="form-control" id="street" name="street" >
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" class="form-control" id="city" name="city" >
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State</label>
+                        <input type="text" class="form-control" id="state" name="state" >
+                    </div>
+                    <!-- modal end-->
+                    <br>
+                    <button type="submit" class="btn btn-primary">Save Address</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- modal end-->
+
+            
+        </div>
+        </div>
+    </div>
+</div>
+
+
+<%-include('../layouts/footer')-%>
+
+<script>
+    document.getElementById('addAddressForm').addEventListener('submit', function(event) {
+        // Prevent the form from submitting by default
+        event.preventDefault();
+
+        // Validate fields
+        let name = document.getElementById('name').value.trim();
+        let mobile = document.getElementById('mobile').value.trim();
+        let pincode = document.getElementById('pincode').value.trim();
+        let house = document.getElementById('house').value.trim();
+        let street = document.getElementById('street').value.trim();
+        let city = document.getElementById('city').value.trim();
+        let state = document.getElementById('state').value.trim();
+        let alertsArea = document.getElementById('validationAlerts');
+
+        alertsArea.innerHTML = ''; // Clear previous alerts
+
+        if (name === '' || mobile === '' || pincode === '' || house === '' || street === '' || city === '' || state === '') {
+            alertsArea.innerHTML += '<p>All fields are required!</p>';
+        }
+
+        if (isNaN(mobile) || isNaN(pincode)) {
+            alertsArea.innerHTML += '<p>Phone number and pincode must be numbers!</p>';
+        }
+        if (mobile.length !== 10 || mobile[0] === '0') {
+        alertsArea.innerHTML += '<p>Enter a Valid Phone Number</p>';
+    }
+        if (alertsArea.innerHTML !== '') {
+            alertsArea.style.display = 'block'; // Show the alerts
+            return;
+        }
+
+        // If all validation passes, submit the form
+        this.submit();
+    });
+
+
+
+
+ //to load address at first
+const addressBox=document.getElementById("addressInsert")
+document.addEventListener('DOMContentLoaded',async function(){
+try {
+axios.get(`http://localhost:3000/address/loadExistingAddress`).then((response)=>{
+
+      const addresstData = response.data.address;
+        console.log(addresstData);
+
+// Clear existing rows
+addressBox.innerHTML = '';
+
+if (addresstData.address.length > 0) {
+
+ for(let i=0;i<addresstData.address.length;i++) {
+   
+    const row = document.createElement('div');
+    row.setAttribute('style', 'margin-right: 20px');
+    row.setAttribute('id', `${addresstData.address[i]._id}`);
+    row.innerHTML = `
+
+
+    <div class="card">
+                <div class="card-body">
+                    <style>
+    /* CSS to reduce space between paragraphs */
+    .text-left.mb-4 p {
+        margin-bottom: 5px; /* Adjust the value as needed */
+    }
+</style>
+                    <div class="text-left mb-4">
+                        <p> ${addresstData.address[i].name}</p>
+                        <p> ${addresstData.address[i].mobile}</p>
+                        <p> ${addresstData.address[i].house}</p>
+                        <p> ${addresstData.address[i].street}</p>
+                        <p> ${addresstData.address[i].city}</p>
+                        <p> ${addresstData.address[i].state}</p>
+                        <p> ${addresstData.address[i].pincode}</p>
+                        <button class="btn btn-primary" onclick="location.href='/address/editAddress?Aid=${i}'">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteAddress('${addresstData.address[i]._id}')">Delete</button>
+                    </div>
+ 
+                </div>          
+            </div><br>
+     `;
+        // to show total while page loading               
+        addressBox.appendChild(row);
+  };
+
+} else {
+  const row = document.createElement('div');
+  row.innerHTML = `<p class="text-center">No Address Added</p>`;
+  addressBox.appendChild(row);
+}
+})
+
+    } catch (error) {
+      console.log(error.message);
+    }
+
+
+  })
+
+
+function deleteAddress(Aid){
+// confirmation sweet alert
+Swal.fire({
+    title: 'Are you sure?',
+    text: '',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Remove',
+    cancelButtonText: 'Cancel',
+    reverseButtons: true
+}).then((result) => {if (result.isConfirmed) {
+    axios.get(`http://localhost:3000/address/removeAddress?Aid=${Aid}`).then((response) =>{
+            const parent=document.getElementById('addressInsert')
+            const child=document.getElementById(Aid)
+            parent.removeChild(child)})
+ }})
+    
+        
+}
+ 
+
+
+
+</script>
+
+

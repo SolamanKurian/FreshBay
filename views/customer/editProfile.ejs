@@ -1,0 +1,98 @@
+
+
+
+
+<%-include('../layouts/header')-%>
+<%-include('../layouts/logednavbar')-%><br>
+<br>
+<br>
+<br>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+       
+        <div class="col-lg-6"> <!-- Registration form -->
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">Edit Profile</h3>
+                    
+                        <form id="signupForm" method="POST" action="" class="needs-validation" novalidate>
+
+                            <!-- getting name -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" value="<%=customer.Name%>" class="form-control" id="name" name="name" pattern="[A-Za-z ]+" title="Please enter letters and spaces only" required>
+                            <div class="invalid-feedback">Please enter your name with letters and spaces only.</div>
+                        </div>
+                        
+                             <!-- getting phone number -->
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" value="<%=customer.Phone%>" class="form-control" id="phone" name="phone" pattern="[0-9]+" title="Please enter numbers only" minlength="10" maxlength="10" required oninput="validatePhoneNumber(this)">
+                            <div class="invalid-feedback">Please enter a valid phone number</div>
+                        </div>
+                    
+                             <!-- getting email -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" value="<%=customer.Email%>" class="form-control" id="email" name="email" required disabled>
+        
+                        </div>
+                        
+                      <button type="submit" class="btn btn-primary w-100">Update</button><br><br>
+                      
+                    </form>
+                    <button onclick="location.href='/profile'"  class="btn btn-danger w-100">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <!-- registration form end -->
+    </div>
+</div>
+
+
+
+       <%-include('../layouts/footer')-%>
+       <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+       <script>
+        
+        (function () {
+            'use strict';
+          
+            var forms = document.querySelectorAll('.needs-validation');
+    
+           
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+    
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+        })();
+
+// to check the first number of phone number is zero or not
+                            function validatePhoneNumber(input) {
+                                if (input.value.charAt(0) === '0') {
+                                    input.setCustomValidity('invalid');
+                                } else {
+                                    input.setCustomValidity('');
+                                }
+                            }
+                        
+// Custom validation for email format including ".com" at the end
+    document.getElementById('email').addEventListener('input', function () {
+        var emailInput = document.getElementById('email');
+        var emailValue = emailInput.value.trim();
+
+        if (emailValue.endsWith('.com')) {
+            emailInput.setCustomValidity('');
+        } else {
+            emailInput.setCustomValidity('Email address must end with ".com"');
+        }
+    });
+    </script>
+<%-include('../layouts/footer')-%>

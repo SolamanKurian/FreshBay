@@ -1,0 +1,66 @@
+
+
+<%-include('../layouts/adminHead')-%>
+
+<%-include('../layouts/adminSidebar')-%>
+
+    <!-- space   -->
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <!-- form to add new product   -->
+        <div class="col-12 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Edit Coupon</h4>
+                <%if(locals.message){%>
+                <span style="color: red;">
+                  <%=message%>
+                </span>
+                <%}%>
+                <form class="forms-sample" action="" method="POST">
+                    <div class="form-group">
+                        <label for="code">Coupon Code</label>
+                        <input type="text" class="form-control" id="code" name="code" value="<%=coupon.couponcode%>"  required>
+                        <input hidden class="form-control" id="cid" name="cid" value="<%=coupon._id%>"  required>
+                      </div>
+                  <div class="form-group">
+                    <label for="percentage">Offer Percentage</label>
+                    <input type="number" class="form-control" id="percentage" name="percentage" pattern="[0-9]+" title="Please enter numbers only" value="<%=coupon.percentage%>"  required>
+
+                  </div>
+                  <div class="form-group">
+                    <label for="maxlimit">Max limit</label>
+                    <input type="number" class="form-control" id="maxlimit" name="maxlimit" pattern="[0-9]+" title="Please enter numbers only" value="<%=coupon.maxlimit%>"  required>
+
+                  </div>
+                  <div class="form-group">
+                    <label for="minlimit">Min order limit</label>
+                    <input type="number" class="form-control" id="minlimit" name="maxlimit" pattern="[0-9]+" title="Please enter numbers only" value="<%=coupon.minlimit%>"  required>
+
+                  </div>
+                  <div class="form-group">
+                    <label for="tillDate">Till Date</label>
+                    <input type="date" class="form-control" id="tillDate" name="tillDate" required>
+                </div>
+                  <button type="submit" class="btn btn-gradient-success mr-2">update</button>
+                  <button onclick="location.href='/admin/coupons'" class="btn btn-light">Cancel</button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+
+
+
+  </div>
+</div>
+
+<!--product list-->
+
+  <%-include('../layouts/adminFooter')-%>
+  <script>
+  
+    const tillDate = new Date('<%=coupon.date%>');
+        const formattedValidity = tillDate.toISOString().split('T')[0]; // Extract YYYY-MM-DD
+        document.getElementById("tillDate").value = formattedValidity;
+  </script>

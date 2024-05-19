@@ -1,0 +1,38 @@
+
+
+<%-include('../layouts/adminHead')-%>
+
+<%-include('../layouts/adminSidebar')-%>
+
+    <!-- space   -->
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <!-- form to add new product   -->
+        <div class="col-12 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Edit Category</h4>
+               
+                <form class="forms-sample" action="" method="POST">
+                  <div class="form-group">
+                    <label for="exampleInputName1">Name</label>
+                    
+                    <input type="text" class="form-control" id="name" name="name" pattern="[A-Za-z ]+" title="Please enter letters and spaces only" value="<%=cat.Name%>" required>
+                  </div>
+                 
+                  <button type="submit" class="btn btn-gradient-success mr-2">Update</button>
+                  <button onclick="location.href='/product/category'" class="btn btn-light">Cancel</button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+
+
+
+  </div>
+</div>
+
+<!--product list-->
+
+  <%-include('../layouts/adminFooter')-%>

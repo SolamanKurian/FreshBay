@@ -1,0 +1,271 @@
+<%-include('../layouts/adminHead')-%>
+
+<%-include('../layouts/adminSidebar')-%>
+<!-- space   -->
+<div class="main-panel">
+  <div class="content-wrapper">
+    <!-- form to add new product   -->
+    <div class="col-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Edit Product</h4>
+          <form class="forms-product" enctype="multipart/form-data" >
+            <!--Name-->
+            <div class="form-group">
+              <label for="exampleInputName1">Name</label>
+              <input type="text" class="form-control" id="name" name="name" value="<%=product.Name%>"
+                title="Please enter letters and spaces only">
+                <span class="error-message text-danger" id="name-error-message"></span>
+            </div>
+
+            <!--Product Id-->
+            
+            <!--Unit price-->
+            <div class="form-group">
+              <label for="price">Unit Price</label>
+              <input type="text" class="form-control" name="price" id="price-input" value="<%=product.Price%>">
+              <span class="error-message text-danger" id="price-error-msg"></span>
+            </div>
+            <!--Category-->
+            <div class="form-group">
+              <label for="category">Category</label>
+              <select class="form-control" name="category" id='categorySelect'>
+                <% for(let i=0;i<cat.length;i++){%>
+                <option <%= cat[i].Name === product.Category ? 'selected' : '' %>>
+                  <%=cat[i].Name%>
+
+                </option>
+                
+                <%}%>
+              </select>
+              <span class="error-message text-danger" id="category-error-message"></span>
+            </div>
+
+            <!--Quantity-->
+            <div class="form-group">
+              <label for="">Quantity in Kg</label>
+              <input type="text" class="form-control" name="quantity" id="quantit-input"
+                value="<%=product.Quantity%>">
+              <span class="error-message text-danger" id="quantity-error-message"></span>
+            </div>
+
+<!--Images-->
+<div class="form-group">
+  <label>File upload (Images only)</label>
+  <input type="file" name="images" id="image-input" class="form-control file-upload-default" multiple accept="image/*">
+  <div class="input-group col-xs-12">
+    <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image">
+    <span class="input-group-append">
+      <button class="file-upload-browse btn btn-gradient-primary" type="button" id="img-upload-btn">Upload</button>
+    </span>
+  </div>
+  <span id="image-error-message" class="error-message text-danger"></span>
+    <!-- Existing Image with Cross Marks -->
+    <div class="image-preview d-flex mt-2 ">
+      <% for(let i=0; i<product.Image.length; i++) { %>
+          <div class="mr-2 image-container">
+              <button class="remove-image-btn" data-index="<%= i %>" type="button">&times;</button>
+              <img src="/productimages/<%= product.Image[i] %>" width="100px">
+          </div>
+      <% } %>
+  </div>
+</div>
+<!-- Image Previews -->
+<div id="image-preview" class="preview-container"></div><br>
+
+
+        <style>
+          .image-container {
+    position: relative;
+}
+
+.remove-image-btn {
+    position: absolute;
+    top: -10px; 
+    right: 0px; 
+    background-color: transparent;
+    border: red;
+    color: red;
+    font-size: 40px;
+    cursor: pointer;
+    z-index: 1; 
+}
+
+.remove-image-btn:hover {
+    color: darkred;
+}
+
+        </style>
+        
+
+            <!--Description-->
+            <div class="form-group">
+              <label>Product Description</label>
+              <textarea class="form-control" name="description" id="exampleTextarea1" rows="4" ><%=product.Pdesc%></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-gradient-success mr-2">Submit</button>
+            <button class="btn btn-light" onclick="location.href='/product'">Cancel</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--product list-->
+
+<%-include('../layouts/adminFooter')-%>
+
+<script>
+ 
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector('.forms-product');
+
+    form.addEventListener('submit', (e) => {
+      const priceInput = document.getElementById('price-input');
+      const quantityInput = document.getElementById('quantit-input');
+      const imagesInput = document.getElementById('image-input');
+      const nameInput = document.getElementById('name');
+      const pidInput = document.getElementById('pidinput');
+     
+      
+
+      const priceErrorMessage = document.getElementById('price-error-msg');
+      const quantityErrorMessage = document.getElementById('quantity-error-message');
+      const imagesErrorMessage = document.getElementById('image-error-message');
+      const nameErrorMessage = document.getElementById('name-error-message');
+      const pidErrorMessage = document.getElementById("pid-error-message");
+     
+     
+      
+
+
+      //name Validation
+      if(!nameInput.value){
+        e.preventDefault(); 
+        nameErrorMessage.textContent = 'Please enter a valid name';
+
+      }else{
+        nameErrorMessage.textContent = ''; 
+      }
+      //Product id validation
+      if(!pidInput.value){
+        e.preventDefault(); 
+        pidErrorMessage.textContent = 'Please enter a valid product Id';
+
+      }else{
+        pidErrorMessage.textContent = ''; 
+      }
+
+      // Price Validation
+      if (!priceInput.value.match(/^\d+(\.\d{1,2})?$/)) {
+        e.preventDefault(); // Prevent form submission
+        priceErrorMessage.textContent = 'Please enter a valid price (numbers only)';
+      } else {
+        priceErrorMessage.textContent = ''; // Clear error message
+      }
+
+      // Quantity Validation
+      if (!quantityInput.value.match(/^\d+(\.\d{1,2})?$/)) {
+        e.preventDefault(); // Prevent form submission
+        quantityErrorMessage.textContent = 'Please enter a valid quantity (numbers only)';
+      } else {
+        quantityErrorMessage.textContent = ''; // Clear error message
+      }
+    });
+  });
+
+
+// tt get indexes of removed images
+let removedImageIndices = [];
+document.addEventListener('DOMContentLoaded', () => {
+    const removeImageButtons = document.querySelectorAll('.remove-image-btn');
+    const imagePreview = document.querySelector('.image-preview');
+
+    // Array to store the indices of removed images
+    
+
+    removeImageButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const indexToRemove = button.dataset.index;
+            removedImageIndices.push(indexToRemove); // Store the index
+            imagePreview.removeChild(button.parentElement); // Remove the image container
+        });
+    });
+
+    // Your existing code for file upload and form submission
+});
+
+//to prevent form submission
+document.querySelector(".forms-product").addEventListener('submit',(event)=>{
+  event.preventDefault();
+  editProduct();
+})
+
+function editProduct(){
+  
+const form=document.querySelector('.forms-product');
+if(removedImageIndices.length>0){
+const deletedIndicesInput=document.createElement('input');
+deletedIndicesInput.type="hidden";
+deletedIndicesInput.name="deletedIndices";
+deletedIndicesInput.value=JSON.stringify(removedImageIndices);
+form.appendChild(deletedIndicesInput);
+
+removedImageIndices=[];
+}
+
+form.method='POST';
+form.action="/product/editProduct?pid=<%=product._id%>";
+form.submit();
+}
+
+</script>
+
+<!-- JavaScript for Image Preview -->
+<script>
+  document.querySelector('.file-upload-browse').addEventListener("click", () => {
+    document.querySelector('#image-input').click();
+  });
+
+  // Function to preview selected images
+  function previewImages() {
+    const previewContainer = document.getElementById('image-preview');
+    const files = document.getElementById('image-input').files;
+    const maxPreviewImages = 3; // Maximum number of images to preview
+
+    previewContainer.innerHTML = ''; // Clear previous previews
+
+    for (let i = 0; i < maxPreviewImages && i < files.length; i++) {
+      const file = files[i];
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.classList.add('preview-image');
+        previewContainer.appendChild(img);
+      };
+
+      reader.readAsDataURL(file);
+    }
+  }
+
+  document.getElementById('image-input').addEventListener('change', previewImages);
+</script>
+
+<style>
+  .preview-container {
+    display: flex;
+    gap: 10px;
+  }
+
+  .preview-image {
+    width: 100px; /* Adjust as needed */
+    height: 100px; /* Adjust as needed */
+    object-fit: cover;
+    border-radius: 5px;
+  }
+</style>

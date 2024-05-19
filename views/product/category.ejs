@@ -1,0 +1,99 @@
+
+
+<%-include('../layouts/adminHead')-%>
+
+<%-include('../layouts/adminSidebar')-%>
+
+
+    <!-- Product   -->
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="row">
+          <div class="col-12 grid-margin">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Category</h4>
+                <div class="table-responsive">
+                 <a href="/product/addCategory"> <label class="badge badge-gradient-success">Add+</label></a>
+                 <a href="/product/unlistedCategory" > <label class="badge badge-gradient-danger">Deleted Category</label></a>
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th> No </th>
+                        <th> Category Name</th>
+                        <th> Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% if(categories.length > 0 ) { %>
+                        
+                        <% for(let i=0; i<categories.length; i++) { %>
+                          <% if(categories[i].Is_delete==false) { %>
+                      <tr>
+                        <td>
+                          <%= i+1 %>
+                        </td>                   
+                        <td> <%=categories[i].Name %> </td>                                                                        
+                        <td> 
+                          <% if(categories[i].Is_delete) { %>
+                          
+                          
+                            <a  onclick="deleteCategory('<%= categories[i]._id %>')"><label class="badge badge-gradient-success">List</label></a>
+                          
+                         
+                          <% } else { %>
+                          
+                            <a  onclick="deleteCategory('<%= categories[i]._id %>')"><label class="badge badge-gradient-success">Unlist</label></a>
+                          
+                          <% } %>
+
+                          <a href="/product/editCategory?cid=<%= categories[i]._id %>"><label class="badge badge-gradient-success">Edit</label></a> 
+                        </td>                       
+                      </tr>
+                      <% } %>
+                      <% } %>
+                      <% } %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--product list-->
+
+<script>
+   
+  async function deleteCategory(catid){
+  const response= await axios.post('http://localhost:3000/product/unlist-category',{catid})
+  if(response.data.success){
+  
+    await Swal.fire({
+      icon:'success',
+      title:'success',
+      showConfirmButton:false,
+      timer:1300,
+      text:response.data.message
+    })
+  window.location.href="/product/category"
+  }else{
+    await Swal.fire({
+      icon:'success',
+      title:'success',
+      text:response.data.message})
+  window.location.href="/admin/users"
+  }
+  
+  }
+  
+    </script>
+   
+
+  <%-include('../layouts/adminFooter')-%>

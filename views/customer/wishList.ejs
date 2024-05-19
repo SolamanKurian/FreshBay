@@ -1,0 +1,188 @@
+
+
+
+
+<%-include('../layouts/header')-%>
+<%-include('../layouts/logednavbar')-%><br>
+
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Wishlist</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a href="/customerHome">Home</a></li>
+        <li class="breadcrumb-item active text-white">Wishlist</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+
+
+<!-- Cart Page Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Products</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Add to Cart</th>
+                    <th scope="col">Remove</th>
+                  </tr>
+                </thead>
+                <tbody id="cart-body">
+                    
+                    
+                </tbody>
+            </table>
+        </div>
+        
+        
+    </div>
+</div>
+<!-- Cart Page End -->
+
+<%-include('../layouts/footer')-%>
+<script>
+   
+    let total=0
+    let shipping=0
+    let gtotal=0
+    //to load cart at first
+const table=document.getElementById("cart-body")
+document.addEventListener('DOMContentLoaded',async function(){
+try {
+axios.get(`http://localhost:3000/insertWish`).then((response)=>{
+
+      const wishData = response.data;
+        
+
+// Clear existing rows
+table.innerHTML = '';
+
+if (wishData) {
+
+// to calculate the subtotal
+ for(let i=0;i<wishData.wish.items.length;i++) {
+   
+    const row = document.createElement('tr');
+    row.setAttribute('id', `${wishData.wish.items[i].productId._id}`);
+    if(!wishData.wish.items[i].productId.Is_delete){
+      
+        if(wishData.wish.items[i].productId.Quantity>0){
+    
+    button=` <a href="#" onclick="addToCart('${wishData.wish.items[i].productId._id}')" class="btn border border-secondary rounded-pill px-3 text-primary">
+<i class="fa fa-shopping-bag me-2 text-primary"></i> Move to cart
+</a>`
+    
+}else{
+    button=` <div class="text-danger mt-3"> Out of Stock</div>`
+};
+
+
+    row.innerHTML = `
+    <th scope="row" >
+                            <div class="d-flex align-items-center">
+                                <img src="/productimages/${wishData.wish.items[i].productId.Image[0]}" class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;" alt="">
+                            </div>
+                        </th>
+                        
+                        <td>
+                            <p class="mb-0 mt-4">${wishData.wish.items[i].productId.Name}</p>
+                        </td>
+                      
+                        <td>
+                            <p class="mb-0 mt-4"> ${wishData.wish.items[i].productId.Price}</p>
+                        </td>
+                        <td>
+                            <p class="mb-0 mt-4"> ${button}</p>
+                        </td>
+
+                        <td>
+                            <button  class="btn btn-md rounded-circle bg-light border mt-4" onclick="removeItem('${wishData.wish.items[i].productId._id}')">
+                                <i class="fa fa-times text-danger"></i>
+                            </button>
+                        </td> `;
+        // to show total while page loading               
+    table.appendChild(row);
+
+                    }
+  };
+} else {
+  const row = document.createElement('tr');
+  row.innerHTML = `<td colspan="5" class="text-center"style="color:red">Your Wishlist Is Empty</td>`;
+  table.appendChild(row);
+
+}
+})
+ 
+    } catch (error) {
+      console.log(error.message);
+    }
+
+
+  })
+
+
+//to remove Item from cart
+
+function removeItem(Pid) {
+
+    // confirmation sweet alert
+    Swal.fire({
+        title: 'Are you sure?',
+        text: '',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Remove',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) { 
+            axios.get(`http://localhost:3000/removeWish?proId=${Pid}`).then((response) => {
+                const parent=document.getElementById('cart-body')
+                const child=document.getElementById(Pid)
+                parent.removeChild(child)
+            }).catch((error) => {
+                console.log(error.message);
+            });
+        } 
+    });
+}
+
+
+
+// to add to cart
+
+async function  addToCart(proId){
+   
+   const response = await axios.get(`http://localhost:3000/addToCart?proId=${proId}`)
+   .then((response)=>{
+       if(response.data.success){
+            Swal.fire({
+icon: 'success',
+title: 'Success',
+showConfirmButton: false,
+timer: 1300,
+text: response.data.message
+});
+
+       }else{
+           Swal.fire({
+icon: 'info',
+title: 'Already in Cart',
+showConfirmButton: false,
+timer: 1300,
+text: response.data.message
+})
+           
+       }
+
+   })
+ }
+
+
+
+
+</script>

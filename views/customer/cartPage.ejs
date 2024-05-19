@@ -1,0 +1,721 @@
+
+
+
+
+<%-include('../layouts/header')-%>
+<%-include('../layouts/logednavbar')-%><br>
+
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Cart</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a href="/customerHome">Home</a></li>
+        <li class="breadcrumb-item active text-white">Cart</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+
+
+<!-- Cart Page Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Products</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Handle</th>
+                  </tr>
+                </thead>
+                <tbody id="cart-body">
+                    
+                    
+                </tbody>
+            </table>
+        </div>
+        <button class="btn  px-4 py-3 text-secondary" type="button" id="showCouponBtn">View Coupons</button>
+        <div class="mt-5" id="couponStatus">
+            <input type="text" id="couponCodeInput" class="border-0 border-bottom rounded me-5 py-3 mb-4" placeholder="Coupon Code">
+            <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="button" id="applyCouponBtn" onclick="applyCoupon()">Apply Coupon</button>
+            
+        </div>
+       
+       <!-- Modal -->
+<div class="modal fade" id="couponModal" tabindex="-1" aria-labelledby="couponModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="couponModalLabel">Existing Coupons</h5>
+              
+            </div>
+            <div class="modal-body" id="couponList">
+                <!-- Coupon details will be displayed here -->
+            </div>
+           
+        </div>
+    </div>
+</div>
+
+        
+        <div class="row g-4 justify-content-end">
+            <div class="col-8"></div>
+            <div class="col-sm-8 col-md-7 col-lg-6 col-xl-4">
+                <div class="bg-light rounded">
+                    <div class="p-4">
+                        <h1 class="display-6 mb-4">Cart <span class="fw-normal">Total</span></h1>
+                        <div class="d-flex justify-content-between mb-4">
+                            <h5 class="mb-0 me-4">Subtotal:</h5>
+                            <p class="mb-0" id="total">
+
+                            </p>
+                        </div>
+                        <div class="d-flex justify-content-between mb-4">
+                            <h5 class="mb-0 me-4">Coupon discount:</h5>
+                            <p class="mb-0" id="coupon"></p>
+                                
+
+                            
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <h5 class="mb-0 me-4">Shipping</h5>
+                            <div class="">
+                                <p class="mb-0" id="shipping" ></p>
+                            </div>
+                        </div>
+                        <p class="mb-0 text-end">(Free shipping above Rs:500)</p>
+                    </div>
+                    <div class="py-4 mb-4 border-top border-bottom d-flex justify-content-between">
+                        <h5 class="mb-0 ps-4 me-4">Total</h5>
+                        <p class="mb-0 pe-4" id="gtotal"></p>
+                    </div>
+                    <button class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4" type="button" onclick="checkQuantity()">Proceed Checkout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Cart Page End -->
+
+
+
+
+
+
+
+
+
+
+<%-include('../layouts/footer')-%>
+
+
+
+
+<script>
+    let discount=0;
+    let coupon=0;
+    let total=0;
+    let shipping=0
+    let gtotal=0;
+    let finalsubtotal=0;
+    let minlimit=0;
+    let maxlimit=0;
+    let checkdiscount=0;
+  
+    //to load cart at first
+const table=document.getElementById("cart-body")
+document.addEventListener('DOMContentLoaded',async function(){
+try {
+axios.get(`http://localhost:3000/insertCart`).then((response)=>{
+
+      const cartData = response.data;
+        
+
+// Clear existing rows
+table.innerHTML = '';
+
+if (cartData) {
+
+// to calculate the subtotal
+ for(let i=0;i<cartData.cart.items.length;i++) {
+    let subtotal=cartData.cart.items[i].quantity * (cartData.cart.items[i].productId.Offerprice?cartData.cart.items[i].productId.Offerprice:cartData.cart.items[i].productId.Price);   total=total+subtotal;
+// to calculate the shipping
+if(total<500){
+    shipping=50
+}else{
+    shipping=0
+}
+// to calculate the gtotal
+total=total-discount;
+gtotal=total+shipping
+
+
+    const row = document.createElement('tr');
+    row.setAttribute('id', `${cartData.cart.items[i].productId._id}`);
+    row.innerHTML = `
+    <th scope="row" >
+                            <div class="d-flex align-items-center">
+                                <img src="/productimages/${cartData.cart.items[i].productId.Image[0]}" class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;" alt="">
+                            </div>
+                        </th>
+                        
+                        <td>
+                            <p class="mb-0 mt-4">${cartData.cart.items[i].productId.Name}</p>
+                        </td>
+                      
+                        <td>
+                            <p class="mb-0 mt-4"> ${cartData.cart.items[i].productId.Offerprice?cartData.cart.items[i].productId.Offerprice:cartData.cart.items[i].productId.Price}</p>
+                        </td>
+
+                        
+
+                        <td>
+                            <div class="input-group quantity mt-4" style="width: 100px;">
+                                <div class="input-group-btn">
+                                    <button class="btn btn-sm btn-minus rounded-circle bg-light border" onclick="decQuantity('${cartData.cart.items[i].productId._id}')" >
+                                    <i class="fa fa-minus"></i>
+                                    </button>
+                                </div>
+                                <input type="text" class="form-control form-control-sm text-center border-0" value="${cartData.cart.items[i].quantity}" id="quantity${cartData.cart.items[i].productId._id}">
+                                <div class="input-group-btn">
+                                    
+                                    <button class="btn btn-sm btn-plus rounded-circle bg-light border" onclick="addQuantity('${cartData.cart.items[i].productId._id}')">
+                                        <i class="fa fa-plus" ></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <p class="mb-0 mt-4"  id="cost${cartData.cart.items[i].productId._id}">
+                                
+                                ${cartData.cart.items[i].quantity * (cartData.cart.items[i].productId.Offerprice?cartData.cart.items[i].productId.Offerprice:cartData.cart.items[i].productId.Price)}
+                                
+                                
+                                </p>
+                            
+                        </td>
+
+                        <td>
+                            <button  class="btn btn-md rounded-circle bg-light border mt-4" onclick="removeItem('${cartData.cart.items[i].productId._id}')">
+                                <i class="fa fa-times text-danger"></i>
+                            </button>
+                        </td> `;
+        // to show total while page loading               
+    table.appendChild(row);
+    const subtotaldiv = document.getElementById(`total`);
+            if (subtotaldiv) {
+                subtotaldiv.innerHTML = total;
+            }
+            discount=(gtotal*coupon)/100;
+            const coupondiv = document.getElementById(`coupon`);
+            if (coupondiv) {
+                coupondiv.innerHTML = discount;
+            }
+           
+            
+    const shippingdiv = document.getElementById(`shipping`);
+            if (shippingdiv) {
+                shippingdiv.innerHTML = shipping;
+            }
+
+const gtotaldiv = document.getElementById(`gtotal`);
+            if (gtotaldiv) {
+                gtotaldiv.innerHTML =gtotal;
+            }
+
+    
+  };
+} else {
+  const row = document.createElement('tr');
+  row.innerHTML = `<td colspan="5" class="text-center"style="color:red">Your Cart Is Empty</td>`;
+  table.appendChild(row);
+}
+})
+ 
+    } catch (error) {
+      console.log(error.message);
+    }
+
+
+  })
+
+
+// to add quantity
+
+function addQuantity(Pid) {
+
+        axios.get(`http://localhost:3000/IncQuantity?Pid=${Pid}`).then((response)=>{
+
+            if(response.data.success){
+         Swal.fire({
+        icon: 'warning',
+        title: 'Sorry',
+        text: 'Maximum order limit reached'
+      })
+
+
+            }else{
+                const updatedQuantity = response.data.newQuantity;
+            const updatedCost = response.data.cost;
+            const updatedItem=response.data.item
+
+            const quantityInput = document.getElementById(`quantity${Pid}`);
+            if (quantityInput) {
+                quantityInput.value = updatedQuantity;
+            }
+// to update total cost
+            const costInput = document.getElementById(`cost${Pid}`);
+            if (costInput) {
+                costInput.innerHTML = updatedCost;
+            }
+
+// to update subtotal
+
+subtotal=  updatedItem.productId.Offerprice?updatedItem.productId.Offerprice:updatedItem.productId.Price;
+total=total+subtotal
+//update coupon
+const coupondiv = document.getElementById(`coupon`);  
+            if (coupondiv) {
+                checkdiscount=(total*coupon)/100;
+                if(total>=minlimit && checkdiscount<=maxlimit){
+                    discount=(total*coupon)/100;
+                coupondiv.innerHTML = discount;
+               
+                const box=document.getElementById("couponStatus")
+                   if(box && coupon!=0){
+                    box.innerHTML=` 
+                    <p>
+                        Coupon Applied</p>
+            <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="button" id="cancelCouponBtn" onclick="RemoveCoupon()">Remove Coupon</button>
+            `
+                   }}          
+        else if(total>=minlimit && checkdiscount>maxlimit){
+            discount=0;
+                coupondiv.innerHTML = discount;
+            const box=document.getElementById("couponStatus")
+                   if(box && coupon!=0){
+                    box.innerHTML=` 
+                    <p>
+                        Maximum amount of offer is limited to Rs: ${maxlimit}</p>
+                        <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="button" id="cancelCouponBtn" onclick="RemoveCoupon()">Remove Coupon</button>
+                        `
+                   }
+            }else if(total<minlimit)
+            {
+                discount=0
+                coupondiv.innerHTML = discount;
+                const box=document.getElementById("couponStatus")
+                   if(box && coupon!=0){
+                    box.innerHTML=` 
+                    <p>
+                        Minimum order must be above Rs: ${minlimit}</p>
+                        <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="button" id="cancelCouponBtn" onclick="RemoveCoupon()">Remove Coupon</button>
+                        `
+                   }
+            }
+        } 
+
+
+
+
+
+
+const subtotaldiv = document.getElementById(`total`);
+            if (subtotaldiv) {
+                subtotaldiv.innerHTML = total;
+               
+            };
+            finalsubtotal=total-discount;
+if(finalsubtotal<500){
+    shipping=50
+}else{
+    shipping=0
+}
+
+
+gtotal=finalsubtotal+shipping;
+const gtotaldiv = document.getElementById(`gtotal`);
+            if (gtotaldiv) {
+                gtotaldiv.innerHTML =gtotal;
+            }
+
+            
+// to calculate the shipping
+
+const shippingdiv = document.getElementById(`shipping`);
+            if (shippingdiv) {
+                shippingdiv.innerHTML = shipping;
+            }
+ 
+            }
+
+})}
+
+
+function decQuantity(Pid) {
+        axios.get(`http://localhost:3000/decQuantity?Pid=${Pid}`).then((response)=>{
+            if(response.data.success){
+         Swal.fire({
+        icon: 'warning',
+        title: 'Sorry',
+        text: 'Minimun quantity must be One'
+      })
+
+
+            }else{
+
+            const updatedQuantity = response.data.newQuantity;
+            const updatedCost = response.data.cost;
+            const updatedItem=response.data.item
+            const quantityInput = document.getElementById(`quantity${Pid}`);
+            if (quantityInput) {
+                quantityInput.value = updatedQuantity;
+            }
+// to update total cost 
+            const costInput = document.getElementById(`cost${Pid}`);
+            if (costInput) {
+                costInput.innerHTML = updatedCost;
+            }
+// to update subtotal
+
+let subtotal=updatedItem.productId.Offerprice?updatedItem.productId.Offerprice:updatedItem.productId.Price;
+total=total-subtotal;
+//update coupon
+const coupondiv = document.getElementById(`coupon`);  
+            if (coupondiv) {
+                checkdiscount=(total*coupon)/100;
+                if(total>=minlimit && checkdiscount<=maxlimit){
+                    discount=(total*coupon)/100;
+                coupondiv.innerHTML = discount;
+                const box=document.getElementById("couponStatus")
+                   if(box && coupon!=0){
+                    box.innerHTML=` 
+                    <p>
+                        Coupon Applied</p>
+            <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="button" id="cancelCouponBtn" onclick="RemoveCoupon()">Remove Coupon</button>
+            `
+                   }}          
+        else if(total>=minlimit && checkdiscount>maxlimit){
+            discount=0
+                coupondiv.innerHTML = discount;
+            const box=document.getElementById("couponStatus")
+                   if(box && coupon!=0){
+                    box.innerHTML=` 
+                    <p>
+                        Maximum amount of offer is limited to Rs: ${maxlimit}</p>
+                        <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="button" id="cancelCouponBtn" onclick="RemoveCoupon()">Remove Coupon</button>
+                        `
+                   }
+            }else if(total<minlimit)
+            {
+                discount=0
+                coupondiv.innerHTML = discount;
+                const box=document.getElementById("couponStatus")
+                   if(box && coupon!=0){
+                    box.innerHTML=` 
+                    <p>
+                        Minimum order must be above Rs: ${minlimit}</p>
+                        <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="button" id="cancelCouponBtn" onclick="RemoveCoupon()">Remove Coupon</button>
+                        `
+                   }
+            }
+        } 
+
+const subtotaldiv = document.getElementById(`total`);
+            if (subtotaldiv) {
+                subtotaldiv.innerHTML = total;
+               
+            }
+            // to calculate the gtotal
+finalsubtotal=total-discount;
+
+
+// to calculate the shipping
+if(finalsubtotal<500){
+    shipping=50
+}else{
+    shipping=0
+}
+gtotal=finalsubtotal+shipping;
+const shippingdiv = document.getElementById(`shipping`);
+            if (shippingdiv) {
+                shippingdiv.innerHTML = shipping;
+            }
+
+const gtotaldiv = document.getElementById(`gtotal`);
+            if (gtotaldiv) {
+                gtotaldiv.innerHTML = gtotal;
+            }
+
+
+        }
+        })
+
+}
+
+
+//to remove Item from cart
+
+function removeItem(Pid) {
+
+    // confirmation sweet alert
+    Swal.fire({
+        title: 'Are you sure?',
+        text: '',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Remove',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) { 
+            axios.get(`http://localhost:3000/removeItem?Pid=${Pid}`).then((response) => {
+                const parent=document.getElementById('cart-body')
+                const child=document.getElementById(Pid)
+                parent.removeChild(child)
+// to update subtotal
+let subtotal=response.data.item.productId.Offerprice?response.data.item.productId.Offerprice:response.data.item.productId.Price;
+total=total-subtotal
+const subtotaldiv = document.getElementById(`total`);
+            if (subtotaldiv) {
+                subtotaldiv.innerHTML = total;            
+            }
+// to calculate the shipping
+if(total<500){
+    shipping=50
+}else{
+    shipping=0
+}
+const shippingdiv = document.getElementById(`shipping`);
+            if (shippingdiv) {
+                shippingdiv.innerHTML = shipping;
+            }
+
+//update coupon
+const coupondiv = document.getElementById(`coupon`);  
+            if (coupondiv) {
+                checkdiscount=(total*coupon)/100;
+                if(total>=minlimit && checkdiscount<=maxlimit){
+                    discount=(total*coupon)/100;
+                coupondiv.innerHTML = discount;
+                const box=document.getElementById("couponStatus")
+                   if(box){
+                    box.innerHTML=` 
+                    <p>
+                        Coupon Applied</p>
+            <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="button" id="cancelCouponBtn" onclick="RemoveCoupon()">Remove Coupon</button>
+            `
+                   }}          
+        else if(total>=minlimit && checkdiscount>maxlimit){
+            discount=0
+                coupondiv.innerHTML = discount;
+            const box=document.getElementById("couponStatus")
+                   if(box){
+                    box.innerHTML=` 
+                    <p>
+                        Maximum amount of offer is limited to Rs: ${maxlimit}</p>
+                        <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="button" id="cancelCouponBtn" onclick="RemoveCoupon()">Remove Coupon</button>
+                        `
+                   }
+            }else if(total<minlimit)
+            {
+                discount=0
+                coupondiv.innerHTML = discount;
+                const box=document.getElementById("couponStatus")
+                   if(box){
+                    box.innerHTML=` 
+                    <p>
+                        Minimum order must be above Rs: ${minlimit}</p>
+                        <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="button" id="cancelCouponBtn" onclick="RemoveCoupon()">Remove Coupon</button>
+                        `
+                   }
+            }
+        } 
+
+     
+// to calculate the gtotal
+finalsubtotal=total+discount;
+gtotal=finalsubtotal+shipping;
+
+const gtotaldiv = document.getElementById(`gtotal`);
+            if (gtotaldiv) {
+                gtotaldiv.innerHTML = gtotal;
+            }
+            }).catch((error) => {
+                console.log(error.message);
+            });
+        } 
+    });
+}
+
+//to check quantity when proceeding
+
+function checkQuantity(){
+
+axios.get(`http://localhost:3000/checkQuantity`).then((response) => {
+
+ if(response.data.success){
+    window.location.href = `/checkout?coupon=${coupon}`;
+ }else{
+     Swal.fire({
+      icon: 'warning',
+      title: 'Sorry',
+      text: 'Some Quantity Get Out of Stock ',
+    }).then(()=>{
+        window.location.href = `/cartPage`;
+    })
+ }
+    })}
+
+  // to take coupons data 
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('showCouponBtn').addEventListener('click', function () {
+        let couponList = document.getElementById('couponList');
+        couponList.innerHTML = '';
+        axios.get('/coupons')
+            .then(function (response) {
+                if(response.data.coupons.length>0){
+                response.data.coupons.forEach(function (coupon) {
+                    let couponItem = document.createElement('div');
+                    couponItem.textContent ='Coupon Code: "' + coupon.couponcode + '", gives ' + coupon.percentage + '% Offer, Maximum offer limit is Rs:' + coupon.maxlimit;
+                    couponList.appendChild(couponItem);
+                });
+            }else{
+                let couponItem = document.createElement('div');
+                    couponItem.textContent = "No coupon available"
+                    couponList.appendChild(couponItem);
+            }
+                var couponModal = new bootstrap.Modal(document.getElementById('couponModal'));
+                couponModal.show();
+            })
+            .catch(function (error) {
+                console.error('Error fetching coupons:', error);
+            });
+    });
+   
+});
+
+function applyCoupon() {
+    let couponCode = document.getElementById('couponCodeInput').value.trim();
+    if (couponCode) {
+        axios.post('/checkCoupon', { couponCode: couponCode })
+            .then(function (response) {
+                if (response.data.success) {    
+                    coupon=response.data.percentage;
+                    minlimit=response.data.minlimit;
+                    maxlimit=response.data.maxlimit;
+                    checkdiscount=(total*coupon)/100;
+                    const coupondiv = document.getElementById(`coupon`);         
+            if (coupondiv) {
+                if(total>=minlimit && checkdiscount<=maxlimit){
+                    discount=(total*coupon)/100;
+                coupondiv.innerHTML = discount;
+                const box=document.getElementById("couponStatus")
+                   if(box){
+                    box.innerHTML=` 
+                    <p>
+                        Coupon Applied</p>
+            <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="button" id="cancelCouponBtn" onclick="RemoveCoupon()">Remove Coupon</button>
+            `
+                   }}          
+        else if(total>=minlimit && checkdiscount>maxlimit){
+            discount=0
+                coupondiv.innerHTML = discount;
+            const box=document.getElementById("couponStatus")
+                   if(box){
+                    box.innerHTML=` 
+                    <p>
+                        Maximum amount of offer is limited to Rs: ${maxlimit}</p>
+                        <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="button" id="cancelCouponBtn" onclick="RemoveCoupon()">Remove Coupon</button>
+                        `
+                   }
+            }else if(total<minlimit)
+            {
+                discount=0
+                coupondiv.innerHTML = discount;
+                const box=document.getElementById("couponStatus")
+                   if(box){
+                    box.innerHTML=` 
+                    <p>
+                        Minimum order must be above Rs: ${minlimit}</p>
+                        <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="button" id="cancelCouponBtn" onclick="RemoveCoupon()">Remove Coupon</button>
+                        `
+                   }
+            }
+        }       
+                }
+//update 
+finalsubtotal=total-discount;
+// to show discount
+const coupondiv = document.getElementById(`coupon`);
+            if (coupondiv) {
+                coupondiv.innerHTML = discount;
+            } 
+// to calculate the shipping
+if(total<500){
+    shipping=50
+}else{
+    shipping=0
+};
+gtotal=finalsubtotal+shipping;
+
+const gtotaldiv = document.getElementById(`gtotal`);
+            if (gtotaldiv) {
+                gtotaldiv.innerHTML =gtotal;
+            };
+const shippingdiv = document.getElementById(`shipping`);
+            if (shippingdiv) {
+                shippingdiv.innerHTML = shipping;
+            }
+       
+            })
+            .catch(function (error) {
+                console.error('Error checking coupon:', error);
+                alert('An error occurred while checking the coupon. Please try again later.');
+            });
+    } else {
+        alert('Please enter a coupon code.');
+    }
+}
+
+function RemoveCoupon()
+{
+const box=document.getElementById("couponStatus")
+coupon=0;
+const coupondiv = document.getElementById(`coupon`);
+            if (coupondiv) {
+                coupondiv.innerHTML =0;
+            }
+                   if(box){
+                    box.innerHTML=`  <input type="text" id="couponCodeInput" class="border-0 border-bottom rounded me-5 py-3 mb-4" placeholder="Coupon Code">
+            <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="button" id="applyCouponBtn" onclick="applyCoupon()">Apply Coupon</button>
+          
+                    `
+                   }
+discount=0;
+gtotal=total+shipping;
+const gtotaldiv = document.getElementById(`gtotal`);
+            if (gtotaldiv) {
+                gtotaldiv.innerHTML =gtotal;
+            }
+// to show discount
+
+            
+// to calculate the shipping
+if(total<500){
+    shipping=50
+}else{
+    shipping=0
+}
+const shippingdiv = document.getElementById(`shipping`);
+            if (shippingdiv) {
+                shippingdiv.innerHTML = shipping;
+            }
+                }
+
+</script>

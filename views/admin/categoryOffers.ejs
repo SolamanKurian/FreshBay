@@ -1,0 +1,104 @@
+
+
+<%-include('../layouts/adminHead')-%>
+
+<%-include('../layouts/adminSidebar')-%>
+
+
+    <!-- Product   -->
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="row">
+          <div class="col-12 grid-margin">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Product Offers</h4>
+                <div class="table-responsive">
+                 <a href="/admin/addCategoryOffer"> <label class="badge badge-gradient-success">Add+</label></a>
+                
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th> Category </th>
+                        <th> Offer Percentage</th>
+                        <th> Till Date</th>
+                        <th> Action</th>
+                      </tr>
+                    </thead>
+                    <% if(coffers.length > 0 ) { %>
+                        
+                      <% for(let i=0; i<coffers.length; i++) { %>
+                      
+                    <tr>
+                                         
+                      <td> <%=coffers[i].categoryId.Name %> </td>  
+                      <td> <%=coffers[i].percentage %> </td>   
+                      <td> <%=coffers[i].date.toLocaleDateString()%> </td>                                                                           
+                      <td> 
+
+                          <a  onclick="deleteCoffer('<%= coffers[i]._id %>')"><label class="badge badge-gradient-danger">Remove</label></a>
+    
+                       
+
+                        <a href="/admin/editCoffer?cofferid=<%= coffers[i]._id %>"><label class="badge badge-gradient-success">Edit</label></a> 
+                      </td>                       
+                    </tr>
+                    <% } %>
+                    <% } %>
+                    
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--product list-->
+
+<script>
+   
+   async function deleteCoffer(cofferid) {
+    const confirmation = await Swal.fire({
+        icon: 'warning',
+        title: 'Confirmation',
+        text: 'Are you sure you want to delete this Coffer?',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (confirmation.isConfirmed) {
+        // User confirmed deletion
+        const response = await axios.post('http://localhost:3000/admin/deleteCoffer', {cofferid});
+        if (response.data.success) {
+            await Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                showConfirmButton: false,
+                timer: 1300,
+                text: response.data.message
+            });
+            window.location.href = "/admin/categoryOffers";
+        } else {
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: response.data.message
+            });
+            window.location.href = "/admin/categoryOffers";
+        }
+    }
+}
+
+  
+    </script>
+   
+
+  <%-include('../layouts/adminFooter')-%>

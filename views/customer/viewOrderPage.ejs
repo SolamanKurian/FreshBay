@@ -1,0 +1,409 @@
+
+
+
+
+<%-include('../layouts/header')-%>
+<%-include('../layouts/logednavbar')-%><br>
+
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Orderid in detail</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a href="/customerHome">Home</a></li>
+        <li class="breadcrumb-item"><a href="/profile">Profile</a></li>
+        <li class="breadcrumb-item"><a href="/myOrders">Orders</a></li>
+        <li class="breadcrumb-item active text-white">Orderid:<%=viewOrder.orderId%></li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+
+
+<!-- Cart Page Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div>Details of Order:<%=viewOrder.orderId%></div><br>
+        <p hidden id="idholder"><%=viewOrder._id%></p>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Products</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Action</th>
+                    
+                  </tr>
+                </thead>
+                <tbody id="cart-body">
+                    
+                    
+                </tbody>
+            </table>
+        </div>
+        <div class="bg-secondary rounded col-md-4">
+          <a id="toggleInvoiceBtn" onclick="toggleInvoice()" class="btn btn-primary btn-sm">Show Invoice</a>
+          <a id="downloadInvoice" class="btn btn-secondary btn-sm ms-2">Download Invoice</a>
+          
+      </div>
+    </div>
+    
+</div>
+
+<!-- Hidden table for Invoice Download -->
+<div id="invoiceContainer" style="display: none;">
+  <div class="invoice-box">
+      <table id="invoiceTable" cellpadding="0" cellspacing="0">
+          <tr class="top">
+              <td colspan="2">
+                  <table id="invoiceTable1">
+                      <tr>
+                          <td>
+                              <h2 style="color: green;">FreshBay</h2>
+                              Invoice #: <%= viewOrder.orderId %><br>
+                              Created: <%= new Date(viewOrder.date).toLocaleDateString() %><br>
+                          </td>
+                          <td>
+                              <img src="/img/logo.png"  style="width:100%; max-width:150px;">
+                          </td>
+                      </tr>
+                  </table>
+              </td>
+          </tr>
+          <tr class="information">
+              <td colspan="2">
+                  <table id="invoiceTable2">
+                      <tr>
+                          <td>
+                              
+                              Billing Address: <br>
+                              Name: <%= viewOrder.address.name %><br>
+                              Mobile: <%= viewOrder.address.mobile %><br>
+                              House: <%= viewOrder.address.house %><br>
+                              City: <%= viewOrder.address.city %><br>
+                              State: <%= viewOrder.address.state %><br>
+                              Pincode: <%= viewOrder.address.pincode %><br>
+                          </td>
+                          <td>
+                            <br>
+                            <br>Payment Method: <%= viewOrder.paymentMethod %><br>
+                            Payment Status: <%= viewOrder.paymentStatus %><br></td>
+                      </tr>
+                  </table>
+              </td>
+              
+          </tr>
+          <table id="invoiceTable3">
+          <tr class="heading">
+              <td>Item and Quantity</td>
+              <td>Price</td>
+          </tr>
+          <% viewOrder.items.forEach(function(item) { %>
+              <tr class="item">
+                  <td><%= item.productName %>  x  <%= item.quantity %></td>
+                  <td>Rs: <%= item.price * item.quantity %></td>
+              </tr>
+          <% }) %>
+          <tr class="total">
+              <td></td>
+              <% if(viewOrder.orderPrice < 500) { %>
+                  <td>Shipping: Rs: 50</td>
+              <% } else { %>
+                  <td>Shipping: Rs: 0</td>
+              <% } %>
+          </tr>
+          <tr class="total">
+              <td></td>
+              <td>Total: Rs: <%= viewOrder.orderPrice + viewOrder.discount %></td>
+          </tr>
+          <tr class="total">
+              <td></td>
+              <td>Discount: Rs: <%= viewOrder.discount %></td>
+          </tr>
+          <tr class="total">
+              <td></td>
+              <td>Final Price: Rs:<%= viewOrder.orderPrice %></td>
+          </tr>
+        </table>
+      </table>
+  </div>
+</div>
+<!-- Cart Page End -->
+
+<style>
+  body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+  }
+  .invoice-box {
+      max-width: 800px;
+      margin: auto;
+      padding: 30px;
+      border: 1px solid #eee;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+      font-size: 16px;
+      line-height: 24px;
+      color: #555;
+  }
+  .invoice-box table {
+      width: 100%;
+      line-height: inherit;
+      text-align: left;
+      border-collapse: collapse;
+  }
+  .invoice-box table td {
+      padding: 5px;
+      vertical-align: top;
+  }
+  .invoice-box table tr td:nth-child(2) {
+      text-align: right;
+  }
+  .invoice-box table tr.top table td {
+      padding-bottom: 20px;
+  }
+  .invoice-box table tr.information table td {
+      padding-bottom: 40px;
+  }
+  .invoice-box table tr.heading td {
+      background: #eee;
+      border-bottom: 1px solid #ddd;
+      font-weight: bold;
+  }
+  .invoice-box table tr.details td {
+      padding-bottom: 20px;
+  }
+  .invoice-box table tr.item td {
+      border-bottom: 1px solid #eee;
+  }
+  .invoice-box table tr.item.last td {
+      border-bottom: none;
+  }
+  .invoice-box table tr.total td:nth-child(2) {
+      border-top: 2px solid #eee;
+      font-weight: bold;
+  }
+</style>
+
+
+
+
+
+
+
+
+
+<%-include('../layouts/footer')-%>
+
+
+<script>
+  
+  
+const table=document.getElementById("cart-body")
+document.addEventListener('DOMContentLoaded',async function(){
+try {
+    const idHolder=document.getElementById('idholder').innerHTML 
+    
+axios.get(`http://localhost:3000/order/insertViewOrder?Oid=${idHolder}`).then((response)=>{
+
+const orderData=response.data
+if (orderData.viewOrder) {
+  
+for(let i=0;i<orderData.viewOrder.items.length;i++){
+    let price=0
+    const row = document.createElement('tr');
+    console.log(orderData.viewOrder.items[i].itemStatus );
+    //to find total price of order
+    
+        price=price+(orderData.viewOrder.items[i].quantity*orderData.viewOrder.items[i].price)
+        let buttonHtml;
+       
+if (orderData.viewOrder.items[i].itemStatus ==="Delivered") {
+    buttonHtml = `<button class="btn btn-md rounded-circle bg-light border mt-4" onclick="returnOrder('${orderData.viewOrder.items[i]._id}', '${idHolder}')">
+        <i class="fa fa-undo text-primary"></i> Return
+    </button>`;
+} else if (orderData.viewOrder.items[i].itemStatus === 'Ordered') {
+    buttonHtml = `<button class="btn btn-md rounded-circle bg-light border mt-4" onclick="cancelOrder('${orderData.viewOrder.items[i]._id}', '${idHolder}')">
+        <i class="fa fa-times text-danger"></i> Cancel
+    </button>`;
+} else {
+    buttonHtml = ` `;
+}
+    
+
+
+    row.innerHTML = `
+                            <td>
+                                <img src="/productimages/${orderData.viewOrder.items[i].image}" class="img-fluid  rounded-circle" style="width: 80px; height: 80px;" alt=""><br>
+                                ${orderData.viewOrder.items[i].productName}
+                                </td>
+                            <td class="align-middle">
+                                ${orderData.viewOrder.items[i].quantity}
+                                </td>
+                                <td class="align-middle">
+                                    ${orderData.viewOrder.items[i].price}
+                                </td>
+                                <td class="align-middle">
+                                ${price}
+                                </td>
+                                <td class="align-middle" id="${orderData.viewOrder.items[i]._id}">
+                                    ${orderData.viewOrder.items[i].itemStatus}
+                                </td>
+                                <td id="button${orderData.viewOrder.items[i]._id}">
+                                    ${buttonHtml}   
+                        </td> 
+                         `;
+                      
+    table.appendChild(row);
+
+
+}
+} else{
+      const row = document.createElement('tr');
+      row.innerHTML = `<td colspan="5" class="text-center"style="color:red">You don't have order history</td>`;
+      table.appendChild(row);
+    }
+})
+ } catch (error) {
+      console.log(error.message);
+    }
+  })
+
+
+
+//to cancel order
+
+async function cancelOrder(itemId,orderId){
+// confirmation sweet alert
+Swal.fire({
+        title: 'Are you sure to cancel the item from order?',
+        text: '',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) { 
+            axios.get(`http://localhost:3000/order/cancelItem?orderId=${orderId}&itemId=${itemId}`).then((response)=>{
+
+                    
+                const divId=response.data.item._id
+                const statusdiv = document.getElementById(`${divId}`);
+                
+            if (statusdiv) {
+                statusdiv.innerHTML = response.data.item.itemStatus;            
+            }
+
+            const buttondiv=document.getElementById(`button${divId}`)
+                if (buttondiv) {
+                    if(response.data.item.itemStatus=="Cancelled"){
+                        buttondiv.innerHTML = '';   
+                    }else if(response.data.item.itemStatus=="Delivered"){
+                        buttondiv.innerHTML = `<button class="btn btn-md rounded-circle bg-light border mt-4" onclick="returnOrder('${orderData.viewOrder.items[i]._id}', '${idHolder}')">
+                <i class="fa fa-undo text-primary">Return</i> 
+            </button>`;  
+                    }
+                             
+            }
+
+            })   
+            
+            
+        }
+    })
+}
+
+
+// to return the product
+
+async function returnOrder(itemId, orderId) 
+{
+    console.log(orderId);
+  // Create a modal for selecting reasons and entering text
+  const { value: formValues } = await Swal.fire({
+    title: 'Select Reasons for Return',
+    html:
+      '<input id="reason1" class="swal2-input" placeholder="Reason">',
+    focusConfirm: false,
+    preConfirm: () => {
+      return {
+        Reason: document.getElementById('reason1').value
+      }
+    }
+  });
+
+  if (formValues) {
+    
+    axios.get(`http://localhost:3000/order/returnItem?orderId=${orderId}&itemId=${itemId}`, {
+      params: formValues 
+    }).then((response) => {
+      const divId = response.data.item._id;
+      const statusdiv = document.getElementById(`${divId}`);
+
+      if (statusdiv) {
+        statusdiv.innerHTML = response.data.item.itemStatus;
+      }
+
+      const buttondiv = document.getElementById(`button${divId}`)
+      if (buttondiv) {
+        if (response.data.item.itemStatus == "Cancelled") {
+          buttondiv.innerHTML = '';
+        } else if (response.data.item.itemStatus == "Delivered") {
+          buttondiv.innerHTML = `<button class="btn btn-md rounded-circle bg-light border mt-4" onclick="returnOrder('${orderData.viewOrder.items[i]._id}')">
+                <i class="fa fa-undo text-primary">Return</i> 
+            </button>`;
+        }else{
+            buttondiv.innerHTML = '';
+        }
+      }
+    });
+  }
+}
+
+
+</script>
+
+</style>
+
+<script>
+    function toggleInvoice() {
+        var invoiceContainer = document.getElementById('invoiceContainer');
+        var toggleBtn = document.getElementById('toggleInvoiceBtn');
+        if (invoiceContainer.style.display === 'none') {
+            invoiceContainer.style.display = 'block';
+            toggleBtn.textContent = 'Hide Invoice';
+        } else {
+            invoiceContainer.style.display = 'none';
+            toggleBtn.textContent = 'Show Invoice';
+        }
+    }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
+
+<script>
+document.getElementById("downloadInvoice").addEventListener("click", function () {
+  let doc = new window.jspdf.jsPDF();
+  const pageCenter = doc.internal.pageSize.getWidth() / 2;
+    // Header
+    doc.setFontSize(25);
+        doc.setTextColor(40, 40, 40);
+        doc.text("FreshBay",pageCenter, 20, { align: 'center' });
+        doc.setFontSize(20);
+        doc.text("Invoice", pageCenter, 30, { align: 'center' });
+    // Convert the table to PDF
+    var table = document.getElementById("invoiceTable1");
+    doc.autoTable({ html: table,startY: 40 });
+
+    var table = document.getElementById("invoiceTable2");
+    doc.autoTable({ html: table });
+
+    var table = document.getElementById("invoiceTable3");
+    doc.autoTable({ html: table })
+  doc.save("sales_report.pdf");
+});
+
+</script>

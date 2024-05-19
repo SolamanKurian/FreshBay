@@ -1,0 +1,518 @@
+
+
+<%-include('../layouts/adminHead')-%>
+
+
+<div class="container-fluid page-body-wrapper">
+
+  <nav class="sidebar sidebar-offcanvas" id="sidebar">
+    <ul class="nav">
+      <li class="nav-item nav-profile">
+        <a href="#" class="nav-link">
+            <span class="font-weight-bold mb-2">Admin</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/adminHome" >
+          <span class="menu-title">Dashboard</span>
+          <i class="fas fa-tachometer-alt menu-icon"></i>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/product" >
+          <span class="menu-title">Products</span>
+          <i class="fas fa-shopping-basket menu-icon"></i>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="/product/category">
+          <span class="menu-title">Category</span>
+          <i class="fas fa-folder menu-icon"></i>
+        </a>
+      </li>
+     
+
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/users">
+          <span class="menu-title">Users</span>
+          <i class="fas fa-users menu-icon"></i>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/orders">
+          <span class="menu-title">Orders</span>
+          <i class="fas fa-shopping-cart menu-icon"></i>
+        </a>
+      </li>
+      
+    
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/coupons">
+          <span class="menu-title">Coupons</span>
+          <i class="fas fa-image menu-icon"></i>
+        </a>
+      </li>
+      
+     
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/report">
+          <span class="menu-title">Reports</span>
+          <i class="fas fa-chart-line menu-icon"></i>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/logout">
+          <span class="menu-title">Logout</span>
+          <i class="fas fa-sign-out-alt menu-icon"></i>
+        </a>
+      </li>
+      
+      <div class="container-scroller">
+<div class="row p-0 m-0 proBanner" id="proBanner">
+  <div class="col-md-12 p-0 m-0">
+   
+  </div>
+</div>
+
+<nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+  <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+    <a class="navbar-brand brand-logo" href="/admin/adminHome"><h1 style="color: green;">Fresh Bay</h1></a>
+    <a class="navbar-brand brand-logo-mini" href="/admin/adminHome"><h1 style="color: green;">FB</h1></a>
+  </div>
+  <div class="navbar-menu-wrapper d-flex align-items-stretch">
+    <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+      <span class="mdi mdi-menu"></span>
+    </button>
+
+
+
+    <div class="search-field d-none d-md-block">
+      <form class="d-flex align-items-center h-100" id="srch-form" action="">
+        <div class="input-group">
+          <div class="input-group-prepend bg-transparent">
+            <i class="input-group-text border-0 mdi mdi-magnify"></i>
+          </div>
+          <input type="text" class="form-control bg-transparent border-0" placeholder="Search projects" id="searchInput">
+        </div>
+      </form>
+    </div>
+    
+
+
+  </div>
+</nav>
+      
+    </ul>
+  </nav>
+
+
+<!--Side bar end-->
+
+
+    <!-- users  -->
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="row">
+          <div class="col-12 grid-margin">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Orders:<%=viewOrder.orderId%></h4>
+                <p hidden id="idholder"><%=viewOrder._id%></p>
+                <div class="table-responsive">
+                  <table class="table" id="tbl">
+                    <thead>
+                      <tr>
+                        <th >Product</th>
+                        <th >Quantity</th>
+                        <th >Price</th>
+                        <th >Amount</th>
+                        <th >Status</th>
+                        <th >Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="srch-table">
+
+<!-- the dynamic contents will update here-->
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--product list-->
+
+  <script>
+
+  const table=document.getElementById("srch-table")
+
+document.addEventListener('DOMContentLoaded',async function(){
+try {
+  const idHolder=document.getElementById('idholder').innerHTML 
+    
+    axios.get(`http://localhost:3000/admin/insertViewOrder?Oid=${idHolder}`).then((response)=>{
+      let buttonHtml;
+    const orderData=response.data
+    if (orderData.viewOrder) {
+      
+    for(let i=0;i<orderData.viewOrder.items.length;i++){
+        
+        const row = document.createElement('tr');
+        
+        
+           
+           
+    if (orderData.viewOrder.items[i].itemStatus ==="Return requested") {
+        buttonHtml = `<div class="dropdown">
+  <button class="btn btn-sm bg-light border dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Update Status
+  </button>
+  <div class="dropdown-menu dropdown-menu-sm" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item btn"  style="color: green;" onclick="approved('${orderData.viewOrder.items[i]._id}', '${idHolder}')">
+      Approve
+    </a>
+    <a class="dropdown-item btn"  style="color: red;" onclick="rejected('${orderData.viewOrder.items[i]._id}', '${idHolder}')">
+      Reject
+    </a>
+  </div>
+</div>`;
+    } else if (orderData.viewOrder.items[i].itemStatus === 'Ordered') {
+        buttonHtml = `<div class="dropdown">
+  <button class="btn btn-sm bg-light border dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Update Status
+  </button>
+  <div class="dropdown-menu dropdown-menu-sm" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item btn "  style="color: green;" onclick="delivered('${orderData.viewOrder.items[i]._id}', '${idHolder}')">
+    Mark as Delivered
+  </a>
+    <a class="dropdown-item btn"  style="color: orange;" onclick="shipped('${orderData.viewOrder.items[i]._id}', '${idHolder}')">
+      Mark as Shipped
+    </a>
+  </div>
+</div>
+`;
+    }else if (orderData.viewOrder.items[i].itemStatus === 'Shipped') {
+        buttonHtml = `<div class="dropdown">
+  <button class="btn btn-sm bg-light border dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Update Status
+  </button>
+  <div class="dropdown-menu dropdown-menu-sm" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item btn"  style="color: green;" onclick="delivered('${orderData.viewOrder.items[i]._id}', '${idHolder}')">
+    Mark as Delivered
+  </a>
+  </div>
+</div>
+`;
+    }
+    else if (orderData.viewOrder.items[i].itemStatus === 'Return approved') {
+        buttonHtml = `<div class="dropdown">
+  <button class="btn btn-sm bg-light border dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Update Status
+  </button>
+  <div class="dropdown-menu dropdown-menu-sm" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item btn"  style="color: green;" onclick="returnrecieved('${orderData.viewOrder.items[i]._id}', '${idHolder}')">
+      Return received
+  </a>
+  </div>
+</div>
+`;
+    } else if (orderData.viewOrder.items[i].itemStatus === 'Return rejected') {
+        buttonHtml = `
+     <button class="btn btn-sm bg-light border " type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Return rejected
+  </button>
+`;
+    } 
+    else if (orderData.viewOrder.items[i].itemStatus === 'Return received') {
+        buttonHtml = `
+     <button class="btn btn-sm bg-light border " type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Return received
+  </button>
+`;
+    } 
+
+    else {
+        buttonHtml = ` <button class="btn btn-sm bg-light border " type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Completed
+  </button>`;
+    }
+        row.innerHTML = `
+                                <td>
+                                    <img src="/productimages/${orderData.viewOrder.items[i].image}" class="img-fluid  rounded-circle" style="width: 80px; height: 80px;" alt=""><br>
+                                    ${orderData.viewOrder.items[i].productName}
+                                    </td>
+                                <td class="align-middle">
+                                    ${orderData.viewOrder.items[i].quantity}
+                                    </td>
+                                    <td class="align-middle">
+                                        ${orderData.viewOrder.items[i].price}
+                                    </td>
+                                    <td class="align-middle">
+                                    ${orderData.viewOrder.items[i].quantity*orderData.viewOrder.items[i].price}
+                                    </td>
+                                    <td class="align-middle" id="${orderData.viewOrder.items[i]._id}">
+                                        ${orderData.viewOrder.items[i].itemStatus}
+                                    </td>
+                                    <td id="button${orderData.viewOrder.items[i]._id}">
+                                        ${buttonHtml}   
+                            </td> 
+                             `;
+                          
+        table.appendChild(row);
+    
+    
+    }
+    } else{
+          const row = document.createElement('tr');
+          row.innerHTML = `<td colspan="5" class="text-center"style="color:red">You don't have order history</td>`;
+          table.appendChild(row);
+        }
+    })
+     } catch (error) {
+      console.log(error.message);
+    }
+  })
+
+
+// to mark as delivered
+async function delivered(itemId,orderId){
+// confirmation sweet alert
+Swal.fire({
+        title: 'Is the order reached customer?',
+        text: '',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) { 
+            axios.get(`http://localhost:3000/admin/delivered?orderId=${orderId}&itemId=${itemId}`).then((response)=>{
+
+                    
+                const divId=response.data.item._id
+               
+                const statusdiv = document.getElementById(`${divId}`);
+                
+            if (statusdiv) {
+                statusdiv.innerHTML = response.data.item.itemStatus;            
+            }
+
+            const buttondiv=document.getElementById(`button${divId}`)
+            
+            
+                if (buttondiv) {
+                  
+     if (response.data.item.itemStatus === 'Delivered'){
+      buttondiv.innerHTML = `<button class="btn btn-sm bg-light border " type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Completed
+  </button> `;
+    }
+
+                             
+            }
+
+            })   
+            
+            
+        }
+    })
+}
+
+// to mark as shipped
+async function shipped(itemId,orderId){
+// confirmation sweet alert
+Swal.fire({
+        title: 'Are you shipped the order?',
+        text: '',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) { 
+            axios.get(`http://localhost:3000/admin/shipped?orderId=${orderId}&itemId=${itemId}`).then((response)=>{
+
+                    
+                const divId=response.data.item._id
+                const statusdiv = document.getElementById(`${divId}`);
+                
+            if (statusdiv) {
+                statusdiv.innerHTML = response.data.item.itemStatus;            
+            }
+
+            const buttondiv=document.getElementById(`button${divId}`)
+           
+
+            if (buttondiv) {
+                 if (response.data.item.itemStatus === 'Shipped') {
+      buttondiv.innerHTML = `
+      <div class="dropdown">
+            <button class="btn btn-sm bg-light border dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Update Status
+            </button>
+            <div class="dropdown-menu dropdown-menu-sm" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" style="color: green; cursor: pointer;" onclick="delivered('${itemId}', '${orderId}')">
+                    Mark as Delivered
+                </a>
+            </div>
+        </div>
+`
+    }                   
+            }
+               })}})}
+
+
+// to approve return
+async function approved(itemId,orderId){
+// confirmation sweet alert
+Swal.fire({
+        title: 'Are you sure to approve the return?',
+        text: '',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) { 
+            axios.get(`http://localhost:3000/admin/approve?orderId=${orderId}&itemId=${itemId}`).then((response)=>{
+
+                    
+                const divId=response.data.item._id
+                const statusdiv = document.getElementById(`${divId}`);
+                
+            if (statusdiv) {
+                statusdiv.innerHTML = response.data.item.itemStatus;            
+            }
+
+            const buttondiv=document.getElementById(`button${divId}`)
+            console.log(buttondiv);
+            
+                if (buttondiv) {
+                    if (response.data.item.itemStatus === 'Return approved') {
+      buttondiv.innerHTML = `<div class="dropdown">
+  <button class="btn btn-sm bg-light border dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Update Status
+  </button>
+  <div class="dropdown-menu dropdown-menu-sm" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item"  style="color: green;" onclick="returnrecieved('${itemId}','${orderId}')">
+    Return received
+  </a>
+  </div>
+</div>
+`;
+    }          
+            }
+            })      
+        }
+    })
+}
+
+
+
+
+// to reject the return
+async function rejected(itemId,orderId){
+// confirmation sweet alert
+Swal.fire({
+        title: 'Are you sure to reject the return request?',
+        text: '',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) { 
+            axios.get(`http://localhost:3000/admin/reject?orderId=${orderId}&itemId=${itemId}`).then((response)=>{
+
+                    
+                const divId=response.data.item._id
+                const statusdiv = document.getElementById(`${divId}`);
+                
+            if (statusdiv) {
+                statusdiv.innerHTML = response.data.item.itemStatus;            
+            }
+
+            const buttondiv=document.getElementById(`button${divId}`)
+            console.log(buttondiv);
+            
+                if (buttondiv) {
+                 if (response.data.item.itemStatus === 'Return rejected') {
+      buttondiv.innerHTML = `<button class="btn btn-sm bg-light border " type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Return rejected
+  </button>
+`;
+    }
+
+                             
+            }
+
+            })   
+            
+            
+        }
+    })
+}
+
+
+
+// to mark as return received return
+async function returnrecieved(itemId,orderId){
+// confirmation sweet alert
+Swal.fire({
+        title: 'Are you received the item back?',
+        text: '',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) { 
+            axios.get(`http://localhost:3000/admin/receive?orderId=${orderId}&itemId=${itemId}`).then((response)=>{ 
+                const divId=response.data.item._id
+                const statusdiv = document.getElementById(`${divId}`);    
+            if (statusdiv) {
+                statusdiv.innerHTML = response.data.item.itemStatus;            
+            }
+            const buttondiv=document.getElementById(`button${divId}`)
+            console.log(buttondiv);
+            
+                if (buttondiv) {
+                  if (response.data.item.itemStatus==="Return received") {
+        buttondiv.innerHTML = `<button class="btn btn-sm bg-light border " type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Return received
+  </button>`;
+    }              
+            }
+            })   
+        }
+    })
+}
+
+
+</script>
+
+
+
+
+
+<%-include('../layouts/adminFooter')-%>

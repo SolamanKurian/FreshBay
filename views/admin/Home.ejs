@@ -1,0 +1,388 @@
+
+
+<%-include('../layouts/adminHead')%>
+
+<%-include('../layouts/adminSidebar')-%>
+    <!-- dashboard -->
+    <div class="main-panel">
+      <div class="content-wrapper">
+
+        <div class="row">
+          <div class="col-md-4 stretch-card grid-margin">
+            <div class="card  card-img-holder text-white" style="background-color: rgb(39, 126, 39);">
+              <div class="card-body">
+                <img src="/assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
+                <h4 class="font-weight-normal mb-3">Total Number of Orders <i class="mdi mdi-chart-line mdi-24px float-right"></i>
+                </h4>
+                
+                <h2 class="mb-5"><%=count%></h2>
+              
+                  
+                <h6 class="card-text"></h6>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 stretch-card grid-margin">
+            <div class="card  card-img-holder text-white" style="background-color: rgb(211, 106, 46);">
+              <div class="card-body">
+                <img src="/assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
+                <h4 class="font-weight-normal mb-3">Total Revenue <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
+                </h4>
+                <h2 class="mb-5">Rs:<%=revenue%></h2>
+                <h6 class="card-text"></h6>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 stretch-card grid-margin">
+            <div class="card card-img-holder text-white" style="background-color: rgb(87, 137, 202);">
+              <div class="card-body">
+                <img src="/assets/images/dashboard/circle.svg" class="card-img-absolute" alt="circle-image" />
+                <h4 class="font-weight-normal mb-3">Total Discount Given <i class="mdi mdi-diamond mdi-24px float-right"></i>
+                </h4>
+                <h2 class="mb-5">Rs:<%=discount%></h2>
+                <h6 class="card-text"></h6>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-7 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <div class="clearfix">
+                  <h4 class="card-title float-left">Most Ordered Products</h4>
+                  <div id="topProductsChart-legend" class="rounded-legend legend-horizontal legend-top-right float-right"></div>
+                </div>
+                <canvas id="topProductsChart" class="mt-4"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-5 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body ">
+                <h4 class="card-title">Most Ordered Category</h4>
+                <canvas id="pieChart" class="mt-4 chartjs-render-monitor" ></canvas>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="filter-options" style="margin: 20px 0; font-family: Arial, sans-serif;">
+          
+      </div>
+        <div class="row">
+          <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+              <div class="card-body">
+                <div class="clearfix">
+                  <h4 class="card-title float-left mr-5">Income Growth</h4>
+                  <select id="filter" 
+                  style="border: 1px none #ccc; border-radius: 4px; background-color: #f9f9f9; cursor: pointer;">
+                  <option value="" style="padding: 5px;" disabled selected>Filter</option>
+                  <option value="weekly" style="padding: 5px;">Weekly</option>
+                  <option value="monthly" style="padding: 5px;">Monthly</option>
+                  <option value="yearly" style="padding: 5px;">Yearly</option>
+              </select>
+              
+                  <div id="topProductsChart-legend" class="rounded-legend legend-horizontal legend-top-right float-right"></div>
+                </div>
+                <canvas id="growth" class="mt-4"></canvas>
+              </div>
+            </div>
+          </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  <%-include('../layouts/adminFooter')-%>
+
+
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            axios.get('http://localhost:3000/admin/takeTop').then((response) => {
+
+              // for bar diagram
+                let topProducts = response.data.topP;
+                let ctx = document.getElementById('topProductsChart').getContext('2d');
+                let productNames = topProducts.map(product => product.productName);
+                let productQuantities = topProducts.map(product => product.totalQuantity);
+
+                let chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: productNames,
+                        datasets: [{
+                            label: 'Quantity of Product',
+                            data: productQuantities,
+                            backgroundColor: [
+            'green',
+            'blue',
+            'yellow',
+            'orange',
+            'red'
+        ],
+                           
+                            borderWidth: 2,
+                            hoverBackgroundColor: 'primary',
+                            hoverBorderColor: 'white',
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) { return value + ' pcs'; }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                            },
+                            tooltip: {
+                                enabled: true,
+                                callbacks: {
+                                    label: function(tooltipItem) {
+                                        return tooltipItem.raw + ' pcs';
+                                    }
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 1000,
+                            easing: 'easeInOutBounce'
+                        },
+                        hover: {
+                            animationDuration: 300,
+                        }
+                    }
+                });
+                // for pi diagram
+
+let topCategory = response.data.topC;
+
+let categoryNames = topCategory.map(category => category.categorytName);
+let categoryQuantities = topCategory.map(category => category.totalQuantity);
+const cty = document.getElementById('pieChart').getContext('2d');
+// Data object for the pie chart
+let pie = new Chart(cty, {
+                    type: 'pie',
+                    data: {
+                        labels: categoryNames,
+                        datasets: [{
+                            label: 'Number of Orders',
+                            data: categoryQuantities,
+                            backgroundColor: [
+            'green',
+            'blue',
+            'yellow',
+            'orange',
+            'red'
+        ],    
+                            borderWidth: 2,
+                            hoverBackgroundColor: 'success',
+                            hoverBorderColor: 'white',
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) { return value + ' pcs'; }
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                            },
+                            tooltip: {
+                                enabled: true,
+                                callbacks: {
+                                    label: function(tooltipItem) {
+                                        return tooltipItem.raw + ' pcs';
+                                    }
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 1000,
+                            easing: 'easeInOutBounce'
+                        },
+                        hover: {
+                            animationDuration: 300,
+                        }
+                    }
+                });
+
+
+            }).catch(error => {
+                console.error('Error fetching top products:', error);
+            });
+        });
+//loading income chart at document loading
+
+document.addEventListener('DOMContentLoaded', function() {
+  axios.get(`http://localhost:3000/admin/growthSearch?filter=${filter}`).then((response)=>{
+    const growth = response.data.growth;
+
+
+let ctz = document.getElementById('growth').getContext('2d');
+let day = growth.map(x => x.day);
+let revenue = growth.map(y => y.totalRevenue);
+
+let chart = new Chart(ctz, {
+    type: 'line',
+    data: {
+        labels: day,
+        datasets: [{
+            label: 'Revenue in Rupees',
+            data: revenue,
+            backgroundColor: 'rgba(0, 0, 0, 0)', // transparent background
+            borderColor: 'green', // line color
+            borderWidth: 2,
+            tension: 0, // this makes the line straight
+            hoverBackgroundColor: 'primary',
+            hoverBorderColor: 'white',
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) { return value + ' pcs'; }
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                display: true,
+                position: 'top',
+            },
+            tooltip: {
+                enabled: true,
+                callbacks: {
+                    label: function(tooltipItem) {
+                        return tooltipItem.raw + ' pcs';
+                    }
+                }
+            }
+        },
+        animation: {
+            duration: 1000,
+            easing: 'easeInOutBounce'
+        },
+        hover: {
+            animationDuration: 300,
+        }
+    }
+});
+
+
+
+  }).catch(error => {
+                console.error('Error fetching top products:', error);
+            })
+
+
+})
+
+
+
+
+
+
+
+
+
+// applaying filter in income chart
+ document.getElementById('filter').addEventListener('change', (event) => {
+  let filter= event.target.value;
+
+            axios.get(`http://localhost:3000/admin/growthSearch?filter=${filter}`).then((response)=>{
+
+              const growth = response.data.growth;
+
+
+let ctz = document.getElementById('growth').getContext('2d');
+let day = growth.map(x => x.day);
+let revenue = growth.map(y => y.totalRevenue);
+
+let chart = new Chart(ctz, {
+    type: 'line',
+    data: {
+        labels: day,
+        datasets: [{
+            label: 'Revenue in Rupees',
+            data: revenue,
+            backgroundColor: 'rgba(0, 0, 0, 0)', // transparent background
+            borderColor: 'green', // line color
+            borderWidth: 2,
+            tension: 0, // this makes the line straight
+            hoverBackgroundColor: 'primary',
+            hoverBorderColor: 'white',
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) { return value + ' pcs'; }
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                display: true,
+                position: 'top',
+            },
+            tooltip: {
+                enabled: true,
+                callbacks: {
+                    label: function(tooltipItem) {
+                        return tooltipItem.raw + ' pcs';
+                    }
+                }
+            }
+        },
+        animation: {
+            duration: 1000,
+            easing: 'easeInOutBounce'
+        },
+        hover: {
+            animationDuration: 300,
+        }
+    }
+});
+
+
+
+
+
+            }).catch(error => {
+                console.error('Error fetching top products:', error);
+            })})
+
+
+    </script>

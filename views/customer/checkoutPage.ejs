@@ -1,0 +1,632 @@
+
+
+
+
+<%-include('../layouts/header')-%>
+<%-include('../layouts/logednavbar')-%><br>
+
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Checkout</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a href="/customerHome">Home</a></li>
+        <li class="breadcrumb-item"><a href="/cartPage">Cart</a></li>
+        <li class="breadcrumb-item active text-white">Checkout</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+
+<!-- Checkout Page Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <h1 class="mb-4">Billing details</h1> 
+        <%if(locals.message){%>
+            <div style="color: red;"><%=message%></div>
+            <%}%>
+        </div>
+        
+<!-- Add New Address Modal -->
+<div class="modal fade" id="addAddressModal" tabindex="-1" role="dialog" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAddressModalLabel">Add New Address</h5>
+                <button type="button" class="close" aria-label="Close" data-dismiss="modal" style="border-radius: 50%;background-color: orange; border-color: orange; ">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addAddressForm" method="POST" action="/address/addAddressFromCart">
+                    <div id="validationAlerts" class="alert alert-danger" style="display: none;"></div>
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" >
+                    </div>
+                    <div class="form-group">
+                        <label for="mobile">Mobile Number</label>
+                        <input type="text" class="form-control" id="mobile" name="mobile" >
+                    </div>
+                    <div class="form-group">
+                        <label for="pincode">Pincode</label>
+                        <input type="text" class="form-control" id="pincode" name="pincode" >
+                    </div>
+                    <div class="form-group">
+                        <label for="house">House/Flat</label>
+                        <input type="text" class="form-control" id="house" name="house" >
+                    </div>
+                    <div class="form-group">
+                        <label for="street">Street</label>
+                        <input type="text" class="form-control" id="street" name="street" >
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" class="form-control" id="city" name="city" >
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State</label>
+                        <input type="text" class="form-control" id="state" name="state" >
+                    </div>
+                    <!-- modal end-->
+                    <br>
+                    <button type="submit" class="btn btn-primary">Save Address</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- modal end-->
+
+
+
+
+        
+            <div class="row g-5">
+                <div class="col-md-12 col-lg-5 col-xl-5">
+                <div id="addressInsert"style="flex-wrap:wrap;height: fit-content" >
+                   
+                        <!--address inserting here-->
+                   
+                </div>
+                <input type="hidden" id="selectedAddress" name="addressId">
+                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#addAddressModal">Add New Address</button>
+            </div>
+                
+               
+                <div class="col-md-12 col-lg-7 col-xl-7">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Products</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cart-body">
+                                <!--cart here-->
+
+                            </tbody>
+                            <tbody>
+                            <tr>
+                                <th scope="row">
+                                </th>
+                                <td class="py-1"></td>
+                                <td class="py-1"></td>
+                                <td class="py-1">
+                                    <p class="mb-0 text-dark py-3">Subtotal</p>
+                                </td>
+                                <td class="py-1">
+                                    <div class="py-3">
+                                        <p class="mb-0 text-dark" id="total"></p>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                </th>
+                                <td class="py-1"></td>
+                                <td class="py-1"></td>
+                                <td class="py-1">
+                                    <p class="mb-0 text-dark py-3">Shipping</p>
+                                </td>
+                                <td class="py-1">
+                                    <div class="py-3">
+                                        <p class="mb-0 text-dark" id="shipping"></p>
+                                    </div>
+                                       
+                                  
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">
+                                </th>
+                                <td class="py-1"></td>
+                                <td class="py-1"></td>
+                                <td class="py-1">
+                                    <p class="mb-0 text-dark py-3">Discount</p>
+                                </td>
+                                <td class="py-1">
+                                    <div class="py-3">
+                                        <p class="mb-0 text-dark" id="discount"></p>
+                                    </div>
+                                       
+                                  
+                                </td>
+                            </tr>
+                            
+                            
+                            <tr>
+                                <th scope="row">
+                                </th>
+                                <td class="py-5">
+                                    <p class="mb-0 text-dark text-uppercase py-3">TOTAL</p>
+                                </td>
+                                <td class="py-5"></td>
+                                <td class="py-5"></td>
+                                <td class="py-5">
+                                    <div class="py-3 border-bottom border-top">
+                                        <p class="mb-0 text-dark" id="gtotal"></p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                            </table>
+                        </table>
+                    </div>
+                    <!--payment -->
+                   
+                    <div class="row g-4 text-center align-items-center justify-content-center border-bottom py-3">
+    <div class="col-12">
+
+        <div class="form-check text-start my-3"onclick="selectPayment('WALLET','<%=wallet.balance%>')">
+            <input type="radio" class="form-check-input bg-primary border-0" id="Delivery-1" name="paymentMethod" value="Cash On Delivery">
+            <label class="form-check-label" for="Delivery-1">Wallet (Available Balance:<%=wallet.balance%>)</label>
+            <span id="warning" style="color: red;"></span>
+        </div>
+        
+        <div class="form-check text-start my-3"onclick="selectPayment('COD','<%=wallet.balance%>')">
+            <input type="radio" class="form-check-input bg-primary border-0" id="Delivery-1" name="paymentMethod" value="Cash On Delivery">
+            <label class="form-check-label" for="Delivery-1">Cash On Delivery</label>
+        </div>
+        <div class="form-check text-start my-3"onclick="selectPayment('ONLINE','<%=wallet.balance%>')">
+            <input type="radio" class="form-check-input bg-primary border-0" id="Paypal-1" name="paymentMethod" value="Online">
+            <label class="form-check-label" for="Paypal-1">Online</label>
+            
+        </div>
+    </div> 
+</div>
+<p hidden id="disc"><%= coupon %></p>
+                    <!--payment end-->
+                    <form id="placeform" action="/order/createOrder" method="post">
+                        <input type="hidden" id="selectedadd" name="addressId">
+                        <input type="hidden" id="selectedMethod" name="paymentMethod">
+                        <input type="hidden" id="totalAmount" name="totalAmount">
+                        <input type="hidden" id="discount" name="discount" value="<%= coupon %>">
+                        
+                        
+                        <div class="row g-4 text-center align-items-center justify-content-center pt-4">
+                            <button type="button" id="placeOrderBtn" class="btn border-secondary py-3 px-4 text-uppercase w-100 text-primary">Place Order</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        
+    </div>
+</div>
+<!-- Checkout Page End -->
+
+
+
+<style>
+    /* CSS to reduce space between paragraphs */
+    .text-left.mb-4 p {
+        margin-bottom: -3px;
+    }
+</style>
+
+<%-include('../layouts/footer')-%>
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+
+const addressBox=document.getElementById("addressInsert")
+document.addEventListener('DOMContentLoaded',async function(){
+try {
+axios.get(`http://localhost:3000/address/loadExistingAddress`).then((response)=>{
+
+      const addresstData = response.data.address;
+      
+       
+
+// Clear existing rows
+addressBox.innerHTML = '';
+
+
+
+ for(let i=0;i<addresstData.address.length;i++) {
+   
+    const row = document.createElement('div');
+   
+  
+    row.innerHTML = `
+   
+    <div class="card"  onclick="selectAddress('${addresstData.address[i]._id}')" >
+        
+      
+        <div class="d-flex">
+            <div id="${addresstData.address[i]._id}" style=" display: none;" class="incdicator mt-2 "> <i class="fas fa-star" style="color: green; font-size: 16px;"></i></div>
+                <div class="card-body" > <div class="text-left mb-4">
+                    
+                   
+                        
+                        <p> ${addresstData.address[i].name}</p>
+                        <p> ${addresstData.address[i].mobile}</p>
+                        <p> ${addresstData.address[i].house}</p>
+                        <p> ${addresstData.address[i].street}</p>
+                        <p> ${addresstData.address[i].city}</p>
+                        <p>${addresstData.address[i].state}</p>
+                        <p>${addresstData.address[i].pincode}</p>
+                        
+                    </div>
+                    
+                </div>    </div>      
+            </div><br>
+     `;
+        // to show total while page loading               
+        addressBox.appendChild(row);
+  };
+
+
+}).catch((response)=>{
+    const row = document.createElement('div');
+  row.innerHTML = `<p class="text-center">No Address Added</p>`;
+  addressBox.appendChild(row);
+})
+
+    } catch (error) {
+      console.log(error.message);
+    }
+
+
+  })
+
+
+</script>
+
+<style>
+    .custom-radio {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+    }
+    .custom-radio input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+    .checkmark {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        height: 15px;
+        width: 15px;
+        background-color: #afb3af;
+        border-radius: 50%;
+    }
+    .custom-radio input:checked ~ .checkmark {
+        background-color: #696e67;
+    }
+   
+</style>
+
+<script>
+    document.getElementById('addAddressForm').addEventListener('submit', function(event) {
+        // Prevent the form from submitting by default
+        event.preventDefault();
+        let name = document.getElementById('name').value.trim();
+        let mobile = document.getElementById('mobile').value.trim();
+        let pincode = document.getElementById('pincode').value.trim();
+        let house = document.getElementById('house').value.trim();
+        let street = document.getElementById('street').value.trim();
+        let city = document.getElementById('city').value.trim();
+        let state = document.getElementById('state').value.trim();
+        let alertsArea = document.getElementById('validationAlerts');
+        alertsArea.innerHTML = ''; // Clear previous alerts
+
+        if (name === '' || mobile === '' || pincode === '' || house === '' || street === '' || city === '' || state === '') {
+            alertsArea.innerHTML += '<p>All fields are required!</p>';
+        }
+
+        if (isNaN(mobile) || isNaN(pincode)) {
+            alertsArea.innerHTML += '<p>Phone number and pincode must be numbers!</p>';
+        }
+        if (mobile.length !== 10 || mobile[0] === '0') {
+        alertsArea.innerHTML += '<p>Enter a Valid Phone Number</p>';
+    }
+        if (alertsArea.innerHTML !== '') {
+            alertsArea.style.display = 'block'; // Show the alerts
+            return;
+        }
+
+        // If all validation passes, submit the form
+        this.submit();
+    });
+</script>
+
+<script>
+    let discount=0;
+    let coupon=0;
+    let newsubtotal=0;
+let total=0;
+    // to load the cart details when page load
+const table=document.getElementById("cart-body")
+document.addEventListener('DOMContentLoaded',async function(){
+try {
+axios.get(`http://localhost:3000/insertCart`).then((response)=>{
+
+      const cartData = response.data;
+        
+
+// Clear existing rows
+table.innerHTML = '';
+
+if (cartData.cart.items.length > 0) {
+
+
+
+
+// to calculate the subtotal
+ for(let i=0;i<cartData.cart.items.length;i++) {
+    
+    let subtotal=cartData.cart.items[i].quantity * (cartData.cart.items[i].productId.Offerprice?cartData.cart.items[i].productId.Offerprice:cartData.cart.items[i].productId.Price)
+
+    total=total+subtotal;
+
+// to calculate the gtotal
+const discountBox = document.getElementById("disc")
+if(discountBox){
+    coupon=discountBox.innerHTML;
+    discount=(total*coupon)/100;
+   
+}
+newsubtotal=total-discount;
+    // to calculate the shipping
+    if(newsubtotal<500){
+    shipping=50
+}else{
+    shipping=0
+}
+
+gtotal=newsubtotal+shipping;
+
+    const row = document.createElement('tr');
+    row.setAttribute('id', `${cartData.cart.items[i].productId._id}`);
+    row.innerHTML = `
+    <th scope="row" >
+                            <div class="d-flex align-items-center">
+                                <img src="/productimages/${cartData.cart.items[i].productId.Image[0]}" class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;" alt="">
+                            </div>
+                        </th>
+                        
+                        <td>
+                            <p class="mb-0 mt-4">${cartData.cart.items[i].productId.Name}</p>
+                        </td>
+                      
+                        <td>
+                            <p class="mb-0 mt-4"> ${cartData.cart.items[i].productId.Offerprice?cartData.cart.items[i].productId.Offerprice:cartData.cart.items[i].productId.Price}</p>
+                        </td>
+
+                        
+
+                        <td>
+                            <p class="mb-0 mt-4">${cartData.cart.items[i].quantity}</p>
+                                                                  
+                        </td>
+
+                        <td>
+                            <p class="mb-0 mt-4">
+                                
+                                ${cartData.cart.items[i].quantity * (cartData.cart.items[i].productId.Offerprice?cartData.cart.items[i].productId.Offerprice:cartData.cart.items[i].productId.Price)}
+                                
+                                </p>
+                            
+                        </td> `;
+        // to show total while page loading               
+    table.appendChild(row);
+
+    const subtotaldiv = document.getElementById(`total`);
+            if (subtotaldiv) {
+                subtotaldiv.innerHTML = total;
+            }    
+    const shippingdiv = document.getElementById(`shipping`);
+            if (shippingdiv) {
+                shippingdiv.innerHTML = shipping;
+            }
+            const discdiv = document.getElementById(`discount`);
+            if (discdiv) {
+                discdiv.innerHTML = discount;
+            }
+const gtotaldiv = document.getElementById(`gtotal`);
+            if (gtotaldiv) {
+                gtotaldiv.innerHTML = gtotal;
+            }
+  };
+} else {
+  const row = document.createElement('tr');
+  row.innerHTML = `<td colspan="5" class="text-center">Cart Is Empty</td>`;
+  table.appendChild(row);
+}
+})   
+    } catch (error) {
+      console.log(error.message);
+    }
+  });
+ 
+
+  // to take the id of selected address
+function selectAddress(Aid){
+   
+    const addresshold = document.getElementById(`selectedadd`);
+            if (addresshold) {
+                addresshold.value = Aid;           
+            }   
+    
+   //to change appearance of selected address div
+const allIndicate=document.querySelectorAll('.incdicator')   
+if(allIndicate){
+    allIndicate.forEach(element => {
+    element.style.display = 'none'; 
+   
+});
+}
+const indicate=document.getElementById(Aid)
+if(indicate){
+    indicate.style.display='block'
+}
+
+
+
+}
+
+
+
+
+
+// to take the selected payment method
+function selectPayment(Payment,wallet){
+    const paymenthold = document.getElementById(`selectedMethod`);
+    if(Payment=='WALLET'){
+        let amountbox=document.getElementById('totalAmount')   
+       amountbox.value=gtotal
+        if(gtotal<=wallet){
+            if (paymenthold) {
+                paymenthold.value = Payment;           
+            } 
+        }else{
+            paymenthold.value = null;
+            let warning=document.getElementById('warning')   
+       warning.innerHTML='Insufficient balance in wallet, Choose another payment method '
+        }
+    }else if(Payment=='COD'){
+        let amountbox=document.getElementById('totalAmount')   
+       amountbox.value=gtotal
+        if(gtotal>400){
+        
+            if (paymenthold) {
+                paymenthold.value = Payment;           
+            } 
+        }else{
+            
+            paymenthold.value = null;
+            let warning=document.getElementById('warning')   
+       warning.innerHTML='COD Available for order above Rs400 Only  '
+        }
+
+
+    }
+    
+    else{
+        if (paymenthold) {
+                paymenthold.value = Payment;           
+            }   
+ 
+       let amountbox=document.getElementById('totalAmount')   
+       amountbox.value=gtotal
+
+    }
+            
+
+
+
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+        const placeOrderBtn = document.getElementById("placeOrderBtn");
+        const address = document.getElementById("selectedadd");
+        const method = document.getElementById("selectedMethod");
+        const total = document.getElementById("totalAmount");
+        const coupon = document.getElementById("discount");
+
+        placeOrderBtn.addEventListener("click", function() {
+            const formData = {addressId:address.value,
+                paymentMethod:method.value,
+                amount:total.value,
+                discount:coupon.value,disc:discount
+
+            }
+            axios.post('http://localhost:3000/order/createOrder', formData)
+    .then(response => {
+       
+       
+
+        let name = response.data.neworder.name;
+        let house = response.data.neworder.house;
+        let street = response.data.neworder.street;
+        let mobile = response.data.neworder.mobile;
+        let pincode = response.data.neworder.pincode;
+        
+        
+        let orderId=response.data.order._id;
+
+        if (response.data.success) {
+            let options = {
+                "key": response.data.key_id,
+                "amount": response.data.amount,
+                "currency": "INR",
+                "order_id": response.data.order_id,
+                "handler": function (response) {
+                    // Handler for successful payment
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Order Placed!',
+                        text: 'Your order has been successfully placed.',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = `/order/orderplaced?name=${name}&house=${house}&street=${street}&mobile=${mobile}&pincode=${pincode}&orderId=${orderId}`;
+                    });
+                },
+                "theme": {
+                    "color": "#2300a3"
+                }
+            };
+            
+            let raz= new Razorpay(options);
+            raz.on('payment.failed',function(response){
+                Swal.fire({
+                        icon: 'warning',
+                        title: 'Order pending',
+                        text: 'Payment pending',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = `/order/myOrders`;
+                    });
+
+
+            })
+
+            raz.open();
+
+        }else{
+
+            window.location.href = `/order/orderplaced?name=${name}&house=${house}&street=${street}&mobile=${mobile}&pincode=${pincode}&orderId=${orderId}`;
+
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
+
+          
+    });
+})
+
+
+
+</script>
+
+

@@ -1,0 +1,467 @@
+
+
+<%-include('../layouts/adminHead')-%>
+
+<%-include('../layouts/adminSidebar')-%>
+
+<!--Side bar end-->
+<style>
+  .filter-options {
+      margin: 20px 0;
+  }
+</style>
+
+    <!-- users  -->
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="row">
+          <div class="col-12 grid-margin">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Sales Report</h4>
+                <!-- Add download buttons -->
+                <button id="pdfbutton" style="padding: 10px 20px; background-color: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer;">PDF</button>
+                <button id="excelbutton" style="padding: 10px 20px; background-color: #28a745; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Excel</button>
+                <div class="filter-options" style="margin: 20px 0; font-family: Arial, sans-serif;">
+                  <label for="filter" style="font-weight: bold; margin-right: 10px;">Filter by:</label>
+                  <select id="filter" 
+        style="padding: 5px 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9; cursor: pointer;">
+    <option value="all" style="padding: 5px;">All</option>
+    <option value="thisDay" style="padding: 5px;">This Day</option>
+    <option value="thisWeek" style="padding: 5px;">This Week</option>
+    <option value="thisMonth" style="padding: 5px;">This Month</option>
+    <option value="thisYear" style="padding: 5px;">This Year</option>
+</select>
+<label for="fromDate">From:</label>
+<input type="date" id="fromDate" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">
+<label for="toDate">To:</label>
+<input type="date" id="toDate" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9;">
+<button onclick="filterByDateRange()" style="padding: 5px 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #f9f9f9; cursor: pointer;">Filter</button>
+
+
+              </div>
+
+                <div class="table-responsive">
+                  <table class="table" id="tbl">
+                    <div class="report-info d-flex" style="justify-content: space-between;">
+                      <div class="report-info-left">
+                        <p><strong>Date of Report:</strong> <span id="reportDate"></span></p>
+                        <p><strong>Total Number of Orders:</strong> <span id="totalOrders"></span></p>
+                      </div>
+                      <div class="report-info-right">
+                        <p><strong>Total Revenue:</strong> Rs <span id="totalRevenue"></span></p>
+                        <p><strong>Total Discount:</strong> Rs <span id="totalDiscount"></span></p>
+                      </div>
+                    </div>
+                    <thead>
+                      <tr>
+                        <th >OrderId</th>
+                        <th >Date</th>
+                        <th >Payment Method</th>
+                        <th >Amount</th>
+                        <th >Discount</th>
+                        
+                      </tr>
+                    </thead>
+                    <tbody id="srch-table">
+
+<!-- the dynamic contents will update here-->
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--product list-->
+
+  <script>
+   
+
+
+
+//  search specific order
+ let currentDateTime;
+ let number=0;
+ let revenue=0;
+ let discount=0;
+  const form=document.getElementById("srch-form")
+  const ipfield=document.getElementById("searchInput")
+  const table=document.getElementById("srch-table")
+ 
+  ipfield.addEventListener('keypress',(event)=>{
+    
+    if(event.key==='Enter'){
+      event.preventDefault();
+      const srch=ipfield.value;
+     
+    axios.get(`http://localhost:3000/admin/orderSearch?q=${srch}`).then((response)=>{
+
+        let price=0;
+      const orderdata = response.data;
+      
+      
+// Clear existing rows
+table.innerHTML = '';
+
+
+if (orderdata.orders.length > 0) {
+    orderdata.orders.forEach((order) => {
+      if(order.paymentStatus=='Completed'){
+        const dateOnly = new Date(order.date).toLocaleDateString()
+        currentDateTime = new Date().toLocaleString();
+        number=number+1;
+        revenue=revenue+order.orderPrice;
+        discount=discount+order.discount;
+
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td> ${order.orderId}</td>
+      <td> ${dateOnly}</td>
+      <td> ${order.paymentMethod}</td>
+        <td> ${order.orderPrice}</td>
+        <td> ${order.discount}</td>
+      `;
+    table.appendChild(row);
+    }
+  });
+const datebox=document.getElementById("reportDate")
+if(datebox){
+  datebox.innerHTML=currentDateTime;
+}
+const countbox=document.getElementById("totalOrders")
+if(countbox){
+  countbox.innerHTML=number;
+}
+const revenuebox=document.getElementById("totalRevenue")
+if(revenuebox){
+  revenuebox.innerHTML=revenue;
+}
+const discountbox=document.getElementById("totalDiscount")
+if(discountbox){
+  discountbox.innerHTML=discount;
+}
+number=0;
+revenue=0;
+discount=0;
+
+} else {
+  const row = document.createElement('tr');
+  row.innerHTML = `<td colspan="5" class="text-center">Order not found</td>`;
+  table.appendChild(row);
+}
+}).catch((error)=>{console.log(error.message);})
+
+
+   
+  }
+  })
+
+
+// load order before searching
+
+document.addEventListener('DOMContentLoaded',async function(){
+try {
+
+axios.get(`http://localhost:3000/admin/reportSearch`).then((response)=>{
+
+    
+      const orderdata = response.data;
+// Clear existing rows
+table.innerHTML = '';
+let productTable;
+if (orderdata.orders.length > 0) {
+  orderdata.orders.forEach((order) => {
+      if(order.paymentStatus=='Completed'){
+        const dateOnly = new Date(order.date).toLocaleDateString()
+        currentDateTime = new Date().toLocaleString();
+        number=number+1;
+        revenue=revenue+order.orderPrice;
+        discount=discount+order.discount;
+
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td> ${order.orderId}</td>
+      <td> ${dateOnly}</td>
+      <td> ${order.paymentMethod}</td>
+        <td> ${order.orderPrice}</td>
+        <td> ${order.discount}</td>
+      `;
+    table.appendChild(row);
+    }
+  });
+const datebox=document.getElementById("reportDate")
+if(datebox){
+  datebox.innerHTML=currentDateTime;
+}
+const countbox=document.getElementById("totalOrders")
+if(countbox){
+  countbox.innerHTML=number;
+}
+const revenuebox=document.getElementById("totalRevenue")
+if(revenuebox){
+  revenuebox.innerHTML=revenue;
+}
+const discountbox=document.getElementById("totalDiscount")
+if(discountbox){
+  discountbox.innerHTML=discount;
+}
+number=0;
+revenue=0;
+discount=0; 
+    
+} else {
+  const row = document.createElement('tr');
+  row.innerHTML = `<td colspan="5" class="text-center">Order not found</td>`;
+  table.appendChild(row);
+}
+})
+
+      
+    } catch (error) {
+      console.log(error.message);
+    }
+
+
+  });
+
+  document.getElementById('filter').addEventListener('change', (event) => {
+           let filter= event.target.value;
+
+            axios.get(`http://localhost:3000/admin/reportSearch?filter=${filter}`).then((response)=>{
+
+    
+const orderdata = response.data;
+// Clear existing rows
+table.innerHTML = '';
+let productTable;
+if (orderdata.orders.length > 0) {
+  orderdata.orders.forEach((order) => {
+      if(order.paymentStatus=='Completed'){
+        const dateOnly = new Date(order.date).toLocaleDateString()
+        currentDateTime = new Date().toLocaleString();
+        number=number+1;
+        revenue=revenue+order.orderPrice;
+        discount=discount+order.discount;
+
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td> ${order.orderId}</td>
+      <td> ${dateOnly}</td>
+      <td> ${order.paymentMethod}</td>
+        <td> ${order.orderPrice}</td>
+        <td> ${order.discount}</td>
+      `;
+    table.appendChild(row);
+    }
+  });
+const datebox=document.getElementById("reportDate")
+if(datebox){
+  datebox.innerHTML=currentDateTime;
+}
+const countbox=document.getElementById("totalOrders")
+if(countbox){
+  countbox.innerHTML=number;
+}
+const revenuebox=document.getElementById("totalRevenue")
+if(revenuebox){
+  revenuebox.innerHTML=revenue;
+}
+const discountbox=document.getElementById("totalDiscount")
+if(discountbox){
+  discountbox.innerHTML=discount;
+}
+number=0;
+revenue=0;
+discount=0;
+} else {
+const row = document.createElement('tr');
+row.innerHTML = `<td colspan="5" class="text-center">Order not found</td>`;
+table.appendChild(row);
+}
+})
+        });
+
+// from to date filter
+  function filterByDateRange() {
+      const fromDate = document.getElementById('fromDate').value;
+      const toDate = document.getElementById('toDate').value;
+  
+      if (!fromDate || !toDate) {
+          alert('Please select both From and To dates.');
+          return;
+      }
+      const fromDateTime = new Date(fromDate).toISOString();
+      const toDateTime = new Date(toDate).toISOString();
+  
+      if (new Date(toDate) < new Date(fromDate)) {
+          alert('"To" date must be after "From" date.');
+          return;
+      }
+  if(fromDateTime && toDateTime ){
+
+    axios.get(`http://localhost:3000/admin/reportSearch?from=${fromDateTime}&to=${toDateTime}`).then((response)=>{
+
+    
+const orderdata = response.data;
+// Clear existing rows
+table.innerHTML = '';
+let productTable;
+if (orderdata.orders.length > 0) {
+
+  orderdata.orders.forEach((order) => {
+      if(order.paymentStatus=='Completed'){
+        const dateOnly = new Date(order.date).toLocaleDateString()
+        currentDateTime = new Date().toLocaleString();
+        number=number+1;
+        revenue=revenue+order.orderPrice;
+        discount=discount+order.discount;
+
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td> ${order.orderId}</td>
+      <td> ${dateOnly}</td>
+      <td> ${order.paymentMethod}</td>
+        <td> ${order.orderPrice}</td>
+        <td> ${order.discount}</td>
+      `;
+    table.appendChild(row);
+    }
+  });
+const datebox=document.getElementById("reportDate")
+if(datebox){
+  datebox.innerHTML=currentDateTime;
+}
+const countbox=document.getElementById("totalOrders")
+if(countbox){
+  countbox.innerHTML=number;
+}
+const revenuebox=document.getElementById("totalRevenue")
+if(revenuebox){
+  revenuebox.innerHTML=revenue;
+}
+const discountbox=document.getElementById("totalDiscount")
+if(discountbox){
+  discountbox.innerHTML=discount;
+}
+number=0;
+revenue=0;
+discount=0;
+} else {
+const row = document.createElement('tr');
+row.innerHTML = `<td colspan="5" class="text-center">Order not found</td>`;
+table.appendChild(row);
+}
+})
+
+
+  }
+  }
+
+
+
+
+
+
+  </script>
+
+<!--product list-->
+<!-- For PDF generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
+
+<script>
+// to download pdf
+document.getElementById("pdfbutton").addEventListener("click", function () {
+  let doc = new window.jspdf.jsPDF();
+  let pageWidth = doc.internal.pageSize.getWidth();
+  let pageCenter = pageWidth / 2;
+  let margin = 10;
+  
+  doc.setFontSize(25);
+  doc.text("Fresh Bay", pageCenter, 10, { align: 'center' });
+  doc.setFontSize(15);
+  doc.text("Sales Report", pageCenter, 20, { align: 'center' });
+
+  let reportDate = document.getElementById("reportDate").textContent;
+  let totalOrders = document.getElementById("totalOrders").textContent;
+  let totalRevenue = document.getElementById("totalRevenue").textContent;
+  let totalDiscount = document.getElementById("totalDiscount").textContent;
+
+  doc.setFontSize(12);
+  doc.text(`Date of Report: ${reportDate}`, margin, 30);
+  doc.text(`Total Number of Orders: ${totalOrders}`, margin, 40);
+  doc.text(`Total Revenue: Rs${totalRevenue}`, pageWidth - margin, 30, { align: 'right' });
+  doc.text(`Total Discount: Rs${totalDiscount}`, pageWidth - margin, 40, { align: 'right' });
+
+  let table = document.querySelector(".table");
+  doc.autoTable({ html: table, startY: 50 });
+
+  doc.save("sales_report.pdf");
+});
+
+
+// to download excel
+document.getElementById("excelbutton").addEventListener("click", function () {
+  let workbook = XLSX.utils.book_new();
+  let worksheet = XLSX.utils.aoa_to_sheet([[]]);
+  let reportDate = document.getElementById("reportDate").textContent;
+  let totalOrders = document.getElementById("totalOrders").textContent;
+  let totalRevenue = document.getElementById("totalRevenue").textContent;
+  let totalDiscount = document.getElementById("totalDiscount").textContent;
+
+  XLSX.utils.sheet_add_aoa(worksheet, [
+    ["Date of Report:", reportDate],
+    ["Total Number of Orders:", totalOrders],
+    ["Total Revenue:", `$${totalRevenue}`],
+    ["Total Discount:", `$${totalDiscount}`],
+    []
+  ], { origin: "A1" });
+
+  let table = document.querySelector(".table");
+  let tableData = XLSX.utils.table_to_sheet(table, { origin: -1 });
+
+  XLSX.utils.sheet_add_json(worksheet, XLSX.utils.sheet_to_json(tableData), { origin: -1 });
+
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Sales Report");
+
+  let range = XLSX.utils.decode_range(worksheet['!ref']);
+  for (let C = range.s.c; C <= range.e.c; ++C) {
+    let max_width = 0;
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+      let cell_address = { c: C, r: R };
+      let cell_ref = XLSX.utils.encode_cell(cell_address);
+      if (!worksheet[cell_ref]) continue;
+      let cell_width = XLSX.SSF.format(cell_address, worksheet[cell_ref].v).length;
+      max_width = Math.max(max_width, cell_width);
+    }
+    worksheet['!cols'] = worksheet['!cols'] || [];
+    worksheet['!cols'][C] = { wch: max_width + 1 };
+  }
+
+  XLSX.writeFile(workbook, "sales_report.xlsx", { bookSST: true, type: 'binary' });
+});
+
+
+
+  </script>
+
+<%-include('../layouts/adminFooter')-%>
+
+
+
+<%-include('../layouts/adminFooter')-%>

@@ -1,0 +1,333 @@
+
+
+<%-include('../layouts/adminHead')-%>
+
+<div class="container-fluid page-body-wrapper">
+  <!-- partial:partials/_sidebar.html -->
+  <nav class="sidebar sidebar-offcanvas" id="sidebar">
+    <ul class="nav">
+      <li class="nav-item nav-profile">
+        <a href="#" class="nav-link">
+            <span class="font-weight-bold mb-2">Admin</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/adminHome" >
+          <span class="menu-title">Dashboard</span>
+          <i class="fas fa-tachometer-alt menu-icon"></i>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/product" >
+          <span class="menu-title">Products</span>
+          <i class="fas fa-shopping-basket menu-icon"></i>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="/product/category">
+          <span class="menu-title">Category</span>
+          <i class="fas fa-folder menu-icon"></i>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/product/subCategory">
+          <span class="menu-title">Sub Category</span>
+          <i class="fas fa-folder menu-icon"></i>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/users">
+          <span class="menu-title">Users</span>
+          <i class="fas fa-users menu-icon"></i>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/orders">
+          <span class="menu-title">Orders</span>
+          <i class="fas fa-shopping-cart menu-icon"></i>
+        </a>
+      </li>
+      
+    
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/coupons">
+          <span class="menu-title">Coupons</span>
+          <i class="fas fa-image menu-icon"></i>
+        </a>
+      </li>
+      
+     
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/report">
+          <span class="menu-title">Reports</span>
+          <i class="fas fa-chart-line menu-icon"></i>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/logout">
+          <span class="menu-title">Logout</span>
+          <i class="fas fa-sign-out-alt menu-icon"></i>
+        </a>
+      </li>
+      
+      <div class="container-scroller">
+<div class="row p-0 m-0 proBanner" id="proBanner">
+  <div class="col-md-12 p-0 m-0">
+   
+  </div>
+</div>
+<!-- partial:partials/_navbar.html -->
+<nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+  <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+    <a class="navbar-brand brand-logo" href="/admin/adminHome"><h1 style="color: green;">Fresh Bay</h1></a>
+    <a class="navbar-brand brand-logo-mini" href="/admin/adminHome"><h1 style="color: green;">FB</h1></a>
+  </div>
+  <div class="navbar-menu-wrapper d-flex align-items-stretch">
+    <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+      <span class="mdi mdi-menu"></span>
+    </button>
+
+
+
+    <div class="search-field d-none d-md-block">
+      <form class="d-flex align-items-center h-100" id="srch-form" action="">
+        <div class="input-group">
+          <div class="input-group-prepend bg-transparent">
+            <i class="input-group-text border-0 mdi mdi-magnify"></i>
+          </div>
+          <input type="text" class="form-control bg-transparent border-0" placeholder="Search projects" id="searchInput">
+        </div>
+      </form>
+    </div>
+    
+
+
+  </div>
+</nav>
+      
+    </ul>
+  </nav>
+
+ 
+
+<!--Side bar end-->
+
+    <!-- Product   -->
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="row">
+          <div class="col-12 grid-margin">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Deleted Products</h4>
+                <a href="/product"> <label class="badge badge-gradient-success">Listed Products</label></a>
+                <div class="table-responsive">
+                  <table class="table" id="tbl">
+                    <thead>
+                      <tr>
+                        <th> Name </th>
+                        <th> Image</th>
+                        <th> Category </th>
+                        <th> Unit Price</th>
+                        <th> Quantity</th>
+                        <th> Action</th>
+                        <th> Edit</th>
+                      </tr>
+                    </thead>
+                    <tbody id="srch-table">
+
+<!-- the dynamic contents will update here-->
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        
+      </div>
+    </div>
+
+
+  </div>
+</div>
+
+<!--product list-->
+
+  
+
+  <script>
+   
+
+//to load users before searching
+const table=document.getElementById("srch-table")
+document.addEventListener('DOMContentLoaded',async function(){
+try {
+axios.get(`http://localhost:3000/product/productSearch`).then((response)=>{
+
+      const productdata = response.data;
+console.log(productdata.products);
+// Clear existing rows
+table.innerHTML = '';
+
+if (productdata.products.length > 0) {
+  productdata.products.forEach(product => {
+    const row = document.createElement('tr');
+    if(product.Is_delete){
+    row.innerHTML = `
+      <td> ${product.Name}</td>
+      <td> <img
+        src="/productimages/${product.Image[0]}" /></td>
+      <td> ${product.Category}</td>
+      <td> ${product.Price}</td>
+      <td> ${product.Quantity}</td>    
+      <td>
+        ${product.Is_delete ?
+        
+        `<a ><label id="fcall1" productid="${product._id}" class="badge badge-gradient-success">Retrive</label></a>` :
+        `<a ><label id="fcall2" productid="${product._id}" class="badge badge-gradient-danger">Delete</label></a>`
+      }
+      </td>
+      <td>
+       
+        <a href="/product/editProduct?pid=${product._id}"><label class="badge badge-gradient-success">Edit</label></a> 
+          
+        
+      </td>
+      `;
+    table.appendChild(row);
+    }
+    
+  });
+} else {
+  const row = document.createElement('tr');
+  row.innerHTML = `<td colspan="5" class="text-center">Product not found</td>`;
+  table.appendChild(row);
+}
+})
+
+      
+    } catch (error) {
+      console.log(error.message);
+    }
+
+
+  })
+
+
+
+  //to load products with search
+
+  const form=document.getElementById("srch-form")
+  const ipfield=document.getElementById("searchInput")
+
+  ipfield.addEventListener('keypress',(event)=>{
+    
+    if(event.key==='Enter'){
+      event.preventDefault();
+      const srch=ipfield.value;
+     
+    axios.get(`http://localhost:3000/product/productSearch?q=${srch}`).then((response)=>{
+
+
+      
+      const productdata = response.data;
+
+// Clear existing rows
+table.innerHTML = '';
+
+if (productdata.products.length > 0) {
+  productdata.products.forEach(product => {
+    const row = document.createElement('tr');
+    if(product.Is_delete){
+    row.innerHTML = `
+      <td> ${product.Name}</td>
+      <td> <img 
+        src="/productimages/${product.Image[0]}" /></td>
+      <td> ${product.Category}</td>
+      <td> ${product.Price}</td>
+      <td> ${product.Quantity}</td>    
+      <td>
+        ${product.Is_delete ?
+        
+        `<a ><label id="fcall1" productid="${product._id}" class="badge badge-gradient-success">Retrive</label></a>` :
+        `<a ><label id="fcall2" productid="${product._id}" class="badge badge-gradient-danger">Delete</label></a>`
+      } 
+      </td>
+      <td>
+        <a href="/product/editProduct?pid=${product._id}"><label class="badge badge-gradient-success">Edit</label></a> 
+   </td>`;
+    table.appendChild(row);
+    }
+  });
+} else {
+  const row = document.createElement('tr');
+  row.innerHTML = `<td colspan="5" class="text-center">Users not found</td>`;
+  table.appendChild(row);
+}
+}).catch((error)=>{console.log(error.message);})
+   
+  }
+  })
+
+
+
+// to set function call for getting id of product
+  document.addEventListener("click",(event)=>{
+
+if(event.target && (event.target.id==="fcall1" || event.target.id==="fcall2")){
+
+  const pid=event.target.getAttribute("productid")
+
+  deleteProduct(pid)
+  
+}
+
+
+})
+
+
+
+
+
+
+//to delete and retrive product
+
+async function deleteProduct(productid){
+const response= await axios.post('http://localhost:3000/product/delete-product',{productid})
+if(response.data.success){
+
+  await Swal.fire({
+    icon:'success',
+    title:'success',
+    showConfirmButton:false,
+    timer:1300,
+    text:response.data.message
+  })
+window.location.href="/product/deletedProducts"
+}else{
+  await Swal.fire({
+    icon:'success',
+    title:'success',
+    text:response.data.message})
+window.location.href="/product/deletedProducts"
+}
+
+}
+
+
+
+
+</script>
+ 
+
+
+  <%-include('../layouts/adminFooter')-%>

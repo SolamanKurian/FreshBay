@@ -1,0 +1,104 @@
+
+
+<%-include('../layouts/adminHead')-%>
+
+<%-include('../layouts/adminSidebar')-%>
+
+
+    <!-- Product   -->
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="row">
+          <div class="col-12 grid-margin">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Product Offers</h4>
+                <div class="table-responsive">
+                 <a href="/admin/addProductOffer"> <label class="badge badge-gradient-success">Add+</label></a>
+                
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th> Product </th>
+                        <th> Offer Percentage</th>
+                        <th> Till Date</th>
+                        <th> Action</th>
+                      </tr>
+                    </thead>
+                    <% if(poffers.length > 0 ) { %>
+                        
+                      <% for(let i=0; i<poffers.length; i++) { %>
+                      
+                    <tr>
+                                         
+                      <td> <%=poffers[i].productId.Name %> </td>  
+                      <td> <%=poffers[i].percentage %> </td>   
+                      <td> <%=poffers[i].date.toLocaleDateString()%> </td>                                                                           
+                      <td> 
+
+                          <a  onclick="deletePoffer('<%= poffers[i]._id %>')"><label class="badge badge-gradient-danger">Remove</label></a>
+    
+                       
+
+                        <a href="/admin/editPoffer?pofferid=<%= poffers[i]._id %>"><label class="badge badge-gradient-success">Edit</label></a> 
+                      </td>                       
+                    </tr>
+                    <% } %>
+                    <% } %>
+                    
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--product list-->
+
+<script>
+   
+   async function deletePoffer(pofferid) {
+    const confirmation = await Swal.fire({
+        icon: 'warning',
+        title: 'Confirmation',
+        text: 'Are you sure you want to delete this Poffer?',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (confirmation.isConfirmed) {
+        // User confirmed deletion
+        const response = await axios.post('http://localhost:3000/admin/deletePoffer', { pofferid });
+        if (response.data.success) {
+            await Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                showConfirmButton: false,
+                timer: 1300,
+                text: response.data.message
+            });
+            window.location.href = "/admin/productOffers";
+        } else {
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: response.data.message
+            });
+            window.location.href = "/admin/productOffers";
+        }
+    }
+}
+
+  
+    </script>
+   
+
+  <%-include('../layouts/adminFooter')-%>

@@ -1,0 +1,110 @@
+
+
+<%-include('../layouts/adminHead')-%>
+
+<%-include('../layouts/adminSidebar')-%>
+
+
+    <!-- Product   -->
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="row">
+          <div class="col-12 grid-margin">
+            <div class="card">
+              <div class="card-body">
+                <h4 class="card-title">Sub Category</h4>
+                <div class="table-responsive">
+                 <a href="/product/addSubCategory"> <label class="badge badge-gradient-success">Add+</label></a>
+                 <a href="/product/subCategory"> <label class="badge badge-gradient-danger">Listed Sub Category</label></a>
+                  <table class="table">
+                    <thead>
+                     
+                      <tr>
+                        <th> No </th>
+                        <th> Sub Category Name</th>
+                        <th> Category Name</th>
+                        <th> Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% if(categories.length > 0 ) { %>
+                        <%let num=0 %>
+                        <% for(let i=0; i<categories.length; i++) { %>
+                          <% for(let j=0; j<categories[i].SubCategory.length; j++) { %>  
+                            <% if(categories[i].SubCategory[j].Is_dlt==true) { %>
+                            <% num++ %>
+                          
+                      <tr>
+                        <td>
+                         
+                         <%=num%>
+                        </td>                   
+                        <td> 
+                          
+                          <%=categories[i].SubCategory[j].subc %> 
+                          
+                        </td>     
+                        <td> 
+                          <%=categories[i].Name %> 
+                        </td>                                                                      
+                        <td> 
+                          <% if(categories[i].SubCategory[j].Is_dlt) { %>
+                          
+                          
+                            <a  onclick="deleteSubCategory('<%= categories[i].SubCategory[j].subc %>')"><label class="badge badge-gradient-success">List</label></a>
+                          
+                         
+                          <% } else { %>
+                          
+                            <a  onclick="deleteSubCategory('<%= categories[i].SubCategory[j].subc %>')"><label class="badge badge-gradient-success">Unlist</label></a>
+                          
+                          <% } %>
+                        </td>                       
+                      </tr>
+                      <%}%>
+                      <%}%>
+                      <%}%>
+                      <%}%>
+                      
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--product list-->
+<script>
+   
+  async function deleteSubCategory(subc){
+  const response= await axios.post('http://localhost:3000/product/unlist-subcategory',{subc})
+  if(response.data.success){
+  
+    await Swal.fire({
+      icon:'success',
+      title:'success',
+      showConfirmButton:false,
+      timer:1300,
+      text:response.data.message
+    })
+  window.location.href="/product/subCategory"
+  }else{
+    await Swal.fire({
+      icon:'success',
+      title:'success',
+      text:response.data.message})
+  window.location.href="/product/subCategory"
+  }
+  
+  }
+  
+    </script>
+
+  <%-include('../layouts/adminFooter')-%>

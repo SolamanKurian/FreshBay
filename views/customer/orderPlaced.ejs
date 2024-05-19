@@ -1,0 +1,143 @@
+
+
+
+
+<%-include('../layouts/header')-%>
+<%-include('../layouts/logednavbar')-%><br>
+
+
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Cart</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a href="/customerHome">Home</a></li>
+        <li class="breadcrumb-item active text-white">Cart</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+<%let subtotal=0%>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card p-4">
+                <h2 class="text-center mb-4">Order Confirmed</h2>
+                <div class="mb-3">
+                    <h5>Delivery Address:</h5>
+                    
+                    <%=neworder.name%><br>
+                    <%=neworder.house%><br>
+                    <%=neworder.street%><br>
+                    <%=neworder.mobile%><br>
+                    <%=neworder.pincode%>
+                </div>
+               
+                <div class="text-center mb-4">
+                    <p>Congratulations! Your order has been confirmed.</p>
+                </div>
+
+
+               
+                
+              
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Products</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Total</th>
+                        </tr>
+                    </thead>
+                    
+                    <tbody id="cart-body">
+                       <%for(let i=0;i<order.items.length;i++){%>
+                        <tr>
+                            <td><%=order.items[i].productName%></td>
+                            <td><%=order.items[i].price%></td>
+                            <td><%=order.items[i].quantity%></td>
+                            <td><%=order.items[i].quantity*order.items[i].price%></td>
+                            <% subtotal=subtotal+(order.items[i].quantity*order.items[i].price)%>
+                        </tr>
+                        <%}%>
+
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <th scope="row">
+                            </th>
+                            <td class="py-1"></td>
+                            <td class="py-1"></td>
+                            <td class="py-1">
+                                <p class="mb-0 text-dark py-3">Subtotal</p>
+                            </td>
+                            <td class="py-1">
+                                <div class="py-3">
+                                    <p class="mb-0 text-dark" id="total"><%=subtotal%></p>
+                                </div>
+                            </td>
+                        </tr>
+                    <tr>
+                        <th scope="row">
+                        </th>
+                        <td class="py-1"></td>
+                        <td class="py-1"></td>
+                        <td class="py-1">
+                            <p class="mb-0 text-dark py-3">Discount</p>
+                        </td>
+                        <td class="py-1">
+                            <div class="py-3">
+                                <p class="mb-0 text-dark" id="total"><%=order.discount%></p>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                        </th>
+                        <td class="py-1"></td>
+                        <td class="py-1"></td>
+                        <td class="py-1">
+                            <p class="mb-0 text-dark py-3">Shipping</p>
+                        </td>
+                        <td class="py-1">
+                            <div class="py-3">
+                                <%if(subtotal>=500){%>
+                                <p class="mb-0 text-dark" id="total">0</p>
+                                <%}else{%>
+                                    <p class="mb-0 text-dark" id="total">50</p> 
+                                    <%}%>
+                            </div>
+                        </td>
+                    </tr>
+                  
+                    
+                    
+                    <tr>
+                        <th scope="row">
+                        </th>
+                        <td class="py-5">
+                            <p class="mb-0 text-dark text-uppercase py-3">TOTAL</p>
+                        </td>
+                        <td class="py-5"></td>
+                        <td class="py-5"></td>
+                        <td class="py-5">
+                            <div class="py-3 border-bottom border-top">
+                                <p class="mb-0 text-dark" id="gtotal"><%=order.orderPrice%></p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+                    </table>
+
+
+
+                <div class="text-center">
+                    <a href="/customerHome" class="btn btn-primary">Continue Shopping</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%-include('../layouts/footer')-%>
+
+

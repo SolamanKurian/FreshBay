@@ -1,0 +1,178 @@
+<%-include('../layouts/header')-%>
+      
+<%-include('../layouts/logednavbar')-%>
+
+       
+       <!-- breadcrumb -->
+       <div class="container-fluid page-header py-5">
+        <h1 class="text-center text-white display-6"><%=product.Name%></h1>
+        <ol class="breadcrumb justify-content-center mb-0">
+            <li class="breadcrumb-item"><a href="#"><%=product.Category.Name%></a></li>
+            <li class="breadcrumb-item"><a href="#"><%=product.Name%></a></li>
+        </ol>
+    </div>
+    <!-- breadcrumb end-->
+
+
+    <!-- Single Product Start -->
+    <div class="container-fluid py-5 mt-5">
+        
+        <div class="container py-5">
+            <div class="row g-4 mb-5">
+                <div class="col-lg-8 col-xl-9">
+                    <div class="row g-4">
+                        
+        <div class="col-lg-6">
+     <!-- Main product image -->
+    <div class="border rounded">
+        <a href="#">
+            <img id="mainImage" src="/productimages/<%=product.Image[0]%>" class="img-fluid rounded" alt="Image">
+        </a>
+    </div>
+    <br>
+    
+    <div class="row mb-3">
+        <div class="col-4">
+            <a  onclick="changeImage('/productimages/<%=product.Image[0]%>')">
+                <img src="/productimages/<%=product.Image[0]%>" class="img-fluid rounded" alt="Thumbnail Image 1">
+            </a>
+        </div>
+        <div class="col-4">
+            <a  onclick="changeImage('/productimages/<%=product.Image[1]%>')">
+                <img src="/productimages/<%=product.Image[1]%>" class="img-fluid rounded" alt="Thumbnail Image 2">
+            </a>
+        </div>
+        <div class="col-4">
+            <a  onclick="changeImage('/productimages/<%=product.Image[2]%>')">
+                <img src="/productimages/<%=product.Image[2]%>" class="img-fluid rounded" alt="Thumbnail Image 3">
+            </a>
+        </div>
+    </div>  
+</div>
+                        <div class="col-lg-6">
+                            <h4 class="fw-bold mb-3"><%=product.Name%></h4>
+                            <p class="mb-3">Category: <%=product.Category.Name%></p>
+                            <span style="text-decoration: line-through; color: grey;">Rs: <%=product.Price+5%></span>
+                            <h5>Rs: <%=product.Price%> </h5>
+                            <%if(product.Quantity>0){%>
+                            <p class="mb-3">Remaining: <%=product.Quantity%>Kg</p>
+                            <%}else{%>
+                                <p class="mb-3"style="color:red">Out of Stock</p>
+                                <%}%>
+                            <div class="d-flex mb-4">
+                                <i class="fa fa-star text-secondary"></i>
+                                <i class="fa fa-star text-secondary"></i>
+                                <i class="fa fa-star text-secondary"></i>
+                                <i class="fa fa-star text-secondary"></i>
+                                <i class="fa fa-star"></i>
+                            </div>
+                            <p class="mb-4"><%=product.Pdesc%></p>
+                            <%if(product.Quantity>0){%>
+                            <a onclick="addToCart('<%=product._id %>')" class="btn border border-secondary rounded-pill px-3 text-primary"><i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart</a>
+                           <%}else{%>
+                            <div class="text-danger"> Out of Stock</div>
+                            <%}%>
+                            <br><br>
+                            <a href="#" class="btn border border-secondary rounded-pill px-4 py-2 mb-4 text-secondary">
+                                <i class="fa fa-heart me-2 text-secondary"></i> Add to wishlist
+                            </a>
+                        </div>                      
+                    </div>                   
+                </div>            
+            </div>         
+        </div>
+    </div>
+    <!-- Single Product End -->
+
+
+
+
+
+
+    <!-- Related Product-->
+    <div class="container-fluid vesitable py-5">
+        <div class="container py-5">
+            <h1 class="mb-0">Related Products</h1>
+            <div class="owl-carousel vegetable-carousel justify-content-center">
+                <% for(pro of products){ %>
+                    <%if(product.Category.Name===pro.Category.Name){%>
+                <div class="border border-primary rounded position-relative vesitable-item"><a href="/productpage?pid=<%=pro._id%>" > 
+                    <div class="vesitable-img">
+                        <img src="/productimages/<%=pro.Image[1]%>" class="img-fluid w-100 rounded-top" alt="">
+                    </div>
+                    <div class="text-white bg-primary px-3 py-1 rounded position-absolute" style="top: 10px; right: 10px;"><%=pro.Category.Name%></div>
+                    <div class="p-4 rounded-bottom">
+                        <h4><%=pro.Name%></h4>
+
+                          
+                          <p class="truncate"><%=pro.Pdesc%></p>
+
+                        
+                          <style>
+                            .truncate {
+                              overflow: hidden;
+                              white-space: nowrap;
+                              text-overflow: ellipsis;
+                              display: -webkit-box;
+                              -webkit-line-clamp: 2; /* Number of lines to show */
+                              -webkit-box-orient: vertical;
+                            }
+                          </style>
+                       
+                        <div class="d-flex justify-content-between flex-lg-wrap">
+                            <p class="text-dark fs-5 fw-bold mb-0">Rs:<%=pro.Price%></p>
+                            <%if(pro.Quantity>0){%>
+                                <a onclick="addToCart('<%=product._id %>')" class="btn border border-secondary rounded-pill px-3 text-primary"><i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart</a>
+                               <%}else{%>
+                                <div class="text-danger"> Out of Stock</div>
+                                <%}%>
+                        </div>
+                    </div></a>
+                </div>
+                <%}%>
+                <%}%>
+               
+            </div>
+        </div>
+    </div>
+   
+
+        <%-include('../layouts/footer')-%>
+
+        <script>
+            function changeImage(imageUrl) {
+                var mainImage = document.getElementById('mainImage');
+                mainImage.src = imageUrl;
+      
+            }
+        </script>
+
+<script>
+    async function  addToCart(proId){
+      const response = await axios.get(`http://localhost:3000/addToCart?proId=${proId}`)
+      .then((response)=>{
+          if(response.data.success){
+               Swal.fire({
+  icon: 'success',
+  title: 'Success',
+  showConfirmButton: false,
+  timer: 1300,
+  text: response.data.message
+});
+          }else{
+              Swal.fire({
+  icon: 'info',
+  title: 'Already in Cart',
+  showConfirmButton: false,
+  timer: 1300,
+  text: response.data.message
+})
+              
+          }
+
+
+
+
+      })
+    }
+  </script>
