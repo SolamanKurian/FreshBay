@@ -14,7 +14,8 @@ product_route.use(session({
 const productstore=multer.diskStorage({destination:(req,file,cb)=>{
     cb(null,path.join(__dirname, '../public/productimages'))
 }, filename:(req,file,cb)=>{
-const name=file.originalname;
+    const unique=Date.now()+"-"+Math.round(Math.random()*1e9);
+const name=file.originalname+"-"+unique;
 cb(null,name)
 }});
 const upload=multer({storage:productstore})

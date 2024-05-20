@@ -37,6 +37,8 @@ const verifyAdmin=async(req,res)=>{
                 req.session.admin_id=adminData._id;
                 res.redirect('/admin/adminHome')
                 
+            }else{
+                res.render('login',{message:"Password incorrect"})
             }
         }    else{
             
@@ -967,7 +969,6 @@ const growthSearch=async(req,res,next)=>{
     try {
         if(req.query.filter=="monthly"){
             const currentDate = new Date();
-currentDate.setHours(0, 0, 0, 0);
 const lastYearStart = new Date(currentDate);
 lastYearStart.setMonth(lastYearStart.getMonth() - 11);
 
@@ -1026,7 +1027,7 @@ res.json({ growth: lastTwelveMonthsRevenue });
 
         }else if (req.query.filter === "yearly") {
             const currentDate = new Date();
-            currentDate.setHours(0, 0, 0, 0);
+          
             const lastFiveYearsStart = new Date(currentDate);
             lastFiveYearsStart.setFullYear(lastFiveYearsStart.getFullYear() - 4);
         
@@ -1077,7 +1078,6 @@ res.json({ growth: lastTwelveMonthsRevenue });
         }else{
    
         const currentDate = new Date();
-        currentDate.setHours(0, 0, 0, 0);
         const lastWeekStart = new Date(currentDate);
         lastWeekStart.setDate(lastWeekStart.getDate() - 6);
 

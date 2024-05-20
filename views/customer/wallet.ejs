@@ -99,12 +99,12 @@ let amount;
             let raz1= new Razorpay(options);
             raz1.on('payment.failed',function(response){
                 Swal.fire({
-                        icon: 'warning',
-                        title: 'Order pending',
-                        text: 'Payment pending',
+                        icon: 'Warning',
+                        title: 'Error',
+                        text: 'Money not added to wallet',
                         confirmButtonText: 'OK'
                     }).then(() => {
-                        window.location.href = `/order/myOrders`;
+                        window.location.href = `/wallet/walletPage`;
                     });
 
 

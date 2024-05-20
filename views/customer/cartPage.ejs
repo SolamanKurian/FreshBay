@@ -125,6 +125,7 @@
     let minlimit=0;
     let maxlimit=0;
     let checkdiscount=0;
+    let couponCode="";
   
     //to load cart at first
 const table=document.getElementById("cart-body")
@@ -560,7 +561,7 @@ function checkQuantity(){
 axios.get(`http://localhost:3000/checkQuantity`).then((response) => {
 
  if(response.data.success){
-    window.location.href = `/checkout?coupon=${coupon}`;
+    window.location.href = `/checkout?coupon=${couponCode}`;
  }else{
      Swal.fire({
       icon: 'warning',
@@ -601,7 +602,7 @@ axios.get(`http://localhost:3000/checkQuantity`).then((response) => {
 });
 
 function applyCoupon() {
-    let couponCode = document.getElementById('couponCodeInput').value.trim();
+     couponCode = document.getElementById('couponCodeInput').value.trim();
     if (couponCode) {
         axios.post('/checkCoupon', { couponCode: couponCode })
             .then(function (response) {

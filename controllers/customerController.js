@@ -546,6 +546,41 @@ const loadPublicHome=async(req,res,next)=>{
     }
     
     }
+        //load publicVeg
+const  loadPublicVeg=async(req,res,next)=>{
+
+    try {
+        const products = await Product.find({Is_delete:false}).populate({
+            path: 'Category',
+            match: { Is_delete: false }}).exec()
+            const filteredProducts = products.filter(product => product.Category && product.Category.Is_delete===false);
+        
+        res.render('publicVeg',{products:filteredProducts})
+        
+    } catch (error) {
+        next(error);
+    }
+    
+    }
+        //load publicFruit
+        const  loadPublicFruit=async(req,res,next)=>{
+
+            try {
+                const products = await Product.find({Is_delete:false}).populate({
+                    path: 'Category',
+                    match: { Is_delete: false }}).exec()
+                    const filteredProducts = products.filter(product => product.Category && product.Category.Is_delete===false);
+                
+                res.render('publicFruit',{products:filteredProducts})
+                
+            } catch (error) {
+                next(error);
+            }
+            
+            }
+        
+
+    
     // to reset the password
 
     const loadresetPassword= async(req,res,next)=>{
@@ -1006,7 +1041,10 @@ if(customerData){
 const loadCheckout=async(req,res,next)=>{
     try {
         if(req.query.coupon){
-        req.session.discount=req.query.coupon;
+            let coupon=await Coupon.findOne({couponcode:req.query.coupon});
+                let value=coupon.percentage;
+
+        req.session.discount=value;
         }
         let coupon=req.session.discount?req.session.discount:0;
         const wallet= await Wallet.findOne({customerId:req.session.customer_id})
@@ -1156,6 +1194,8 @@ module.exports={
     insertWish,
     listCoupons,
     checkCoupon,
-    loadProductToHome
+    loadProductToHome,
+    loadPublicVeg,
+    loadPublicFruit
    
 }
