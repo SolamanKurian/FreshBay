@@ -404,7 +404,7 @@ const    loadcustomerShopPage=async(req,res,next)=>{
         
                 const filteredData =req.query.filter? productData.filter(product => filter.includes(product.Category._id.toString())):productData
                 const sortedData = filteredData.sort((a, b) => b.Name.localeCompare(a.Name)); 
-                const finalData = sortedData.slice((page - 1) * 6, page * 6);
+                const finalData = sortedData.slice((page - 1) * 8, page * 8);
 
                 res.json({ products: finalData,wish:wish });
             }else if (sort == 'atoz') {
@@ -413,7 +413,7 @@ const    loadcustomerShopPage=async(req,res,next)=>{
         
                 const filteredData =req.query.filter? productData.filter(product => filter.includes(product.Category._id.toString())):productData
                 const sortedData = filteredData.sort((a, b) => a.Name.localeCompare(b.Name)); 
-                const finalData = sortedData.slice((page - 1) * 6, page * 6);
+                const finalData = sortedData.slice((page - 1) * 8, page * 8);
 
                 res.json({ products: finalData,wish:wish  });
             }
@@ -423,7 +423,7 @@ const    loadcustomerShopPage=async(req,res,next)=>{
             
                 const filteredData = req.query.filter ? productData.filter(product => filter.includes(product.Category._id.toString())) : productData;
                 const sortedData = filteredData.sort((a, b) => a.Price - b.Price); 
-                const finalData = sortedData.slice((page - 1) * 6, page * 6);
+                const finalData = sortedData.slice((page - 1) * 8, page * 8);
             
                 res.json({ products: finalData,wish:wish  });
             } else if (sort == 'htol') {
@@ -432,7 +432,7 @@ const    loadcustomerShopPage=async(req,res,next)=>{
             
                 const filteredData = req.query.filter ? productData.filter(product => filter.includes(product.Category._id.toString())) : productData;
                 const sortedData = filteredData.sort((a, b) => b.Price - a.Price); 
-                const finalData = sortedData.slice((page - 1) * 6, page * 6);
+                const finalData = sortedData.slice((page - 1) * 8, page * 8);
             
                 res.json({ products: finalData,wish:wish  });
             }else {
@@ -443,14 +443,14 @@ const    loadcustomerShopPage=async(req,res,next)=>{
                     .populate('Category');
                 const filteredData =  productData.filter(product => filter.includes(product.Category._id.toString()));
 
-                const finalData = filteredData.slice((page - 1) * 6, page * 6);
+                const finalData = filteredData.slice((page - 1) * 8, page * 8);
                 
                 res.json({ products:finalData,wish:wish });
             }else{
                 
                 const productData = await Product.find()
                     .populate('Category');
-                const finalData = productData.slice((page - 1) * 6, page * 6);
+                const finalData = productData.slice((page - 1) * 8, page * 8);
                 
                 res.json({ products:finalData,wish:wish });
             }
@@ -464,8 +464,8 @@ const    loadcustomerShopPage=async(req,res,next)=>{
             
             const productData = await Product.find({})
                 .populate('Category')
-                .skip((page - 1) * 6) 
-                .limit(6); 
+                .skip((page - 1) * 8) 
+                .limit(8); 
 
             res.json({ products: productData,wish:wish });
         }
@@ -489,7 +489,7 @@ const loadProductToHome = async (req, res, next) => {
         const wish=await Wish.findOne({customerId:customer}).populate('items.productId')
                 const productData = await Product.find()
                     .populate('Category');
-                const finalData = productData.slice((page - 1) * 6, page * 6);
+                const finalData = productData.slice((page - 1) * 8, page * 8);
                 
                 res.json({ products:finalData,wish:wish });
 

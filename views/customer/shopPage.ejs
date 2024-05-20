@@ -47,7 +47,7 @@
                                 </div>
                             </div>
                         </div>    
-                        <div class="cont d-flex ">
+                        <div class="cont d-flex col-12">
                           <div id="sort-selection" class="border-0 bg-light ">
                             <h4>Filter</h4>
                             <%for(let i=0;i<category.length;i++){%>
@@ -59,11 +59,27 @@
                             </div>
                             <%}%>
                         </div>
-
                         
-                            <div class="col-lg-12"id="product-card"style="display: flex;flex-wrap: wrap;justify-content:center">                              
-                                        <!--inserting product-->
-                            </div>
+
+                        <div class="container py-5">
+                          <div class="tab-class text-center">
+                            
+                              <div class="tab-content">
+                                  <div id="tab-1" class="tab-pane fade show p-0 active">
+                                      <div class="row g-4"id="product-card">
+                                         
+                                              <!--inserting product-->
+                                  
+                                      
+                                  </div>
+                                  
+                              </div>
+                          </div>  
+                              
+                      </div>
+                  </div>
+
+                       
                            
                         </div>
                         <div id="pagination" class="text-center mt-4">
@@ -161,7 +177,7 @@ table.innerHTML = '';
 if (productdata.products.length > 0) {
   productdata.products.forEach(product => {
     const row = document.createElement('div');
-    row.setAttribute('class', 'col-md-6 col-lg-3 col-xl-3 m-2');
+    row.setAttribute('class', "col-md-6 col-lg-4 col-xl-3");
     
     if(!product.Is_delete){
         if(product.Quantity>0){
