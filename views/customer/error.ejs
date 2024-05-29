@@ -16,6 +16,11 @@
                 <h1 class="mb-4">Something went Wrong</h1>
                 <p class="mb-4"> It seems like there was an unexpected issue while processing your request. Our team is already on it, working hard to fix the problem. Please try again later or contact our support team for assistance. We apologize for any inconvenience this may have caused and appreciate your patience.</p>
                 <a class="btn border-secondary rounded-pill py-3 px-5" href="/customerHome">Go Back To Home</a>
+                <% if (locals.message) { %>
+                    <span style="color: red;">
+                      <%= message %>
+                    </span>
+                  <% } %>
             </div>
         </div>
     </div>
