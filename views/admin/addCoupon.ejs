@@ -1,60 +1,127 @@
-
-
 <%-include('../layouts/adminHead')-%>
+<%-include('../layouts/adminSidebarNoS')-%>
 
-<%-include('../layouts/adminSidebar')-%>
-
-    <!-- space   -->
-    <div class="main-panel">
-      <div class="content-wrapper">
-        <!-- form to add new product   -->
-        <div class="col-12 grid-margin stretch-card">
-            <div class="card">
-              <div class="card-body">
-                <h4 class="card-title">Add Coupon</h4>
-                <%if(locals.message){%>
-                <span style="color: red;">
-                  <%=message%>
-                </span>
-                <%}%>
-                <form class="forms-sample" action="" method="POST">
-                    <div class="form-group">
-                        <label for="code">Coupon Code</label>
-                        <input type="text" class="form-control" id="code" name="code"   required>
-
-                      </div>
-                  <div class="form-group">
-                    <label for="percentage">Offer Percentage</label>
-                    <input type="number" class="form-control" id="percentage" name="percentage" pattern="[0-9]+" title="Please enter numbers only" required>
-
-                  </div>
-                  <div class="form-group">
-                    <label for="maxlimit">Max limit</label>
-                    <input type="number" class="form-control" id="maxlimit" name="maxlimit" pattern="[0-9]+" title="Please enter numbers only" required>
-
-                  </div>
-                  <div class="form-group">
-                    <label for="maxlimit">Min order limit</label>
-                    <input type="number" class="form-control" id="minlimit" name="minlimit" pattern="[0-9]+" title="Please enter numbers only" required>
-
-                  </div>
-                  <div class="form-group">
-                    <label for="tillDate">Till Date</label>
-                    <input type="date" class="form-control" id="tillDate" name="tillDate" required>
-                </div>
-                  <button type="submit" class="btn btn-gradient-success mr-2">Add+</button>
-                  <button onclick="location.href='/admin/coupons'" class="btn btn-light">Cancel</button>
-                </form>
-              </div>
+<div class="main-panel">
+  <div class="content-wrapper">
+    <!-- form to add new coupon -->
+    <div class="col-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Add Coupon</h4>
+          <% if (locals.message) { %>
+            <span style="color: red;">
+              <%= message %>
+            </span>
+          <% } %>
+          <form class="forms-sample" action="" method="POST">
+            <div class="form-group">
+              <label for="code">Coupon Code</label>
+              <input type="text" class="form-control" id="code" name="code" >
+              <span class="error-message" id="code-error"></span>
             </div>
-          </div>
-
-
-
-
+            <div class="form-group">
+              <label for="percentage">Offer Percentage</label>
+              <input type="number" class="form-control" id="percentage" name="percentage" pattern="[0-9]+" title="Please enter numbers only">
+              <span class="error-message" id="percentage-error"></span>
+            </div>
+            <div class="form-group">
+              <label for="maxlimit">Max Offer limit</label>
+              <input type="number" class="form-control" id="maxlimit" name="maxlimit" pattern="[0-9]+" title="Please enter numbers only" >
+              <span class="error-message" id="maxlimit-error"></span>
+            </div>
+            <div class="form-group">
+              <label for="minlimit">Min order limit</label>
+              <input type="number" class="form-control" id="minlimit" name="minlimit" pattern="[0-9]+" title="Please enter numbers only" >
+              <span class="error-message" id="minlimit-error"></span>
+            </div>
+            <div class="form-group">
+              <label for="tillDate">Till Date</label>
+              <input type="date" class="form-control" id="tillDate" name="tillDate" >
+              <span class="error-message" id="tillDate-error"></span>
+            </div>
+            <button type="submit" class="btn btn-gradient-success mr-2">Add+</button>
+            <button onclick="location.href='/admin/coupons'" class="btn btn-light">Cancel</button>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!--product list-->
+<%-include('../layouts/adminFooter')-%>
 
-  <%-include('../layouts/adminFooter')-%>
+<style>
+  .error-message {
+    color: red;
+    font-size: 0.8em;
+    margin-top: 0.25em;
+  }
+</style>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector('.forms-sample');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+    
+      const codeInput = document.getElementById('code');
+      const percentageInput = document.getElementById('percentage');
+      const maxlimitInput = document.getElementById('maxlimit');
+      const minlimitInput = document.getElementById('minlimit');
+      const tillDateInput = document.getElementById('tillDate');
+
+      const codeError = document.getElementById('code-error');
+      const percentageError = document.getElementById('percentage-error');
+      const maxlimitError = document.getElementById('maxlimit-error');
+      const minlimitError = document.getElementById('minlimit-error');
+      const tillDateError = document.getElementById('tillDate-error');
+
+      codeError.textContent = '';
+      percentageError.textContent = '';
+      maxlimitError.textContent = '';
+      minlimitError.textContent = '';
+      tillDateError.textContent = '';
+
+     
+      const code = codeInput.value.trim();
+      const percentage = percentageInput.value.trim();
+      const maxlimit = maxlimitInput.value.trim();
+      const minlimit = minlimitInput.value.trim();
+      const tillDate = tillDateInput.value;
+
+    
+      let isValid = true;
+      if (code === '') {
+        isValid = false;
+        codeError.textContent = 'Coupon code cannot be blank';
+      }
+      if (percentage === '' || percentage < 0 || percentage > 99) {
+        isValid = false;
+        percentageError.textContent = 'Please enter a valid percentage (0-99)';
+      }
+      if (maxlimit === '' || maxlimit <= 0) {
+        isValid = false;
+        maxlimitError.textContent = 'Please enter a valid max limit (greater than 0)';
+      }
+      if (minlimit === '' || minlimit <= 0) {
+        isValid = false;
+        minlimitError.textContent = 'Please enter a valid min order limit (greater than 0)';
+      }
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1); 
+      const tomorrowISO = tomorrow.toISOString().split('T')[0]; 
+
+      if (tillDate === '' || tillDate < tomorrowISO) {
+        isValid = false;
+        tillDateError.textContent = 'Please enter a future date starting from tomorrow';
+      }
+
+      if (isValid) {
+     
+        form.submit();
+      }
+    });
+  });
+</script>
+

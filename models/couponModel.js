@@ -3,10 +3,10 @@ const mongoose=require("mongoose")
 
 const couponSchema= mongoose.Schema({
 
-    couponcode: { type: String, required: true},
-    percentage: { type: Number, required: true },
-    maxlimit: { type: Number, required: true },
-    minlimit: { type: Number, required: true },
+    couponcode: { type: String},
+    percentage: { type: Number  },
+    maxlimit: { type: Number  },
+    minlimit: { type: Number},
     date:{ type: Date, index:{expires:0} }
 
 })

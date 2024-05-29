@@ -1,38 +1,56 @@
-
-
 <%-include('../layouts/adminHead')-%>
+<%-include('../layouts/adminSidebarNoS')-%>
 
-<%-include('../layouts/adminSidebar')-%>
-
-    <!-- space   -->
-    <div class="main-panel">
-      <div class="content-wrapper">
-        <!-- form to add new product   -->
-        <div class="col-12 grid-margin stretch-card">
-            <div class="card">
-              <div class="card-body">
-                <h4 class="card-title">Edit Category</h4>
-               
-                <form class="forms-sample" action="" method="POST">
-                  <div class="form-group">
-                    <label for="exampleInputName1">Name</label>
-                    
-                    <input type="text" class="form-control" id="name" name="name" pattern="[A-Za-z ]+" title="Please enter letters and spaces only" value="<%=cat.Name%>" required>
-                  </div>
-                 
-                  <button type="submit" class="btn btn-gradient-success mr-2">Update</button>
-                  <button onclick="location.href='/product/category'" class="btn btn-light">Cancel</button>
-                </form>
-              </div>
+<div class="main-panel">
+  <div class="content-wrapper">
+    <!-- form to edit product -->
+    <div class="col-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Edit Category</h4>
+          <% if (locals.message) { %>
+            <span style="color: red;">
+              <%= message %>
+            </span>
+          <% } %>
+          <form id="categoryForm" class="forms-sample" action="" method="POST">
+            <div id="validationMessage" style="color: red; display: none;"></div>
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" class="form-control" id="name" name="name" pattern="[A-Za-z ]+" title="Please enter letters and spaces only" value="<%=cat.Name%>" >
             </div>
-          </div>
-
-
-
-
+            <button type="submit" class="btn btn-gradient-success mr-2">Update</button>
+            <button type="button" onclick="location.href='/product/category'" class="btn btn-light">Cancel</button>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!--product list-->
+<%-include('../layouts/adminFooter')-%>
 
-  <%-include('../layouts/adminFooter')-%>
+<script>
+  document.getElementById('categoryForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    var nameInput = document.getElementById('name');
+    var nameValue = nameInput.value.trim();
+
+
+    nameInput.value = nameValue;
+
+ 
+    var validationMessage = document.getElementById('validationMessage');
+    validationMessage.style.display = 'none';
+    validationMessage.innerHTML = '';
+
+    if (nameValue === '') {
+      validationMessage.innerHTML = 'Please enter the category name.';
+      validationMessage.style.display = 'block';
+      return;
+    }
+
+    this.submit();
+  });
+</script>

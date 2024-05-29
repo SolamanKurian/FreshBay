@@ -2,6 +2,8 @@ const Admin= require('../models/adminModel')
 const Customer= require('../models/customerModel')
 const Category=require('../models/categoryModel')
 const Product=require('../models/prodectmodel')
+const Poffer=require("../models/productofferModel")
+const Coffer=require("../models/categoryofferModel")
 const sharp=require('sharp')
 const fs=require("fs")
 const bcrypt=require("bcrypt")
@@ -290,6 +292,16 @@ try {
 
 const addProduct=async(req,res)=>{
 try {
+
+    const already = await Product.findOne({ Name: { $regex: new RegExp('^' + req.body.name + '$', 'i') } });
+
+    if(already){
+        const categoryData=await Category.find({})
+       return res.render('addProduct',{message:'Product name already exists',cat:categoryData})
+    }
+
+
+   
     const category=await Category.findOne({Name:req.body.category})
     const product=new Product({
         Name: req.body.name ,
@@ -309,6 +321,18 @@ try {
         .toFile(`./public/productimages/${filename}`);
         product.Image.push(filename)
     }
+    //to check the offer price
+    const coffer = await Coffer.find().populate('categoryId');
+    const isCatOffer = coffer.find(item => item.categoryId._id.toString() === category._id.toString());
+    
+    if (isCatOffer) {
+       
+        let percentage=isCatOffer.percentage;
+        let offer=(req.body.price*percentage)/100;
+         cofferprice=req.body.price-offer;
+         product.Offerprice=cofferprice;
+      } 
+      
     const productData=await product.save()
     if(productData){
 
@@ -338,7 +362,7 @@ const loadEditProduct=async(req,res)=>{
 try {
     const category=await Category.find({Is_delete:false})
     const pid=req.query.pid
-    const productData=await Product.findOne({_id:pid})
+    const productData=await Product.findOne({_id:pid}).populate('Category')
     if(productData){
         res.render('productEdit',{product:productData,cat:category})
     }
@@ -349,19 +373,28 @@ try {
 
 // to edit/update product
 
-
 const editProduct=async(req,res)=>{
 try {
-const pid=req.query.pid;
+
+    const pid = req.query.pid;
+
+
+    const existingProduct = await Product.findOne({ Name: { $regex: new RegExp('^' + req.body.name + '$', 'i') } });
+    if (existingProduct && existingProduct._id.toString() !== pid) {
+      const categories = await Category.find({ Is_delete: false });
+      const productData = await Product.findById(pid);
+      return res.render('productEdit', { message: 'Product name already exists', product: productData, cat: categories });
+    }
+    const category=await Category.findOne({Name:req.body.category})
+
 const product=await Product.findByIdAndUpdate({_id:pid},{$set:{
 
     Name:req.body.name,
     Price:req.body.price,
     Quantity:req.body.quantity,
+    Category:category._id ,
     Pdesc:req.body.description
 }});
-
-
 
 if(req.body.deletedIndices){
     
@@ -387,6 +420,18 @@ for(let i=0;i<req.files.length;i++){
     .toFile(`./public/productimages/${filename}`);
     product.Image.push(filename)
 }
+
+  //to check the offer price
+  const coffer = await Coffer.find().populate('categoryId');
+  const isCatOffer = coffer.find(item => item.categoryId._id.toString() === category._id.toString());
+  
+  if (isCatOffer) {
+     
+      let percentage=isCatOffer.percentage;
+      let offer=(req.body.price*percentage)/100;
+       cofferprice=req.body.price-offer;
+       product.Offerprice=cofferprice;
+    } 
 const productData=await product.save()
 if(productData){
     res.redirect('/product')
@@ -413,8 +458,9 @@ const editCategory=async(req,res)=>{
 try {
     const already = await Category.findOne({ Name: { $regex: new RegExp('^' + req.body.name + '$', 'i') } });
     if(already){
-
-       return res.redirect('/product/category')
+       
+        const categoryData=await Category.findOne({_id:req.query.cid})
+       return res.render('editCategory',{message:'Category name already exists',cat:categoryData})
     }
     const cid=req.query.cid;
     const category=await Category.findByIdAndUpdate({_id:cid},{$set:{

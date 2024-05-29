@@ -117,8 +117,8 @@ table.innerHTML = '';
 if (orderdata.orders.length > 0) {
     orderdata.orders.forEach((order) => {
       if(order.paymentStatus=='Completed'){
-        const dateOnly = new Date(order.date).toLocaleDateString()
-        currentDateTime = new Date().toLocaleString();
+        const dateOnly = new Date(order.date).toLocaleDateString('en-IN')
+        currentDateTime = new Date().toLocaleString('en-IN');
         number=number+1;
         revenue=revenue+order.orderPrice;
         discount=discount+order.discount;
@@ -183,8 +183,8 @@ let productTable;
 if (orderdata.orders.length > 0) {
   orderdata.orders.forEach((order) => {
       if(order.paymentStatus=='Completed'){
-        const dateOnly = new Date(order.date).toLocaleDateString()
-        currentDateTime = new Date().toLocaleString();
+        const dateOnly = new Date(order.date).toLocaleDateString('en-IN')
+        currentDateTime = new Date().toLocaleString('en-IN');
         number=number+1;
         revenue=revenue+order.orderPrice;
         discount=discount+order.discount;
@@ -249,8 +249,8 @@ let productTable;
 if (orderdata.orders.length > 0) {
   orderdata.orders.forEach((order) => {
       if(order.paymentStatus=='Completed'){
-        const dateOnly = new Date(order.date).toLocaleDateString()
-        currentDateTime = new Date().toLocaleString();
+        const dateOnly = new Date(order.date).toLocaleDateString('en-IN')
+        currentDateTime = new Date().toLocaleString('en-IN');
         number=number+1;
         revenue=revenue+order.orderPrice;
         discount=discount+order.discount;
@@ -323,8 +323,8 @@ if (orderdata.orders.length > 0) {
 
   orderdata.orders.forEach((order) => {
       if(order.paymentStatus=='Completed'){
-        const dateOnly = new Date(order.date).toLocaleDateString()
-        currentDateTime = new Date().toLocaleString();
+        const dateOnly = new Date(order.date).toLocaleDateString('en-IN')
+        currentDateTime = new Date().toLocaleString('en-IN');
         number=number+1;
         revenue=revenue+order.orderPrice;
         discount=discount+order.discount;

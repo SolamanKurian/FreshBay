@@ -352,7 +352,7 @@ text: response.data.message
 
     // load with search
 
-    const form=document.getElementById("srch-form")
+  const form=document.getElementById("srch-form")
   const ipfield=document.getElementById("searchInput")
   
   const searchIcon=document.getElementById("search-icon-1");
@@ -371,6 +371,7 @@ let srch='';
   function searchProduct(){
     event.preventDefault();
        srch=ipfield.value;
+       
       
        let wisharr=[]
     axios.get(`http://localhost:3000/productSearch?q=${srch}&filter=${filtercategory}&sort=${sortWith}&cp=${currentPage}`).then((response)=>{
@@ -387,7 +388,7 @@ table.innerHTML = '';
 if (productdata.products.length > 0) {
   productdata.products.forEach(product => {
     const row = document.createElement('div');
-    row.setAttribute('class', 'col-md-6 col-lg-3 col-xl-3 m-2');
+    row.setAttribute('class', 'col-md-6 col-lg-4 col-xl-3');
     if(!product.Is_delete){
         if(product.Quantity>0){
             button=` <a href="#" onclick="addToCart('${product._id}')" class="btn border border-secondary rounded-pill px-3 text-primary">
@@ -488,7 +489,7 @@ table.innerHTML = '';
 if (productdata.products.length > 0) {
 productdata.products.forEach(product => {
 const row = document.createElement('div');
-row.setAttribute('class', 'col-md-6 col-lg-3 col-xl-3 m-2');
+row.setAttribute('class', 'col-md-6 col-lg-4 col-xl-3');
 
 if(!product.Is_delete){
 if(product.Quantity>0){

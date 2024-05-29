@@ -27,8 +27,8 @@
 
       <li class="nav-item">
         <a class="nav-link" href="/product/category">
-          <span class="menu-title">Category</span>
-          <i class="fas fa-folder menu-icon"></i>
+          <span class="">Category</span>
+          <i class="fas fa-folder menu-icon" style="color: #a89ea8;"></i>
         </a>
       </li>
      
@@ -46,6 +46,19 @@
           <i class="fas fa-shopping-cart menu-icon"></i>
         </a>
       </li>
+
+      
+      <li class="nav-item dropdown">
+        <a class="nav-link" href="#" id="offersDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="">Offers</span>
+            <i class="fas fa-tag menu-icon" style="color: #a89ea8;"></i>
+        </a>
+        <div class="dropdown-menu" aria-labelledby="offersDropdown">
+          <a class="dropdown-item" href="/admin/productOffers" style="color: rgb(15, 55, 236);" onmouseover="this.style.color='black'" onmouseout="this.style.color=''">Product Offers</a>
+          <a class="dropdown-item" href="/admin/categoryOffers" style="color: black;" onmouseover="this.style.color='black'" onmouseout="this.style.color=''">Category Offers</a>
+      </div>
+      
+    </li>
       
     
       

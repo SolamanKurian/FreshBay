@@ -84,10 +84,10 @@
 
 <script>
     document.getElementById('addAddressForm').addEventListener('submit', function(event) {
-        // Prevent the form from submitting by default
+     
         event.preventDefault();
 
-        // Validate fields
+       
         let name = document.getElementById('name').value.trim();
         let mobile = document.getElementById('mobile').value.trim();
         let pincode = document.getElementById('pincode').value.trim();
@@ -97,12 +97,17 @@
         let state = document.getElementById('state').value.trim();
         let alertsArea = document.getElementById('validationAlerts');
 
-        alertsArea.innerHTML = ''; // Clear previous alerts
+        alertsArea.innerHTML = '';
 
         if (name === '' || mobile === '' || pincode === '' || house === '' || street === '' || city === '' || state === '') {
             alertsArea.innerHTML += '<p>All fields are required!</p>';
         }
-
+        if (!/^[A-Za-z ]+$/.test(name)) {
+            alertsArea.innerHTML += '<p>Name must contain only letters and spaces!</p>';
+        }
+        if (!/^[A-Za-z ]+$/.test(house)) {
+            alertsArea.innerHTML += '<p>Must contain only letters and spaces!</p>';
+        }
         if (isNaN(mobile) || isNaN(pincode)) {
             alertsArea.innerHTML += '<p>Phone number and pincode must be numbers!</p>';
         }
@@ -110,11 +115,11 @@
         alertsArea.innerHTML += '<p>Enter a Valid Phone Number</p>';
     }
         if (alertsArea.innerHTML !== '') {
-            alertsArea.style.display = 'block'; // Show the alerts
+            alertsArea.style.display = 'block';
             return;
         }
 
-        // If all validation passes, submit the form
+     
         this.submit();
     });
 
@@ -130,7 +135,6 @@ axios.get(`http://localhost:3000/address/loadExistingAddress`).then((response)=>
       const addresstData = response.data.address;
         console.log(addresstData);
 
-// Clear existing rows
 addressBox.innerHTML = '';
 
 if (addresstData.address.length > 0) {
@@ -186,7 +190,7 @@ if (addresstData.address.length > 0) {
 
 
 function deleteAddress(Aid){
-// confirmation sweet alert
+
 Swal.fire({
     title: 'Are you sure?',
     text: '',

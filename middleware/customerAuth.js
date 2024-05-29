@@ -26,7 +26,8 @@ else{
 const noSession=async(req,res,next)=>{
 
     try {
-        if(req.session.user_id){
+        if(req.session.customer_id){
+           
             res.redirect('/customerHome')
         }else{
             next()

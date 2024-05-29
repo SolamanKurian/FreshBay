@@ -75,7 +75,8 @@ if (orderData.order.length>0) {
 for(let i=0;i<orderData.order.length;i++){
     let price=0
     const row = document.createElement('tr');
-    const dateOnly = new Date(orderData.order[i].date).toLocaleDateString()
+    const dateOnly = new Date(orderData.order[i].date).toLocaleDateString('en-IN');
+
     //to find total price of order
     for(let j=0;j<orderData.order[i].items.length;j++){
         // price=price+(orderData.order[i].items[j].quantity*orderData.order[i].items[j].price)

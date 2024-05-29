@@ -1,78 +1,70 @@
-<%-include('../layouts/header')-%>
+<%- include('../layouts/header') -%>
 
-
- <!-- Navbar  -->
- <div class="container-fluid fixed-top">
-
+<!-- Navbar  -->
+<div class="container-fluid fixed-top">
     <div class="container px-0">
         <nav class="navbar navbar-light bg-white navbar-expand-xl">
-            <a href="index.html" class="navbar-brand"><h1 class="text-primary display-6">FreshBay</h1></a>
+            <a href="/" class="navbar-brand"><h1 class="text-primary display-6">FreshBay</h1></a>
             <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                 <span class="fa fa-bars text-primary"></span>
             </button>
-            <div class="collapse navbar-collapse bg-white" id="navbarCollapse"  >
+            <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
                 <div class="navbar-nav mx-auto">
-                    <a href="/" class="nav-item nav-link active">Home  </a>
-                    <a href="#" class="nav-item nav-link">Fruits </a>
-                    <a href="#" class="nav-item nav-link">Vegetables </a>
-                  
+                    <a href="/" class="nav-item nav-link active">Home</a>
+                    <a href="#" class="nav-item nav-link">Fruits</a>
+                    <a href="#" class="nav-item nav-link">Vegetables</a>
                     <a href="/publicContact" class="nav-item nav-link">Contact</a>
                 </div>
-                <div class="d-flex m-3 me-0">
-                   
-                </div>
+                <div class="d-flex m-3 me-0"></div>
             </div>
         </nav>
     </div>
 </div>
 
-
 <br><br><br>
 
 <div class="container mt-5">
     <div class="row justify-content-center">
-       
-      
-        <%-include('../layouts/carosal')-%>
+        <%- include('../layouts/carosal') -%>
 
-        <div class="col-lg-6"> <!-- Registration form -->
+        <div class="col-lg-6">
+            <!-- Registration form -->
             <div class="card">
                 <div class="card-body">
                     <h3 class="card-title text-center mb-4">Sign Up</h3>
-                    
-                        <form id="signupForm" method="POST" action="/register" class="needs-validation" novalidate>
-
-                            <!-- getting name -->
+                    <% if (locals.message) { %>
+                        <span style="color: red;">
+                          <%= message %>
+                        </span>
+                      <% } %>
+                    <form id="signupForm" method="POST" action="/register" class="needs-validation" novalidate>
+                        <!-- Getting name -->
                         <div class="mb-3">
                             <label for="name" class="form-label">Name</label>
                             <input type="text" class="form-control" id="name" name="name" pattern="[A-Za-z ]+" title="Please enter letters and spaces only" required>
                             <div class="invalid-feedback">Please enter your name with letters and spaces only.</div>
                         </div>
                         
-                             <!-- getting phone number -->
+                        <!-- Getting phone number -->
                         <div class="mb-3">
                             <label for="phone" class="form-label">Phone Number</label>
                             <input type="tel" class="form-control" id="phone" name="phone" pattern="[0-9]+" title="Please enter numbers only" minlength="10" maxlength="10" required oninput="validatePhoneNumber(this)">
-                            <div class="invalid-feedback">Please enter a valid phone number</div>
+                            <div class="invalid-feedback">Please enter a valid phone number.</div>
                         </div>
-                    
-                             <!-- getting email -->
+
+                        <!-- Getting email -->
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
                             <input type="email" class="form-control" id="email" name="email" required>
                             <div class="invalid-feedback">Please enter a valid email address.</div>
                         </div>
                         
-                       
-                        
-
-                             <!-- getting password -->
+                        <!-- Getting password -->
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
                             <input type="password" class="form-control" id="password" name="password" minlength="8" required>
                             <div class="invalid-feedback">Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one special character, and one digit.</div>
                         </div>
-
 
                         <div class="mb-3">
                             <label for="confirmPassword" class="form-label">Confirm Password</label>
@@ -88,45 +80,47 @@
                 </div>
             </div>
         </div>
-        <!-- registration form end -->
+        <!-- Registration form end -->
     </div>
 </div>
 
+<%- include('../layouts/footer') -%>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    (function () {
+        'use strict';
 
-       <%-include('../layouts/footer')-%>
-       <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-       <script>
-        
-        (function () {
-            'use strict';
-          
-            var forms = document.querySelectorAll('.needs-validation');
-    
-           
-            Array.prototype.slice.call(forms)
-                .forEach(function (form) {
-                    form.addEventListener('submit', function (event) {
-                        if (!form.checkValidity()) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                        }
-    
-                        form.classList.add('was-validated');
-                    }, false);
-                });
-        })();
+        var forms = document.querySelectorAll('.needs-validation');
 
-// to check the first number of phone number is zero or not
-                            function validatePhoneNumber(input) {
-                                if (input.value.charAt(0) === '0') {
-                                    input.setCustomValidity('invalid');
-                                } else {
-                                    input.setCustomValidity('');
-                                }
-                            }
-                        
-// Custom validation for email format including ".com" at the end
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                   
+                    var inputs = form.querySelectorAll('input');
+                    inputs.forEach(function(input) {
+                        input.value = input.value.trim();
+                    });
+
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+
+                    form.classList.add('was-validated');
+                }, false);
+            });
+    })();
+
+    function validatePhoneNumber(input) {
+        if (input.value.charAt(0) === '0') {
+            input.setCustomValidity('Invalid');
+        } else {
+            input.setCustomValidity('');
+        }
+    }
+
+ 
     document.getElementById('email').addEventListener('input', function () {
         var emailInput = document.getElementById('email');
         var emailValue = emailInput.value.trim();
@@ -138,18 +132,18 @@
         }
     });
 
-// Custom validate the password
-     document.getElementById('password').addEventListener('input', function () {
+  
+    document.getElementById('password').addEventListener('input', function () {
         var passwordInput = document.getElementById('password');
         var passwordValue = passwordInput.value;
 
-// expressions to check for password requirements
+      
         var uppercaseRegex = /[A-Z]/;
         var lowercaseRegex = /[a-z]/;
         var specialCharRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
         var digitRegex = /\d/;
 
-// Check if the password meets all requirements
+     
         if (passwordValue.length >= 8 &&
             uppercaseRegex.test(passwordValue) &&
             lowercaseRegex.test(passwordValue) &&
@@ -160,7 +154,8 @@
             passwordInput.setCustomValidity('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one special character, and one digit.');
         }
     });
-//to check with entered password confirm password
+
+
     document.getElementById('confirmPassword').addEventListener('input', function () {
         var passwordInput = document.getElementById('password');
         var confirmPasswordInput = document.getElementById('confirmPassword');
@@ -171,6 +166,4 @@
             confirmPasswordInput.setCustomValidity('');
         }
     });
-
-
-    </script>
+</script>

@@ -338,16 +338,28 @@ addressBox.innerHTML = '';
         let alertsArea = document.getElementById('validationAlerts');
         alertsArea.innerHTML = ''; // Clear previous alerts
 
+        // Regular expression for validating name (letters and spaces only)
+        let nameRegex = /^[A-Za-z\s]+$/;
+
         if (name === '' || mobile === '' || pincode === '' || house === '' || street === '' || city === '' || state === '') {
             alertsArea.innerHTML += '<p>All fields are required!</p>';
+        }
+
+        if (!nameRegex.test(name)) {
+            alertsArea.innerHTML += '<p>Name must contain only letters and spaces!</p>';
+        }
+        if (!nameRegex.test(house)) {
+            alertsArea.innerHTML += '<p>Must contain only letters and spaces!</p>';
         }
 
         if (isNaN(mobile) || isNaN(pincode)) {
             alertsArea.innerHTML += '<p>Phone number and pincode must be numbers!</p>';
         }
+
         if (mobile.length !== 10 || mobile[0] === '0') {
-        alertsArea.innerHTML += '<p>Enter a Valid Phone Number</p>';
-    }
+            alertsArea.innerHTML += '<p>Enter a valid phone number!</p>';
+        }
+
         if (alertsArea.innerHTML !== '') {
             alertsArea.style.display = 'block'; // Show the alerts
             return;
@@ -357,6 +369,7 @@ addressBox.innerHTML = '';
         this.submit();
     });
 </script>
+
 
 <script>
     let discount=0;

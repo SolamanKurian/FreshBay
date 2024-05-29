@@ -1,74 +1,58 @@
-
-
-
-
 <%-include('../layouts/header')-%>
-<%-include('../layouts/logednavbar')-%><br>
-<br>
-<br>
-<br>
-<br>
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addAddressModalLabel">Edit Address</h5>
-            </div>
-            <div class="modal-body">
-                <form id="addAddressForm" method="POST" action="/address/editAddress">
-                    <div id="validationAlerts" class="alert alert-danger" style="display: none;"></div>
-                    <div class="form-group">
-                        <label for="name">Name</label>
-                        <input type="text" class="form-control" id="name" name="name" value="<%=add.name%>" >
-                    </div>
-                    <div class="form-group">
-                        <label for="mobile">Mobile Number</label>
-                        <input type="text" class="form-control" id="mobile" name="mobile"value="<%=add.mobile%>" >
-                    </div>
-                    <div class="form-group">
-                        <label for="pincode">Pincode</label>
-                        <input type="text" class="form-control" id="pincode" name="pincode" value="<%=add.pincode%>" >
-                    </div>
-                    <div class="form-group">
-                        <label for="house">House/Flat</label>
-                        <input type="text" class="form-control" id="house" name="house"value="<%=add.house%>" >
-                    </div>
-                    <div class="form-group">
-                        <label for="street">Street</label>
-                        <input type="text" class="form-control" id="street" name="street"value="<%=add.street%>" >
-                    </div>
-                    <div class="form-group">
-                        <label for="city">City</label>
-                        <input type="text" class="form-control" id="city" name="city"value="<%=add.city%>" >
-                    </div>
-                    <div class="form-group">
-                        <label for="state">State</label>
-                        <input type="text" class="form-control" id="state" name="state" value="<%=add.state%>" >
-                        <input type="text" class="form-control"style="display: none;" id="id" name="id" value="<%=add._id%>" >
-                    </div>
-                    
-                    <br>
-                    <button type="submit" class="btn btn-primary">Update</button>
-                    <button onclick="location.href='/address/manageAddress'" class="btn btn-danger">Cancel</button>
-                   
-                   
-                </form>
-               
-                
-            </div>
-            
+<%-include('../layouts/logednavbar')-%>
+<br><br><br><br><br>
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="addAddressModalLabel">Edit Address</h5>
+        </div>
+        <div class="modal-body">
+            <form id="addAddressForm" method="POST" action="/address/editAddress">
+                <div id="validationAlerts" class="alert alert-danger" style="display: none;"></div>
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" value="<%=add.name%>">
+                </div>
+                <div class="form-group">
+                    <label for="mobile">Mobile Number</label>
+                    <input type="text" class="form-control" id="mobile" name="mobile" value="<%=add.mobile%>">
+                </div>
+                <div class="form-group">
+                    <label for="pincode">Pincode</label>
+                    <input type="text" class="form-control" id="pincode" name="pincode" value="<%=add.pincode%>">
+                </div>
+                <div class="form-group">
+                    <label for="house">House/Flat</label>
+                    <input type="text" class="form-control" id="house" name="house" value="<%=add.house%>">
+                </div>
+                <div class="form-group">
+                    <label for="street">Street</label>
+                    <input type="text" class="form-control" id="street" name="street" value="<%=add.street%>">
+                </div>
+                <div class="form-group">
+                    <label for="city">City</label>
+                    <input type="text" class="form-control" id="city" name="city" value="<%=add.city%>">
+                </div>
+                <div class="form-group">
+                    <label for="state">State</label>
+                    <input type="text" class="form-control" id="state" name="state" value="<%=add.state%>">
+                    <input type="text" class="form-control" style="display: none;" id="id" name="id" value="<%=add._id%>">
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary">Update</button>
+                <button onclick="location.href='/address/manageAddress'" class="btn btn-danger">Cancel</button>
+            </form>
         </div>
     </div>
-
-
+</div>
 
 <%-include('../layouts/footer')-%>
 
 <script>
     document.getElementById('addAddressForm').addEventListener('submit', function(event) {
-        // Prevent the form from submitting by default
+      
         event.preventDefault();
 
-        // Validate fields
         let name = document.getElementById('name').value.trim();
         let mobile = document.getElementById('mobile').value.trim();
         let pincode = document.getElementById('pincode').value.trim();
@@ -78,30 +62,33 @@
         let state = document.getElementById('state').value.trim();
         let alertsArea = document.getElementById('validationAlerts');
 
-        alertsArea.innerHTML = ''; // Clear previous alerts
+        alertsArea.innerHTML = '';
 
         if (name === '' || mobile === '' || pincode === '' || house === '' || street === '' || city === '' || state === '') {
             alertsArea.innerHTML += '<p>All fields are required!</p>';
         }
 
+        if (!/^[A-Za-z ]+$/.test(name)) {
+            alertsArea.innerHTML += '<p>Name must contain only letters and spaces!</p>';
+        }
+        if (!/^[A-Za-z ]+$/.test(house)) {
+            alertsArea.innerHTML += '<p> Must contain only letters and spaces!</p>';
+        }
         if (isNaN(mobile) || isNaN(pincode)) {
             alertsArea.innerHTML += '<p>Phone number and pincode must be numbers!</p>';
         }
-        if (mobile.length !== 10 || mobile[0] === '0') {
-        alertsArea.innerHTML += '<p>Enter a Valid Phone Number</p>';
-    }
+
+        if (mobile.length !== 10 || mobile.charAt(0) === '0') {
+            alertsArea.innerHTML += '<p>Enter a valid phone number!</p>';
+        }
+
         if (alertsArea.innerHTML !== '') {
-            alertsArea.style.display = 'block'; // Show the alerts
+            alertsArea.style.display = 'block'; 
             return;
         }
 
-        // If all validation passes, submit the form
+       
         this.submit();
     });
-
-
-
-
 </script>
-
-
+<%-include('../layouts/footer')-%>

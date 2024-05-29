@@ -79,9 +79,9 @@
                             <div class="text-danger"> Out of Stock</div>
                             <%}%>
                             <br><br>
-                            <a href="#" class="btn border border-secondary rounded-pill px-4 py-2 mb-4 text-secondary">
-                                <i class="fa fa-heart me-2 text-secondary"></i> Add to wishlist
-                            </a>
+                           <!-- <div id="<%=product._id %>">
+                                <a onclick="addToWishlist('<%=product._id %>')" class="btn border border-secondary rounded-pill px-3 text-primary"><i class="fa fa-heart fa-lg me-3  mt-2 ml-3 "></i>  Add Wishlist</a>
+                            </div> -->
                         </div>                      
                     </div>                   
                 </div>            
@@ -120,7 +120,7 @@
                               white-space: nowrap;
                               text-overflow: ellipsis;
                               display: -webkit-box;
-                              -webkit-line-clamp: 2; /* Number of lines to show */
+                              -webkit-line-clamp: 2; 
                               -webkit-box-orient: vertical;
                             }
                           </style>
@@ -181,4 +181,73 @@
 
       })
     }
+
+    async function  addToWishlist(proId){
+
+const response = await axios.get(`http://localhost:3000/addToWish?proId=${proId}`)
+.then((response)=>{
+
+    if(response.data.success){
+         Swal.fire({
+icon: 'success',
+title: 'Added',
+showConfirmButton: false,
+timer: 1300,
+text: response.data.message
+});const wishdiv = document.getElementById(proId);
+ if (wishdiv) {
+           wishdiv.innerHTML =`<a href="#" onclick="removeFromWish('${proId}')">
+<i class="fa fa-heart fa-lg me-3  mt-2 ml-3 text-danger"></i> 
+</a>`   
+         }
+
+    }else{
+        Swal.fire({
+icon: 'info',
+
+showConfirmButton: false,
+timer: 1300,
+text: response.data.message
+})
+        
+    }
+
+})
+}
+
+async function  removeFromWish(proId){
+
+   
+
+const response = await axios.get(`http://localhost:3000/removeFromWish?proId=${proId}`)
+.then((response)=>{
+
+    if(response.data.success){
+         Swal.fire({
+icon: 'success',
+title: 'Removed',
+showConfirmButton: false,
+timer: 1300,
+text: response.data.message
+});
+const wishdiv = document.getElementById(proId);
+ if (wishdiv) {
+           wishdiv.innerHTML =`<a href="#" onclick="addToWishlist('${proId}')">
+<i class="fa fa-heart fa-lg me-3  mt-2 ml-3 "></i> 
+</a>`  
+         }
+    }else{
+        Swal.fire({
+icon: 'info',
+showConfirmButton: false,
+timer: 1300,
+text: response.data.message
+})
+        
+    }
+
+})
+}
+
+
   </script>

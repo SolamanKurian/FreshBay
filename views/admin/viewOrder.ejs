@@ -203,6 +203,9 @@ try {
     <a class="dropdown-item btn"  style="color: orange;" onclick="shipped('${orderData.viewOrder.items[i]._id}', '${idHolder}')">
       Mark as Shipped
     </a>
+    <a class="dropdown-item btn"  style="color: red;" onclick="cancel('${orderData.viewOrder.items[i]._id}', '${idHolder}')">
+      Cancel
+    </a>
   </div>
 </div>
 `;
@@ -504,6 +507,49 @@ Swal.fire({
     }              
             }
             })   
+        }
+    })
+}
+
+
+// to mark as delivered
+async function cancel(itemId,orderId){
+// confirmation sweet alert
+Swal.fire({
+        title: 'Are you sure to cancel this order?',
+        text: '',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) { 
+            axios.get(`http://localhost:3000/admin/cancel?orderId=${orderId}&itemId=${itemId}`).then((response)=>{
+
+              const divId=response.data.item;
+               const statusdiv = document.getElementById(`${divId}`);
+               
+           if (statusdiv) {
+               statusdiv.innerHTML = response.data.order.items[0].itemStatus;            
+           }
+
+           const buttondiv=document.getElementById(`button${divId}`)
+           
+           
+               if (buttondiv) {
+               
+    if (response.data.order.items[0].itemStatus === 'Cancelled'){
+     buttondiv.innerHTML = `<button class="btn btn-sm bg-light border " type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+   Cancelled
+ </button> `;
+   }
+
+                            
+           }
+            })   
+            
+            
         }
     })
 }

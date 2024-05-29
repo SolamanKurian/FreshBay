@@ -52,8 +52,6 @@ const verifyAdmin=async(req,res)=>{
 const loadHome=async(req,res)=>{
 
 try {
-
-
     const orders=await Order.find()
     if(orders){
         let count=0;
@@ -71,15 +69,12 @@ try {
     }else{
         res.render('Home')
     }
-
-    
-    
 } catch (error) {
     res.redirect('/admin/error')
 }
 }
-//to provide top
 
+//to provide top
 const takeTop=async(req,res,next)=>{
     try {
         let topProducts = await Order.aggregate([
@@ -99,12 +94,10 @@ const takeTop=async(req,res,next)=>{
             }}
         ]);
         
-    
         let topCategory= await Order.aggregate([{ $match: { paymentStatus: "Completed" } },{$unwind:"$items"},{$group:{_id:"$items.categoryName",totalQuantity:{$sum:"$items.quantity"},
         }},{$sort:{totalQuantity:-1}},{$limit:5},{$project:{categorytName:"$_id",totalQuantity:1,image:1}}]);
     
         res.json({topP:topProducts,topC:topCategory})
-
 
         
     } catch (error) {
@@ -131,6 +124,7 @@ try {
 }
     
 }
+
 // load user with search
 
 const loadUsers= async(req,res)=>{
@@ -298,6 +292,109 @@ const markAsDelivered=async(req,res,next)=>{
         next(error)
     }
 }
+const markAsCancelled=async(req,res,next)=>{
+    // try {
+    //     const order = await Order.findOne({ _id: req.query.orderId});
+    //     if(order){
+    //     //   const updated=await Order.updateOne({ _id: req.query.orderId }, { $set: { status: "Cancelled" } });
+    //         // if(updated){
+    //          for(item of order.items) {item.itemStatus="Cancelled"}
+    //         await order.save()
+    //         // to update wallet if cancell the order
+    //         const orderUpdated = await Order.findOne({ _id: req.query.orderId });
+    //         if(orderUpdated.status=='Cancelled'&& order.paymentStatus=='Completed'){
+    //           const customerId=order.userId;
+    //           let amount=orderUpdated.orderPrice;
+    //           const haveWallet= await Wallet.findOne({customerId:customerId})
+    //           if(haveWallet){
+    //               let balance=haveWallet.balance;
+    //               let newbalance=balance+amount;
+    //               haveWallet.balance=newbalance;
+    //               haveWallet.history.push({
+    //           type: 'Credit',
+    //           amount: amount,
+    //           balance: newbalance,
+    //           about:'Order Cancelled'
+    //               })
+    //            const walletUpdated= await haveWallet.save()
+    //            if(walletUpdated){
+    //             const ordertochange= await Order.findOne({ _id: req.query.orderId});
+    //             ordertochange.paymentStatus="Refunded";
+    //             ordertochange.save();
+    //            }
+    //           }
+    //     //   }
+    //         const updatedorder = await Order.findOne({  _id: req.query.orderId});  
+    //         res.json({success:true,order:updatedorder})
+    //       }    
+    //     }
+    // } catch (error) {
+    //     next(error)
+    // }
+    try {
+        
+
+        const order = await Order.findOne({_id: req.query.orderId });
+        const itemOrdered = await order.items.find(item => item._id.toString() === req.query.itemId);
+        if(itemOrdered){
+            itemOrdered.itemStatus='Cancelled'
+          let updated=await order.save()
+          //updating the wallet if return received
+          if(updated){
+            const order = await Order.findOne({_id: req.query.orderId });
+            const itemOrdered = await order.items.find(item => item._id.toString() === req.query.itemId);
+            if(itemOrdered.itemStatus=='Cancelled'){
+                const customerId=order.userId;
+                let amount=itemOrdered.price*itemOrdered.quantity;
+                const haveWallet= await Wallet.findOne({customerId:customerId})
+                if(haveWallet){
+                    let balance=haveWallet.balance;
+                    let newbalance=balance+amount;
+                    haveWallet.balance=newbalance;
+                    haveWallet.history.push({
+                type: 'Credit',
+                amount: amount,
+                balance: newbalance,
+                about:'Returned a product'
+                
+                    })
+                  await haveWallet.save()
+                }
+            }
+          }
+
+
+
+
+
+          let flag=0
+          for(item of order.items){
+            if(item.itemStatus=='Cancelled'){
+              flag=1
+            }else{
+              flag=0
+            }
+          }
+          if(flag==1){
+            order.status='Cancelled'
+            order.save()
+          }
+    
+          const updatedorder = await Order.findOne({  _id: req.query.orderId});  
+                  res.json({success:true,order:updatedorder,item:req.query.itemId})
+        }
+
+
+
+    } catch (error) {
+        next(error)
+    }
+
+
+
+
+
+}
 
 // to mark as shipped
 
@@ -410,8 +507,10 @@ const markAsReturnReceived=async(req,res,next)=>{
             const order = await Order.findOne({_id: req.query.orderId });
             const itemDelivered = await order.items.find(item => item._id.toString() === req.query.itemId);
             if(itemDelivered.itemStatus=='Return received'){
-                const customerId=req.session.customer_id;
-                let amount=itemDelivered.price;
+
+
+                const customerId=order.userId;
+                let amount=itemDelivered.price*itemDelivered.quantity;
                 const haveWallet= await Wallet.findOne({customerId:customerId})
                 if(haveWallet){
                     let balance=haveWallet.balance;
@@ -1188,7 +1287,8 @@ module.exports={
     loadReport,
     reportTopage,
     takeTop,
-    growthSearch
+    growthSearch,
+    markAsCancelled
    
   
 }

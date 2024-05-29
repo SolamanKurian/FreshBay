@@ -263,18 +263,29 @@ axios.get(`http://localhost:3000/productHome`).then((response)=>{
 
       const productdata = response.data;
 
-if(productdata.wish){
-  productdata.wish.items.forEach(item=>{
-    wisharr.push(item.productId._id)
-   
-  })
+
+      if (productdata.wish && Array.isArray(productdata.wish.items)) {
+  for (let i = 0; i < productdata.wish.items.length; i++) {
+    const item = productdata.wish.items[i];
+    if (item.productId && item.productId._id) {
+      wisharr.push(item.productId._id);
+    } else {
+      console.log('Missing productId or _id in item:', item);
+    }
+  }
+} else {
+  console.log('productdata.wish or productdata.wish.items is not defined or not an array');
 }
+
+
 
 // Clear existing rows
 table.innerHTML = '';
 
 if (productdata.products.length > 0) {
+  
   productdata.products.forEach(product => {
+   
     const row = document.createElement('div');
     row.setAttribute('class', "col-md-6 col-lg-4 col-xl-3");
     
@@ -520,6 +531,8 @@ text: response.data.message
 
 //to remove from wishlist
 async function  removeFromWish(proId){
+
+   
 
 const response = await axios.get(`http://localhost:3000/removeFromWish?proId=${proId}`)
 .then((response)=>{

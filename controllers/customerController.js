@@ -65,9 +65,21 @@ const loadRegister=async(req,res,next)=>{
 try {
     if(req.query.referal){
         req.session.referal_id=req.query.referal;
-        res.render('registration')
+        if(req.session.message){
+            const message=req.session.message;
+            delete req.session.message;
+            res.render('registration',{message:message})
+        }else{
+            res.render('registration')
+        }
+       
     }else{
-        res.render('registration')
+        if(req.session.message){
+            const message=req.session.message;
+            res.render('registration',{message:message})
+        }else{
+            res.render('registration')
+        }
     }
 
 } catch (error) {
@@ -79,6 +91,13 @@ try {
 const insertCustomer=async(req,res,next)=>{
 try {
     const spassword = await securePassword(req.body.password);
+
+    const existingUser=await Customer.findOne({Email:req.body.email});
+    if(existingUser){
+        req.session.message="Sorry.. this email already exists";
+        return res.redirect("/register")
+    }
+
 req.session.newUser={ 
         Name:req.body.name,
         Phone:req.body.phone,
@@ -122,6 +141,9 @@ res.render('./otppage')
 const registerCustomer=async(req,res,next)=>{
     
     try {
+
+
+
         if(req.body.otp==req.session.otp){
             
             const customer=new Customer({
@@ -295,12 +317,14 @@ passport.serializeUser((user, done) => {
 const loadcustomerHome=async(req,res,next)=>{
 
 try {
+    
     const cust=req.session.customer_id
     const wish=await Wish.findOne({customerId:cust}).populate('items.productId')
     if(wish){
         const products = await Product.find({Is_delete:false}).populate({
             path: 'Category',
             match: { Is_delete: false }}).exec()
+         
             const filteredProducts = products.filter(product => product.Category && product.Category.Is_delete===false);
     
         const customer=await Customer.findOne({_id:req.session.customer_id})
@@ -376,6 +400,7 @@ const    loadcustomerShopPage=async(req,res,next)=>{
 
   const loadProductToShop = async (req, res, next) => {
     try {
+      
         const filter=req.query.filter;
         const sort=req.query.sort
         let page ;
@@ -383,12 +408,14 @@ const    loadcustomerShopPage=async(req,res,next)=>{
         let search = "";
         if(req.query.q){
             search=req.query.q;
-        }
+            console.log("two");
+        };
        if(req.query.cp){
+        
         page=req.query.cp;
        }else{
         page=1;
-       }
+       };
         
    
         const customer=req.session.customer_id
@@ -436,6 +463,7 @@ const    loadcustomerShopPage=async(req,res,next)=>{
             
                 res.json({ products: finalData,wish:wish  });
             }else {
+                
                 const productData = await Product.find({ $or: [{ Name: { $regex: ".*" + search + ".*", $options: "i" } }] })
                     .populate('Category');
             if(req.query.filter){
@@ -448,7 +476,7 @@ const    loadcustomerShopPage=async(req,res,next)=>{
                 res.json({ products:finalData,wish:wish });
             }else{
                 
-                const productData = await Product.find()
+                const productData = await Product.find({ $or: [{ Name: { $regex: ".*" + search + ".*", $options: "i" } }] })
                     .populate('Category');
                 const finalData = productData.slice((page - 1) * 8, page * 8);
                 
@@ -1040,8 +1068,8 @@ if(customerData){
 
 const loadCheckout=async(req,res,next)=>{
     try {
-        if(req.query.coupon){
-            let coupon=await Coupon.findOne({couponcode:req.query.coupon});
+        if(req.body.coupon){
+            let coupon=await Coupon.findOne({couponcode:req.body.coupon});
                 let value=coupon.percentage;
 
         req.session.discount=value;

@@ -1,65 +1,102 @@
-
-
 <%-include('../layouts/adminHead')-%>
 
-<%-include('../layouts/adminSidebar')-%>
+<%-include('../layouts/adminSidebarNoS')-%>
 
-    <!-- space   -->
-    <div class="main-panel">
-      <div class="content-wrapper">
-        <!-- form to add new product   -->
-        <div class="col-12 grid-margin stretch-card">
-            <div class="card">
-              <div class="card-body">
-                <h4 class="card-title">Edit Product Offer</h4>
-                <%if(locals.message){%>
-                <span style="color: red;">
-                  <%=message%>
-                </span>
-                <%}%>
-                <form class="forms-sample" action="" method="POST">
-                    <div class="form-group">
-                        <label for="exampleInputName1">Category</label>
-                        <select class="form-control" id="name" name="name" value="<%=coffer.categoryId_id%>"  required>
-                            <option value="<%=coffer.categoryId_id%>"  selected><%=coffer.categoryId.Name%></option>
-                            <%if(locals.category){%>
-                            <%for(let i=0;i<category.length;i++){%>
-                            <option value="<%=category[i]._id%>"><%=category[i].Name%></option>
-                           <%}%>
-                           <%}%>
-                        </select>
-                    </div>
-                  <div class="form-group">
-                    <label for="exampleInputName1">Offer Percentage</label>
-                    <input type="number" class="form-control" id="percentage" name="percentage" pattern="[0-9]+" value="<%=coffer.percentage%>" title="Please enter numbers only" required>
-                    <input hidden class="form-control" id="cid" name="cid" value="<%=coffer._id%>"  required>
-
-                  </div>
-                  <div class="form-group">
-                    <label for="exampleInputName1">Till Date</label>
-                    <input type="date" class="form-control" id="tillDate" name="tillDate" required>
-                </div>
-                
-                
-                 
-                  
-                
-                  <button type="submit" class="btn btn-gradient-success mr-2">Update</button>
-                  <button onclick="location.href='/admin/categoryOffers'" class="btn btn-light">Cancel</button>
-                </form>
-              </div>
+<div class="main-panel">
+  <div class="content-wrapper">
+    <!-- form to add new product -->
+    <div class="col-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Edit Product Offer</h4>
+          <% if (locals.message) { %>
+            <span style="color: red;">
+              <%= message %>
+            </span>
+          <% } %>
+          <form class="forms-sample" action="" method="POST">
+            <div class="form-group">
+              <label for="exampleInputName1">Category</label>
+              <select class="form-control" id="name" name="name" value="<%= coffer.categoryId_id %>" required>
+                <option value="<%= coffer.categoryId_id %>" selected><%= coffer.categoryId.Name %></option>
+                <% if (locals.category) { %>
+                  <% for (let i = 0; i < category.length; i++) { %>
+                    <option value="<%= category[i]._id %>"><%= category[i].Name %></option>
+                  <% } %>
+                <% } %>
+              </select>
             </div>
-          </div>
+            <div class="form-group">
+              <label for="exampleInputName1">Offer Percentage</label>
+              <input type="number" class="form-control" id="percentage" name="percentage" pattern="[0-9]+" value="<%= coffer.percentage %>" title="Please enter numbers only" required>
+              <input hidden class="form-control" id="cid" name="cid" value="<%= coffer._id %>" required>
+              <span class="error-message" id="percentage-error"></span>
+            </div>
+            <div class="form-group">
+              <label for="exampleInputName1">Till Date</label>
+              <input type="date" class="form-control" id="tillDate" name="tillDate" required>
+              <span class="error-message" id="tillDate-error"></span>
+            </div>
+            <button type="submit" class="btn btn-gradient-success mr-2">Update</button>
+            <button onclick="location.href='/admin/categoryOffers'" class="btn btn-light">Cancel</button>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!--product list-->
+<%-include('../layouts/adminFooter')-%>
 
-  <%-include('../layouts/adminFooter')-%>
+<style>
+  .error-message {
+    color: red;
+    font-size: 0.8em;
+    margin-top: 0.25em;
+  }
+</style>
 
-  <script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector('.forms-sample');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault(); 
+
+     
+      const percentageInput = document.getElementById('percentage');
+      const tillDateInput = document.getElementById('tillDate');
+
+      const percentageError = document.getElementById('percentage-error');
+      const tillDateError = document.getElementById('tillDate-error');
+
   
-    const tillDate = new Date('<%=coffer.date%>');
-        const formattedValidity = tillDate.toISOString().split('T')[0]; 
-        document.getElementById("tillDate").value = formattedValidity;
-  </script>
+      percentageError.textContent = '';
+      tillDateError.textContent = '';
+
+      const percentage = percentageInput.value.trim();
+      const tillDate = tillDateInput.value;
+
+   
+      let isValid = true;
+      if (percentage === '' || percentage < 0 || percentage > 99) {
+        isValid = false;
+        percentageError.textContent = 'Please enter a valid percentage (0-99)';
+      }
+
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1); 
+      const tomorrowISO = tomorrow.toISOString().split('T')[0]; 
+
+      if (tillDate === '' || tillDate < tomorrowISO) {
+        isValid = false;
+        tillDateError.textContent = 'Please enter a future date starting from tomorrow';
+      }
+
+      if (isValid) {
+      
+        form.submit();
+      }
+    });
+  });
+</script>

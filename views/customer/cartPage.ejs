@@ -296,7 +296,7 @@ const coupondiv = document.getElementById(`coupon`);
             `
                    }}          
         else if(total>=minlimit && checkdiscount>maxlimit){
-            discount=0;
+            discount=maxlimit;
                 coupondiv.innerHTML = discount;
             const box=document.getElementById("couponStatus")
                    if(box && coupon!=0){
@@ -402,7 +402,7 @@ const coupondiv = document.getElementById(`coupon`);
             `
                    }}          
         else if(total>=minlimit && checkdiscount>maxlimit){
-            discount=0
+            discount=maxlimit;
                 coupondiv.innerHTML = discount;
             const box=document.getElementById("couponStatus")
                    if(box && coupon!=0){
@@ -476,11 +476,18 @@ function removeItem(Pid) {
     }).then((result) => {
         if (result.isConfirmed) { 
             axios.get(`http://localhost:3000/removeItem?Pid=${Pid}`).then((response) => {
+                const quantityInput = document.getElementById(`quantity${Pid}`);      
                 const parent=document.getElementById('cart-body')
                 const child=document.getElementById(Pid)
                 parent.removeChild(child)
 // to update subtotal
-let subtotal=response.data.item.productId.Offerprice?response.data.item.productId.Offerprice:response.data.item.productId.Price;
+console.log(Pid);
+
+const quantity=quantityInput.value;
+
+
+let subtotal=response.data.item.productId.Offerprice?(response.data.item.productId.Offerprice*quantity):(response.data.item.productId.Price*quantity);
+console.log(subtotal);
 total=total-subtotal
 const subtotaldiv = document.getElementById(`total`);
             if (subtotaldiv) {
@@ -505,15 +512,22 @@ const coupondiv = document.getElementById(`coupon`);
                     discount=(total*coupon)/100;
                 coupondiv.innerHTML = discount;
                 const box=document.getElementById("couponStatus")
-                   if(box){
+                   if(box && coupon!=0){
                     box.innerHTML=` 
                     <p>
                         Coupon Applied</p>
             <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="button" id="cancelCouponBtn" onclick="RemoveCoupon()">Remove Coupon</button>
             `
+                   }else{
+                    box.innerHTML=`
+                    <div class="mt-5" id="couponStatus">
+            <input type="text" id="couponCodeInput" class="border-0 border-bottom rounded me-5 py-3 mb-4" placeholder="Coupon Code">
+            <button class="btn border-secondary rounded-pill px-4 py-3 text-primary" type="button" id="applyCouponBtn" onclick="applyCoupon()">Apply Coupon</button>
+            
+        </div>`
                    }}          
         else if(total>=minlimit && checkdiscount>maxlimit){
-            discount=0
+            discount=maxlimit;
                 coupondiv.innerHTML = discount;
             const box=document.getElementById("couponStatus")
                    if(box){
@@ -561,7 +575,14 @@ function checkQuantity(){
 axios.get(`http://localhost:3000/checkQuantity`).then((response) => {
 
  if(response.data.success){
-    window.location.href = `/checkout?coupon=${couponCode}`;
+    if(response.data.success){
+    axios.post('http://localhost:3000/checkout', {
+    coupon: couponCode
+}).then(()=>{
+    window.location.href = `/checkout`
+})
+
+   
  }else{
      Swal.fire({
       icon: 'warning',
@@ -571,7 +592,7 @@ axios.get(`http://localhost:3000/checkQuantity`).then((response) => {
         window.location.href = `/cartPage`;
     })
  }
-    })}
+}})}
 
   // to take coupons data 
   document.addEventListener('DOMContentLoaded', function () {
@@ -625,7 +646,7 @@ function applyCoupon() {
             `
                    }}          
         else if(total>=minlimit && checkdiscount>maxlimit){
-            discount=0
+            discount=maxlimit;
                 coupondiv.innerHTML = discount;
             const box=document.getElementById("couponStatus")
                    if(box){
@@ -686,6 +707,7 @@ const shippingdiv = document.getElementById(`shipping`);
 
 function RemoveCoupon()
 {
+    
 const box=document.getElementById("couponStatus")
 coupon=0;
 const coupondiv = document.getElementById(`coupon`);

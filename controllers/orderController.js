@@ -371,7 +371,7 @@ const cancelItem=async(req,res,next)=>{
           const itemDelivered = await order.items.find(item => item._id.toString() === req.query.itemId);
           if(itemDelivered.itemStatus=='Cancelled'){
               const customerId=req.session.customer_id;
-              let amount=itemDelivered.price;
+              let amount=itemDelivered.price*itemDelivered.quantity;
               const haveWallet= await Wallet.findOne({customerId:customerId})
               if(haveWallet){
                   let balance=haveWallet.balance;

@@ -1,13 +1,14 @@
 
 //connecting database, named database as freshbay
+require("dotenv").config()
 const mongoose=require("mongoose");
-mongoose.connect("mongodb://127.0.0.1:27017/freshbay_data").then(()=>{console.log("DB Connected");}).catch(()=>{console.log("DB Not connected");})
+mongoose.connect(process.env.mongoconnect).then(()=>{console.log("DB Connected");}).catch((err)=>{console.log("DB Not connected",err);})
 
 const express=require("express")
 const nocache=require("nocache")
 const axios=require("axios")
 const Swal=require("sweetalert2")
-require("dotenv").config()
+
 
 const app=express()
 app.use(express.json());

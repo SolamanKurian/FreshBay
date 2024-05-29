@@ -38,7 +38,7 @@ customer_route.get('/publicVeg',customerAuth.noSession,customerController.loadPu
 customer_route.get('/publicFruit',customerAuth.noSession,customerController.loadPublicFruit)
 
 customer_route.get('/register',customerAuth.noSession,customerController.loadRegister)
-customer_route.post('/register',customerController.insertCustomer)
+customer_route.post('/register',customerAuth.noSession,customerController.insertCustomer)
 customer_route.get('/otp',customerAuth.noSession,customerController.manageOtp)
 customer_route.post('/otp',customerController.registerCustomer)
 customer_route.get('/login',customerAuth.noSession,customerController.loadLogin)
@@ -73,6 +73,7 @@ customer_route.get('/editProfile',customerAuth.isSession,customerController.load
 customer_route.post('/editProfile',customerAuth.isSession,customerController.editProfile)
 customer_route.get('/changePassword',customerAuth.isSession,customerController.loadeChangePassword)
 customer_route.post('/changePassword',customerAuth.isSession,customerController.ChangePassword)
+customer_route.post('/checkout',customerAuth.isSession,customerController.loadCheckout)
 customer_route.get('/checkout',customerAuth.isSession,customerController.loadCheckout)
 customer_route.get('/checkQuantity',customerAuth.isSession,customerController.CheckQuantity)
 customer_route.get('/wishList',customerAuth.isSession,customerController.loadWishList)
