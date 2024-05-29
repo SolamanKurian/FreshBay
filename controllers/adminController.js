@@ -560,7 +560,7 @@ const markAsReturnReceived=async(req,res,next)=>{
 const loadProductOffers=async(req,res,next)=>{
     try {
         const poffers=await Poffer.find().populate('productId')
-        res.render('productOffer',{poffers:poffers})
+        res.render('productoffer',{poffers:poffers})
         
     } catch (error) {
         next(error)
