@@ -160,7 +160,7 @@ const table=document.getElementById("product-card")
 document.addEventListener('DOMContentLoaded',async function(){
   let wisharr=[]
 try {
-axios.get(`http://localhost:3000/productSearch`).then((response)=>{
+axios.get(`https://freshbay.online/productSearch`).then((response)=>{
 
       const productdata = response.data;
 
@@ -254,7 +254,7 @@ if(product.Offerprice>0){
 
   async function  addToCart(proId){
    
-      const response = await axios.get(`http://localhost:3000/addToCart?proId=${proId}`)
+      const response = await axios.get(`https://freshbay.online/addToCart?proId=${proId}`)
       .then((response)=>{
           if(response.data.success){
                Swal.fire({
@@ -285,7 +285,7 @@ if(product.Offerprice>0){
 
 async function  addToWishlist(proId){
    
-   const response = await axios.get(`http://localhost:3000/addToWish?proId=${proId}`)
+   const response = await axios.get(`https://freshbay.online/addToWish?proId=${proId}`)
    .then((response)=>{
 
        if(response.data.success){
@@ -319,7 +319,7 @@ text: response.data.message
 //to remove from wishlist
 async function  removeFromWish(proId){
    
-   const response = await axios.get(`http://localhost:3000/removeFromWish?proId=${proId}`)
+   const response = await axios.get(`https://freshbay.online/removeFromWish?proId=${proId}`)
    .then((response)=>{
 
        if(response.data.success){
@@ -374,7 +374,7 @@ let srch='';
        
       
        let wisharr=[]
-    axios.get(`http://localhost:3000/productSearch?q=${srch}&filter=${filtercategory}&sort=${sortWith}&cp=${currentPage}`).then((response)=>{
+    axios.get(`https://freshbay.online/productSearch?q=${srch}&filter=${filtercategory}&sort=${sortWith}&cp=${currentPage}`).then((response)=>{
      
         const productdata = response.data
         if(productdata.wish){
@@ -472,7 +472,7 @@ async function goToPage(currentPage){
  
 let wisharr=[]
 
-axios.get(`http://localhost:3000/productSearch?q=${srch}&filter=${filtercategory}&sort=${sortWith}&cp=${currentPage}`).then((response)=>{
+axios.get(`https://freshbay.online/productSearch?q=${srch}&filter=${filtercategory}&sort=${sortWith}&cp=${currentPage}`).then((response)=>{
 
   console.log(response.data);
 const productdata = response.data

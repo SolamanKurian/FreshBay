@@ -131,7 +131,7 @@
 const table=document.getElementById("cart-body")
 document.addEventListener('DOMContentLoaded',async function(){
 try {
-axios.get(`http://localhost:3000/insertCart`).then((response)=>{
+axios.get(`https://freshbay.online/insertCart`).then((response)=>{
 
       const cartData = response.data;
         
@@ -250,7 +250,7 @@ const gtotaldiv = document.getElementById(`gtotal`);
 
 function addQuantity(Pid) {
 
-        axios.get(`http://localhost:3000/IncQuantity?Pid=${Pid}`).then((response)=>{
+        axios.get(`https://freshbay.online/IncQuantity?Pid=${Pid}`).then((response)=>{
 
             if(response.data.success){
          Swal.fire({
@@ -359,7 +359,7 @@ const shippingdiv = document.getElementById(`shipping`);
 
 
 function decQuantity(Pid) {
-        axios.get(`http://localhost:3000/decQuantity?Pid=${Pid}`).then((response)=>{
+        axios.get(`https://freshbay.online/decQuantity?Pid=${Pid}`).then((response)=>{
             if(response.data.success){
          Swal.fire({
         icon: 'warning',
@@ -475,7 +475,7 @@ function removeItem(Pid) {
         reverseButtons: true
     }).then((result) => {
         if (result.isConfirmed) { 
-            axios.get(`http://localhost:3000/removeItem?Pid=${Pid}`).then((response) => {
+            axios.get(`https://freshbay.online/removeItem?Pid=${Pid}`).then((response) => {
                 const quantityInput = document.getElementById(`quantity${Pid}`);      
                 const parent=document.getElementById('cart-body')
                 const child=document.getElementById(Pid)
@@ -572,11 +572,11 @@ const gtotaldiv = document.getElementById(`gtotal`);
 
 function checkQuantity(){
 
-axios.get(`http://localhost:3000/checkQuantity`).then((response) => {
+axios.get(`https://freshbay.online/checkQuantity`).then((response) => {
 
  if(response.data.success){
     if(response.data.success){
-    axios.post('http://localhost:3000/checkout', {
+    axios.post('https://freshbay.online/checkout', {
     coupon: couponCode
 }).then(()=>{
     window.location.href = `/checkout`

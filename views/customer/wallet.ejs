@@ -71,7 +71,7 @@ let amount;
                 Swal.showValidationMessage('Please enter a valid amount')
             }
  } }).then(()=>{
-    return axios.get(`http://localhost:3000/wallet/addMoney?wid=${wid}&amount=${amount}`).then(response => {
+    return axios.get(`https://freshbay.online/wallet/addMoney?wid=${wid}&amount=${amount}`).then(response => {
 
         if (response.data.success) {
             let options = {

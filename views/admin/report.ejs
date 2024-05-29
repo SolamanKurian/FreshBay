@@ -104,7 +104,7 @@
       event.preventDefault();
       const srch=ipfield.value;
      
-    axios.get(`http://localhost:3000/admin/orderSearch?q=${srch}`).then((response)=>{
+    axios.get(`https://freshbay.online/admin/orderSearch?q=${srch}`).then((response)=>{
 
         let price=0;
       const orderdata = response.data;
@@ -173,7 +173,7 @@ discount=0;
 document.addEventListener('DOMContentLoaded',async function(){
 try {
 
-axios.get(`http://localhost:3000/admin/reportSearch`).then((response)=>{
+axios.get(`https://freshbay.online/admin/reportSearch`).then((response)=>{
 
     
       const orderdata = response.data;
@@ -239,7 +239,7 @@ discount=0;
   document.getElementById('filter').addEventListener('change', (event) => {
            let filter= event.target.value;
 
-            axios.get(`http://localhost:3000/admin/reportSearch?filter=${filter}`).then((response)=>{
+            axios.get(`https://freshbay.online/admin/reportSearch?filter=${filter}`).then((response)=>{
 
     
 const orderdata = response.data;
@@ -312,7 +312,7 @@ table.appendChild(row);
       }
   if(fromDateTime && toDateTime ){
 
-    axios.get(`http://localhost:3000/admin/reportSearch?from=${fromDateTime}&to=${toDateTime}`).then((response)=>{
+    axios.get(`https://freshbay.online/admin/reportSearch?from=${fromDateTime}&to=${toDateTime}`).then((response)=>{
 
     
 const orderdata = response.data;

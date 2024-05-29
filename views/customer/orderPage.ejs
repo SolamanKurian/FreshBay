@@ -68,7 +68,7 @@
 const table=document.getElementById("cart-body")
 document.addEventListener('DOMContentLoaded',async function(){
 try {
-axios.get(`http://localhost:3000/order/insertOrders`).then((response)=>{
+axios.get(`https://freshbay.online/order/insertOrders`).then((response)=>{
 
 const orderData=response.data
 if (orderData.order.length>0) {
@@ -178,7 +178,7 @@ Swal.fire({
         reverseButtons: true
     }).then((result) => {
         if (result.isConfirmed) { 
-            axios.get(`http://localhost:3000/order/cancelOrder?Oid=${Oid}`).then((response)=>{
+            axios.get(`https://freshbay.online/order/cancelOrder?Oid=${Oid}`).then((response)=>{
 
                 const divId=response.data.order._id
                 
@@ -205,7 +205,7 @@ Swal.fire({
 function payNow(oid){
     
 
-axios.get(`http://localhost:3000/order/payNow?oid=${oid}`).then(response => {
+axios.get(`https://freshbay.online/order/payNow?oid=${oid}`).then(response => {
 
         if (response.data.success) {
             let options = {

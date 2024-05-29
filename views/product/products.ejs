@@ -216,7 +216,7 @@ nextPageBtn.addEventListener('click', async () => {
 const table=document.getElementById("srch-table")
 document.addEventListener('DOMContentLoaded',async function(){
 try {
-axios.get(`http://localhost:3000/product/productSearch`).then((response)=>{
+axios.get(`https://freshbay.online/product/productSearch`).then((response)=>{
 
       const productdata = response.data;
 // Clear existing rows
@@ -279,7 +279,7 @@ if (productdata.products.length > 0) {
       event.preventDefault();
      srch=ipfield.value;
      
-    axios.get(`http://localhost:3000/product/productSearch?q=${srch}`).then((response)=>{
+    axios.get(`https://freshbay.online/product/productSearch?q=${srch}`).then((response)=>{
 
 
       
@@ -341,7 +341,7 @@ document.addEventListener("click",(event)=>{
 //to delete and retrive product
 
 async function deleteProduct(productid){
-const response= await axios.post('http://localhost:3000/product/delete-product',{productid})
+const response= await axios.post('https://freshbay.online/product/delete-product',{productid})
 if(response.data.success){
 
   await Swal.fire({
@@ -364,7 +364,7 @@ window.location.href="/product"
 
 
 async function goToPage(currentPage){
-  axios.get(`http://localhost:3000/product/productSearch?q=${srch}&cp=${currentPage}`).then((response)=>{
+  axios.get(`https://freshbay.online/product/productSearch?q=${srch}&cp=${currentPage}`).then((response)=>{
   const productdata = response.data;
 // Clear existing rows
 table.innerHTML = '';

@@ -231,7 +231,7 @@
         <%-include('../layouts/footer')-%>
         <script>
           async function  addToCart(proId){
-            const response = await axios.get(`http://localhost:3000/addToCart?proId=${proId}`)
+            const response = await axios.get(`https://freshbay.online/addToCart?proId=${proId}`)
             .then((response)=>{
                 if(response.data.success){
                      Swal.fire({
