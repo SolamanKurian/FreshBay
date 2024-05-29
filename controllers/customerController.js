@@ -716,7 +716,7 @@ try {
 const loadError=async(req,res,next)=>{
     try {
         const customer=await Customer.findOne({_id:req.session.customer_id})
-        res.render('error',{customer:customer})   
+        res.render('error',{customer:customer,message:err})   
     } catch (error) {
         next(error);
     }

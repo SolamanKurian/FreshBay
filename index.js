@@ -53,7 +53,7 @@ app.use('/wallet',walletRoute)
 // error handling, keep bottom of all routes
 app.use(function(err, req, res, next) {
     console.error(err.stack);
-    res.redirect('/error',{message:err});
+    res.redirect('/error');
 });
 
 const PORT=process.env.PORT||3000
