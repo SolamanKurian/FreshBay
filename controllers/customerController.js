@@ -713,7 +713,7 @@ try {
 }
 
 // to load error page
-const loadError=async(req,res,next)=>{
+const loadError=async(err,req,res,next)=>{
     try {
         const customer=await Customer.findOne({_id:req.session.customer_id})
         res.render('error',{customer:customer,message:err})   
