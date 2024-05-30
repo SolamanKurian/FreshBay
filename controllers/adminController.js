@@ -573,7 +573,7 @@ const loadAddProductOffers=async(req,res,next)=>{
     try {
         const product= await Product.find()
 
-        res.render('addProductoffer',{product:product})
+        res.render('addProductOffer',{product:product})
         
     } catch (error) {
         next(error)
