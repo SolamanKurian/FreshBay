@@ -243,7 +243,7 @@ const loginCustomer=async(req,res,next)=>{
 
         const customerData=await Customer.findOne({Email:email})
 
-        if(customerData){
+        if(customerData && customerData.Password){
             const passMatch= await bcrypt.compare(password,customerData.Password)
             if(passMatch){              
                 if(customerData.Is_blocked==false){
