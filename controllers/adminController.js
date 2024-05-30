@@ -589,7 +589,7 @@ const loadAddProductOffers=async(req,res,next)=>{
     try {
         const already=await Poffer.findOne({productId:req.body.name})
         if(already){
-           return res.render('addProductoffer',{message:'The product have an offer aldeady '})
+           return res.render('addProductOffer',{message:'The product have an offer aldeady '})
         }
             const poffer= new Poffer({       
                 productId: req.body.name,
