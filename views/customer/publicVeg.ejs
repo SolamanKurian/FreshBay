@@ -23,7 +23,7 @@
 
 
                                         <% for(product of products){ %>
-                                            <%if(product.Category.Name==='Vegitables'){%> 
+                                            <%if(product.Category.Name==='Vegetables'){%> 
                                             <div class="col-md-6 col-lg-4 col-xl-3">
                                                 <a href="/productpage?pid=<%=product._id%>" class="rounded position-relative fruite-item">
                                                     <div class="fruite-img">
@@ -34,13 +34,13 @@
     <%= product.Category.Name %>
 </div>
 <%}%>
-<%if(product.Category.Name==='Vegitables'){%>                                                 
+<%if(product.Category.Name==='Vegetables'){%>                                                 
     <div class="text-white px-3 py-1  ; rounded position-absolute" style="top: 10px; left: 10px; background-color: rgb(18, 177, 18);">
         <%= product.Category.Name %>
     </div>
     <%}%>
     
-    <%if(product.Category.Name!=='Vegitables' && product.Category.Name!=='Fruit'){%>                                                 
+    <%if(product.Category.Name!=='Vegetables' && product.Category.Name!=='Fruit'){%>                                                 
         <div class="text-white px-3 py-1  ; rounded position-absolute" style="top: 10px; left: 10px; background-color: rgb(202, 58, 58);">
             <%= product.Category.Name %>
         </div>
@@ -99,13 +99,13 @@
                                 <%= product.Category.Name %>
                             </div>
                             <%}%>
-                            <%if(product.Category.Name==='Vegitables'){%>                                                 
+                            <%if(product.Category.Name==='Vegetables'){%>                                                 
                                 <div class="text-white px-3 py-1  ; rounded position-absolute" style="top: 10px; left: 10px; background-color: rgb(18, 177, 18);">
                                     <%= product.Category.Name %>
                                 </div>
                                 <%}%>
                                 
-                                <%if(product.Category.Name!=='Vegitables' && product.Category.Name!=='Fruit'){%>                                                 
+                                <%if(product.Category.Name!=='Vegetables' && product.Category.Name!=='Fruit'){%>                                                 
                                     <div class="text-white px-3 py-1  ; rounded position-absolute" style="top: 10px; left: 10px; background-color: rgb(202, 58, 58);">
                                         <%= product.Category.Name %>
                                     </div>
