@@ -15,7 +15,7 @@ const Swal=require("sweetalert2")
 
 const app=express()
 app.use(cors({
-    origin: 'https://www.freshbay.online'
+   
   }));
 app.use(express.json());
 app.use(express.urlencoded({extended:true}))
