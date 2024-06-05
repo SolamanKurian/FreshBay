@@ -5,6 +5,7 @@ const mongoose=require("mongoose");
 mongoose.connect(process.env.mongoconnect).then(()=>{console.log("DB Connected");}).catch((err)=>{console.log("DB Not connected",err);})
 
 const express=require("express")
+const cors = require('cors');
 const nocache=require("nocache")
 
 const axios=require("axios")
@@ -13,6 +14,9 @@ const Swal=require("sweetalert2")
 
 
 const app=express()
+app.use(cors({
+    origin: 'https://www.freshbay.online'
+  }));
 app.use(express.json());
 app.use(express.urlencoded({extended:true}))
 app.use(nocache())
