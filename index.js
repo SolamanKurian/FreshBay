@@ -15,7 +15,7 @@ const Swal=require("sweetalert2")
 
 const app=express()
 app.use(cors({
-    origin: 'https://www.freshbay.online/admin', // Allow requests from this origin
+    origin: 'https://www.freshbay.online', // Allow requests from this origin
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // If you need to allow credentials
     optionsSuccessStatus: 200 // Some legacy browsers choke on 204
