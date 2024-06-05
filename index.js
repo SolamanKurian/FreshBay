@@ -6,8 +6,7 @@ mongoose.connect(process.env.mongoconnect).then(()=>{console.log("DB Connected")
 
 const express=require("express")
 const nocache=require("nocache")
-const cors = require('cors');
-app.use(cors());
+
 const axios=require("axios")
 const Swal=require("sweetalert2")
 
