@@ -76,7 +76,7 @@
 
     if (confirmation.isConfirmed) {
         // User confirmed deletion
-        const response = await axios.post('https://www.freshbay.online/admin/deletePoffer', { pofferid });
+        const response = await axios.post('https://freshbay.online/admin/deletePoffer', { pofferid });
         if (response.data.success) {
             await Swal.fire({
                 icon: 'success',

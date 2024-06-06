@@ -80,7 +80,7 @@
 
     if (confirmation.isConfirmed) {
         // User confirmed deletion
-        const response = await axios.post('https://www.freshbay.online/admin/deleteCoupon', {couponId});
+        const response = await axios.post('https://freshbay.online/admin/deleteCoupon', {couponId});
         if (response.data.success) {
             await Swal.fire({
                 icon: 'success',
