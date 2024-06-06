@@ -259,7 +259,7 @@ const table=document.getElementById("product-card")
 document.addEventListener('DOMContentLoaded',async function(){
   let wisharr=[]
 try {
-axios.get(`https://www.freshbay.online/productHome`).then((response)=>{
+axios.get(`https://freshbay.online/productHome`).then((response)=>{
 
       const productdata = response.data;
 
@@ -367,7 +367,7 @@ async function goToPage(currentPage){
 
     let wisharr=[]
 try {
-axios.get(`https://www.freshbay.online/productHome?cp=${currentPage}`).then((response)=>{
+axios.get(`https://freshbay.online/productHome?cp=${currentPage}`).then((response)=>{
 
       const productdata = response.data;
 
@@ -467,7 +467,7 @@ if(product.Offerprice>0){
 
 async function  addToCart(proId){
    
-   const response = await axios.get(`https://www.freshbay.online/addToCart?proId=${proId}`)
+   const response = await axios.get(`https://freshbay.online/addToCart?proId=${proId}`)
    .then((response)=>{
        if(response.data.success){
             Swal.fire({
@@ -498,7 +498,7 @@ text: response.data.message
 
 async function  addToWishlist(proId){
 
-const response = await axios.get(`https://www.freshbay.online/addToWish?proId=${proId}`)
+const response = await axios.get(`https://freshbay.online/addToWish?proId=${proId}`)
 .then((response)=>{
 
     if(response.data.success){
@@ -534,7 +534,7 @@ async function  removeFromWish(proId){
 
    
 
-const response = await axios.get(`https://www.freshbay.online/removeFromWish?proId=${proId}`)
+const response = await axios.get(`https://freshbay.online/removeFromWish?proId=${proId}`)
 .then((response)=>{
 
     if(response.data.success){

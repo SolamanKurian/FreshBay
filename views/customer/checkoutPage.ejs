@@ -237,7 +237,7 @@
 const addressBox=document.getElementById("addressInsert")
 document.addEventListener('DOMContentLoaded',async function(){
 try {
-axios.get(`https://www.freshbay.online/address/loadExistingAddress`).then((response)=>{
+axios.get(`https://freshbay.online/address/loadExistingAddress`).then((response)=>{
 
       const addresstData = response.data.address;
       
@@ -380,7 +380,7 @@ let total=0;
 const table=document.getElementById("cart-body")
 document.addEventListener('DOMContentLoaded',async function(){
 try {
-axios.get(`https://www.freshbay.online/insertCart`).then((response)=>{
+axios.get(`https://freshbay.online/insertCart`).then((response)=>{
 
       const cartData = response.data;
         
@@ -572,7 +572,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 discount:coupon.value,disc:discount
 
             }
-            axios.post('https://www.freshbay.online/order/createOrder', formData)
+            axios.post('https://freshbay.online/order/createOrder', formData)
     .then(response => {
        
        

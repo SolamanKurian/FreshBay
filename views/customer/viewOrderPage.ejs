@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded',async function(){
 try {
     const idHolder=document.getElementById('idholder').innerHTML 
     
-axios.get(`https://www.freshbay.online/order/insertViewOrder?Oid=${idHolder}`).then((response)=>{
+axios.get(`https://freshbay.online/order/insertViewOrder?Oid=${idHolder}`).then((response)=>{
 
 const orderData=response.data
 if (orderData.viewOrder) {
@@ -286,7 +286,7 @@ Swal.fire({
         reverseButtons: true
     }).then((result) => {
         if (result.isConfirmed) { 
-            axios.get(`https://www.freshbay.online/order/cancelItem?orderId=${orderId}&itemId=${itemId}`).then((response)=>{
+            axios.get(`https://freshbay.online/order/cancelItem?orderId=${orderId}&itemId=${itemId}`).then((response)=>{
 
                     
                 const divId=response.data.item._id
@@ -336,7 +336,7 @@ async function returnOrder(itemId, orderId)
 
   if (formValues) {
     
-    axios.get(`https://www.freshbay.online/order/returnItem?orderId=${orderId}&itemId=${itemId}`, {
+    axios.get(`https://freshbay.online/order/returnItem?orderId=${orderId}&itemId=${itemId}`, {
       params: formValues 
     }).then((response) => {
       const divId = response.data.item._id;

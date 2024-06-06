@@ -130,7 +130,7 @@
 const addressBox=document.getElementById("addressInsert")
 document.addEventListener('DOMContentLoaded',async function(){
 try {
-axios.get(`https://www.freshbay.online/address/loadExistingAddress`).then((response)=>{
+axios.get(`https://freshbay.online/address/loadExistingAddress`).then((response)=>{
 
       const addresstData = response.data.address;
         console.log(addresstData);
@@ -200,7 +200,7 @@ Swal.fire({
     cancelButtonText: 'Cancel',
     reverseButtons: true
 }).then((result) => {if (result.isConfirmed) {
-    axios.get(`https://www.freshbay.online/address/removeAddress?Aid=${Aid}`).then((response) =>{
+    axios.get(`https://freshbay.online/address/removeAddress?Aid=${Aid}`).then((response) =>{
             const parent=document.getElementById('addressInsert')
             const child=document.getElementById(Aid)
             parent.removeChild(child)})

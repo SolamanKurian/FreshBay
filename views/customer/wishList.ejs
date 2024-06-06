@@ -53,7 +53,7 @@
 const table=document.getElementById("cart-body")
 document.addEventListener('DOMContentLoaded',async function(){
 try {
-axios.get(`https://www.freshbay.online/insertWish`).then((response)=>{
+axios.get(`https://freshbay.online/insertWish`).then((response)=>{
 
       const wishData = response.data;
         
@@ -140,7 +140,7 @@ function removeItem(Pid) {
         reverseButtons: true
     }).then((result) => {
         if (result.isConfirmed) { 
-            axios.get(`https://www.freshbay.online/removeWish?proId=${Pid}`).then((response) => {
+            axios.get(`https://freshbay.online/removeWish?proId=${Pid}`).then((response) => {
                 const parent=document.getElementById('cart-body')
                 const child=document.getElementById(Pid)
                 parent.removeChild(child)
@@ -157,7 +157,7 @@ function removeItem(Pid) {
 
 async function  addToCart(proId){
    
-   const response = await axios.get(`https://www.freshbay.online/addToCart?proId=${proId}`)
+   const response = await axios.get(`https://freshbay.online/addToCart?proId=${proId}`)
    .then((response)=>{
        if(response.data.success){
             Swal.fire({
