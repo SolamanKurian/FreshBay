@@ -218,7 +218,7 @@ nextPageBtn.addEventListener('click', async () => {
 
   if (confirmed.isConfirmed) {
     // Proceed with blocking/unblocking
-    const response = await axios.post('https://freshbay.online/admin/block-user', { userid });
+    const response = await axios.post('https://www.freshbay.online/admin/block-user', { userid });
     
     if (response.data.success) {
       await Swal.fire({
@@ -254,7 +254,7 @@ nextPageBtn.addEventListener('click', async () => {
       event.preventDefault();
       srch=ipfield.value;
      
-    axios.get(`https://freshbay.online/admin/usersSearch?q=${srch}`).then((response)=>{
+    axios.get(`https://www.freshbay.online/admin/usersSearch?q=${srch}`).then((response)=>{
 
 
       const userdata = response.data;
@@ -293,7 +293,7 @@ if (userdata.users.length > 0) {
 
 document.addEventListener('DOMContentLoaded',async function(){
 try {
-axios.get(`https://freshbay.online/admin/usersSearch`).then((response)=>{
+axios.get(`https://www.freshbay.online/admin/usersSearch`).then((response)=>{
 
       const userdata = response.data;
 console.log(userdata.users);
@@ -334,7 +334,7 @@ if (userdata.users.length > 0) {
 
   async function goToPage(currentPage){
 
-    axios.get(`https://freshbay.online/admin/usersSearch?q=${srch}&cp=${currentPage}`).then((response)=>{
+    axios.get(`https://www.freshbay.online/admin/usersSearch?q=${srch}&cp=${currentPage}`).then((response)=>{
 
 
 const userdata = response.data;

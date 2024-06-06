@@ -104,7 +104,7 @@ nextPageBtn.addEventListener('click', async () => {
       event.preventDefault();
        srch=ipfield.value;
      
-    axios.get(`https://freshbay.online/admin/orderSearch?q=${srch}`).then((response)=>{
+    axios.get(`https://www.freshbay.online/admin/orderSearch?q=${srch}`).then((response)=>{
 
         let price=0;
       const orderdata = response.data;
@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded',async function(){
 try {
   let buttonHtml;
   let status=0
-axios.get(`https://freshbay.online/admin/orderSearch`).then((response)=>{
+axios.get(`https://www.freshbay.online/admin/orderSearch`).then((response)=>{
 
     let price=0;
       const orderdata = response.data;
@@ -239,7 +239,7 @@ if (orderdata.orders.length > 0) {
     try {
   let buttonHtml;
   let status=0
-axios.get(`https://freshbay.online/admin/orderSearch?&cp=${currentPage}&q=${srch}`).then((response)=>{
+axios.get(`https://www.freshbay.online/admin/orderSearch?&cp=${currentPage}&q=${srch}`).then((response)=>{
 
     let price=0;
       const orderdata = response.data;

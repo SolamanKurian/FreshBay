@@ -171,7 +171,7 @@
 const table=document.getElementById("srch-table")
 document.addEventListener('DOMContentLoaded',async function(){
 try {
-axios.get(`https://freshbay.online/product/productSearch`).then((response)=>{
+axios.get(`https://www.freshbay.online/product/productSearch`).then((response)=>{
 
       const productdata = response.data;
 console.log(productdata.products);
@@ -235,7 +235,7 @@ if (productdata.products.length > 0) {
       event.preventDefault();
       const srch=ipfield.value;
      
-    axios.get(`https://freshbay.online/product/productSearch?q=${srch}`).then((response)=>{
+    axios.get(`https://www.freshbay.online/product/productSearch?q=${srch}`).then((response)=>{
 
 
       
@@ -302,7 +302,7 @@ if(event.target && (event.target.id==="fcall1" || event.target.id==="fcall2")){
 //to delete and retrive product
 
 async function deleteProduct(productid){
-const response= await axios.post('https://freshbay.online/product/delete-product',{productid})
+const response= await axios.post('https://www.freshbay.online/product/delete-product',{productid})
 if(response.data.success){
 
   await Swal.fire({

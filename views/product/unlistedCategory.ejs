@@ -69,7 +69,7 @@
 <script>
    
   async function deleteCategory(catid){
-  const response= await axios.post('https://freshbay.online/product/unlist-category',{catid})
+  const response= await axios.post('https://www.freshbay.online/product/unlist-category',{catid})
   if(response.data.success){
   
     await Swal.fire({

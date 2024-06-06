@@ -84,7 +84,7 @@
 <script>
    
   async function deleteSubCategory(subc){
-  const response= await axios.post('https://freshbay.online/product/unlist-subcategory',{subc})
+  const response= await axios.post('https://www.freshbay.online/product/unlist-subcategory',{subc})
   if(response.data.success){
   
     await Swal.fire({

@@ -238,7 +238,7 @@ let pie = new Chart(cty, {
 //loading income chart at document loading
 
 document.addEventListener('DOMContentLoaded', function() {
-  axios.get(`https://freshbay.online/admin/growthSearch?filter=${filter}`).then((response)=>{
+  axios.get(`https://www.freshbay.online/admin/growthSearch?filter=${filter}`).then((response)=>{
     const growth = response.data.growth;
 
 
@@ -317,7 +317,7 @@ let chart = new Chart(ctz, {
  document.getElementById('filter').addEventListener('change', (event) => {
   let filter= event.target.value;
 
-            axios.get(`https://freshbay.online/admin/growthSearch?filter=${filter}`).then((response)=>{
+            axios.get(`https://www.freshbay.online/admin/growthSearch?filter=${filter}`).then((response)=>{
 
               const growth = response.data.growth;
 
