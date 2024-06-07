@@ -190,10 +190,11 @@ const loadSubCategory=async(req,res)=>{
         
         try {
             const categoryId=req.body.catid
-           
+           const product=await Product.findOne({Category:categoryId})
+
             const catData=await Category.findOne({_id:categoryId})
            
-            if(catData.Is_delete){
+            if(catData.Is_delete && !product){
         
              await Category.updateOne({_id:categoryId},{$set:{Is_delete:0}})
               res.json({success:true,message:"Unlisted"})
