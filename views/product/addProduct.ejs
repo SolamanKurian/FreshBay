@@ -13,7 +13,7 @@
               <%= message %>
             </span>
           <% } %>
-          <form class="forms-product" action="/product/AddProduct" method="post" enctype="multipart/form-data">
+          <form class="forms-product" action="/product/AddProduct" method="post" enctype="multipart/form-data" id="product-form">
             <!--Name-->
             <div class="form-group">
               <label for="exampleInputName1">Name</label>
@@ -45,7 +45,7 @@
             <!--Images-->
             <div class="form-group">
               <label>File upload (Images only)</label>
-              <input type="file" name="images" id="image-input" class="form-control file-upload-default" multiple accept="image/*" >
+              <input type="file" id="image-input" class="form-control file-upload-default" accept="image/*" multiple>
               <div class="input-group col-xs-12">
                 <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image">
                 <span class="input-group-append">
@@ -54,8 +54,12 @@
               </div>
               <span id="image-error-message" class="error-message text-danger"></span>
             </div>
-            <!-- Image Previews -->
-            <div id="image-preview" class="preview-container"></div><br>
+            <!-- Image Crop and Preview -->
+            <div class="form-group" id="image-preview-container">
+              <label>Image Preview and Crop</label>
+              <!-- Dynamic image previews will be added here -->
+            </div>
+            <button type="button" class="btn btn-gradient-primary" id="crop-btn">Crop</button>
             <!--Description-->
             <div class="form-group">
               <label>Product Description</label>
@@ -72,12 +76,71 @@
 <!--product list-->
 <%- include('../layouts/adminFooter')-%>
 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('.forms-product');
+    const imageInput = document.getElementById('image-input');
+    const imagePreviewContainer = document.getElementById('image-preview-container');
+    const cropButton = document.getElementById('crop-btn');
+    let cropperInstances = [];
+
+    // Display images and initialize croppers
+    imageInput.addEventListener('change', (event) => {
+      const files = event.target.files;
+      imagePreviewContainer.innerHTML = ''; // Clear previous previews and croppers
+      cropperInstances = []; // Reset croppers
+
+      if (files && files.length > 0) {
+        Array.from(files).forEach((file, index) => {
+          const fileReader = new FileReader();
+          fileReader.onload = (e) => {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.style.maxWidth = '100%';
+            img.dataset.index = index;
+            imagePreviewContainer.appendChild(img);
+
+            const cropper = new Cropper(img, {
+              aspectRatio: 1,
+              viewMode: 2,
+            });
+
+            cropperInstances.push(cropper);
+          };
+          fileReader.readAsDataURL(file);
+        });
+      }
+    });
+
+    // Crop images and prepare for upload
+    cropButton.addEventListener('click', () => {
+      cropperInstances.forEach((cropper, index) => {
+        const canvas = cropper.getCroppedCanvas({
+          width: 600,
+          height: 600,
+        });
+        canvas.toBlob((blob) => {
+          const file = new File([blob], `cropped-image-${index}.jpg`, { type: 'image/jpeg' });
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+
+          // Assign cropped files back to the file input
+          if (index === 0) {
+            imageInput.files = dataTransfer.files; // If first file, replace file input
+          } else {
+            Array.from(imageInput.files).forEach((existingFile, i) => {
+              dataTransfer.items.add(existingFile);
+            });
+            dataTransfer.items.add(file);
+            imageInput.files = dataTransfer.files;
+          }
+        });
+      });
+    });
 
     form.addEventListener('submit', (e) => {
-    
       const nameInput = document.getElementById('name');
       const priceInput = document.getElementById('price-input');
       const quantityInput = document.getElementById('quantity-input');
@@ -91,7 +154,6 @@
       const name = nameInput.value.trim();
       const price = priceInput.value.trim();
       const quantity = quantityInput.value.trim();
-
 
       nameErrorMessage.textContent = '';
       priceErrorMessage.textContent = '';
@@ -149,47 +211,44 @@
       }
     });
 
-    // Function to preview selected images
-    function previewImages() {
-      const previewContainer = document.getElementById('image-preview');
-      const files = document.getElementById('image-input').files;
-      const maxPreviewImages = 3; // Maximum number of images to preview
-
-      previewContainer.innerHTML = ''; // Clear previous previews
-
-      for (let i = 0; i < maxPreviewImages && i < files.length; i++) {
-        const file = files[i];
-        const reader = new FileReader();
-
-        reader.onload = function(e) {
-          const img = document.createElement('img');
-          img.src = e.target.result;
-          img.classList.add('preview-image');
-          previewContainer.appendChild(img);
-        };
-
-        reader.readAsDataURL(file);
-      }
-    }
-
-    document.getElementById('image-input').addEventListener('change', previewImages);
-  });
-
-  document.querySelector('.file-upload-browse').addEventListener("click", () => {
-    document.querySelector('#image-input').click();
+    document.querySelector('.file-upload-browse').addEventListener("click", () => {
+      document.querySelector('#image-input').click();
+    });
   });
 </script>
 
 <style>
   .preview-container {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
   }
 
   .preview-image {
-    width: 100px; 
-    height: 100px; 
+    width: 150px;
+    height: 150px;
     object-fit: cover;
     border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .preview-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .preview-remove-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 50%;
+    padding: 5px;
+    cursor: pointer;
   }
 </style>
+
+   
