@@ -5,37 +5,13 @@ const Product=require('../models/prodectmodel')
 const Poffer=require("../models/productofferModel")
 const Coffer=require("../models/categoryofferModel")
 const sharp=require('sharp')
-const multer = require('multer');
-const path = require('path');
 const fs=require("fs")
 const bcrypt=require("bcrypt")
 const axios=require("axios")
 const Swal=require("sweetalert2")
 const { error } = require('console')
 
-// Set up multer storage
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, './public/productimages/');
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + path.extname(file.originalname)); // Appending extension
-    }
-});
 
-const upload = multer({
-    storage: storage,
-    fileFilter: function (req, file, cb) {
-        const allowedExtensions = /jpg|jpeg|png|webp/;
-        const extname = allowedExtensions.test(path.extname(file.originalname).toLowerCase());
-        const mimetype = allowedExtensions.test(file.mimetype);
-        if (extname && mimetype) {
-            return cb(null, true);
-        } else {
-            cb(new Error('Only images are allowed'));
-        }
-    }
-});
 
 
 
@@ -147,12 +123,17 @@ const categories=await Category.find({})
 const loadAddCategory=async(req,res)=>{
 
     try {
+    
         res.render('addCategory')
+        
     } catch (error) {
         console.log(error.message);
     }
+    
     }
+
     // to add category to db
+
     const addCategory=async(req,res)=>{
 try {
     
@@ -186,6 +167,7 @@ const loadSubCategory=async(req,res)=>{
     } catch (error) {
         console.log(error.message);
     }
+    
         }
 
     // to render add sub category page
@@ -306,101 +288,158 @@ try {
 
 
 }
-// Add product to db
-const addProduct = async (req, res) => {
-    try {
-        const already = await Product.findOne({ Name: { $regex: new RegExp('^' + req.body.name + '$', 'i') } });
-        if (already) {
-            const categoryData = await Category.find({});
-            return res.render('addProduct', { message: 'Product name already exists', cat: categoryData });
-        }
+// to add product to db
 
-        const category = await Category.findOne({ Name: req.body.category });
-        const product = new Product({
-            Name: req.body.name,
-            Price: req.body.price,
-            Quantity: req.body.quantity,
-            Category: category._id,
-            Pdesc: req.body.description,
-            Date: new Date(),
-            Image: req.files.map(file => file.filename)
-        });
+const addProduct=async(req,res)=>{
+try {
 
-        const coffer = await Coffer.find().populate('categoryId');
-        const isCatOffer = coffer.find(item => item.categoryId._id.toString() === category._id.toString());
+    const already = await Product.findOne({ Name: { $regex: new RegExp('^' + req.body.name + '$', 'i') } });
 
-        if (isCatOffer) {
-            let percentage = isCatOffer.percentage;
-            let offer = (req.body.price * percentage) / 100;
-            product.Offerprice = req.body.price - offer;
-        }
-
-        const productData = await product.save();
-        if (productData) {
-            req.files.forEach(file => fs.unlinkSync(`./public/productimages/${file.filename}`));
-            res.redirect('/product');
-        }
-    } catch (error) {
-        console.log(error.message);
+    if(already){
+        const categoryData=await Category.find({})
+       return res.render('addProduct',{message:'Product name already exists',cat:categoryData})
     }
-};
 
-// Load edit product page
-const loadEditProduct = async (req, res) => {
-    try {
-        const category = await Category.find({ Is_delete: false });
-        const pid = req.query.pid;
-        const productData = await Product.findOne({ _id: pid }).populate('Category');
-        if (productData) {
-            res.render('productEdit', { product: productData, cat: category });
-        }
-    } catch (error) {
-        console.log(error.message);
+
+   
+    const category=await Category.findOne({Name:req.body.category})
+    const product=new Product({
+        Name: req.body.name ,
+        Price:req.body.price ,
+        Quantity:req.body.quantity ,
+        Category:category._id ,
+        Pdesc:req.body.description,
+        Date: new Date(),
+    })
+    //image cropping
+    for(let i=0;i<req.files.length;i++){
+        const date = new Date();
+        const timestamp = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}_${date.getHours().toString().padStart(2, '0')}${date.getMinutes().toString().padStart(2, '0')}${date.getSeconds().toString().padStart(2, '0')}`;
+        const filename = `croped-${timestamp}-${req.files[i].originalname}`;
+        await sharp(req.files[i].path)
+        .resize({width:600,height:600,fit:"cover"})
+        .toFile(`./public/productimages/${filename}`);
+        product.Image.push(filename)
     }
-};
+    //to check the offer price
+    const coffer = await Coffer.find().populate('categoryId');
+    const isCatOffer = coffer.find(item => item.categoryId._id.toString() === category._id.toString());
+    
+    if (isCatOffer) {
+       
+        let percentage=isCatOffer.percentage;
+        let offer=(req.body.price*percentage)/100;
+         cofferprice=req.body.price-offer;
+         product.Offerprice=cofferprice;
+      } 
+      
+    const productData=await product.save()
+    if(productData){
 
-// Edit/update product
-const editProduct = async (req, res) => {
-    try {
-        const pid = req.query.pid;
-
-        const existingProduct = await Product.findOne({ Name: { $regex: new RegExp('^' + req.body.name + '$', 'i') } });
-        if (existingProduct && existingProduct._id.toString() !== pid) {
-            const categoryData = await Category.find({});
-            return res.render('productEdit', { message: 'Product name already exists', cat: categoryData, product: existingProduct });
+        for (let j = 0; j < req.files.length; j++) {
+            const filePath = `./public/productimages/${req.files[j].originalname}`;
+            try {
+                fs.unlinkSync(filePath);
+                
+            } catch (error) {
+                // error ocuuring while unlink, issue with permission need to clarify
+                
+            }
         }
+        
+        
 
-        const category = await Category.findOne({ Name: req.body.category });
+        res.redirect('/product')
 
-        const updateData = {
-            Name: req.body.name,
-            Price: req.body.price,
-            Quantity: req.body.quantity,
-            Category: category._id,
-            Pdesc: req.body.description,
-            Image: req.files.map(file => file.filename),
-            Date: new Date()
-        };
-
-        const coffer = await Coffer.find().populate('categoryId');
-        const isCatOffer = coffer.find(item => item.categoryId._id.toString() === category._id.toString());
-
-        if (isCatOffer) {
-            let percentage = isCatOffer.percentage;
-            let offer = (req.body.price * percentage) / 100;
-            updateData.Offerprice = req.body.price - offer;
-        }
-
-        await Product.updateOne({ _id: pid }, { $set: updateData });
-
-        req.files.forEach(file => fs.unlinkSync(`./public/productimages/${file.filename}`));
-
-        res.redirect('/product');
-    } catch (error) {
-        console.log(error.message);
     }
-};
+} catch (error) {
+    console.log(error.message);
+}
+}
+// to load edit product
 
+const loadEditProduct=async(req,res)=>{
+try {
+    const category=await Category.find({Is_delete:false})
+    const pid=req.query.pid
+    const productData=await Product.findOne({_id:pid}).populate('Category')
+    if(productData){
+        res.render('productEdit',{product:productData,cat:category})
+    }
+} catch (error) {
+    console.log(error.message);
+}
+}
+
+// to edit/update product
+
+const editProduct=async(req,res)=>{
+try {
+
+    const pid = req.query.pid;
+
+
+    const existingProduct = await Product.findOne({ Name: { $regex: new RegExp('^' + req.body.name + '$', 'i') } });
+    if (existingProduct && existingProduct._id.toString() !== pid) {
+      const categories = await Category.find({ Is_delete: false });
+      const productData = await Product.findById(pid);
+      return res.render('productEdit', { message: 'Product name already exists', product: productData, cat: categories });
+    }
+    const category=await Category.findOne({Name:req.body.category})
+
+const product=await Product.findByIdAndUpdate({_id:pid},{$set:{
+
+    Name:req.body.name,
+    Price:req.body.price,
+    Quantity:req.body.quantity,
+    Category:category._id ,
+    Pdesc:req.body.description
+}});
+
+if(req.body.deletedIndices){
+    
+const deletedIndices=JSON.parse(req.body.deletedIndices)
+
+for(let index of deletedIndices){
+     
+     const deletedImage = product.Image[Number(index)];
+
+     // Remove the image file from the file system
+     fs.unlinkSync(`./public/productimages/${deletedImage}`);
+    product.Image.splice(Number(index),1)
+}
+
+}
+for(let i=0;i<req.files.length;i++){
+
+    const date = new Date();
+    const timestamp = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}_${date.getHours().toString().padStart(2, '0')}${date.getMinutes().toString().padStart(2, '0')}${date.getSeconds().toString().padStart(2, '0')}`;
+    const filename = `croped-${timestamp}-${req.files[i].originalname}`;
+    await sharp(req.files[i].path)
+    .resize({width:600,height:600,fit:"cover"})
+    .toFile(`./public/productimages/${filename}`);
+    product.Image.push(filename)
+}
+
+  //to check the offer price
+  const coffer = await Coffer.find().populate('categoryId');
+  const isCatOffer = coffer.find(item => item.categoryId._id.toString() === category._id.toString());
+  
+  if (isCatOffer) {
+     
+      let percentage=isCatOffer.percentage;
+      let offer=(req.body.price*percentage)/100;
+       cofferprice=req.body.price-offer;
+       product.Offerprice=cofferprice;
+    } 
+const productData=await product.save()
+if(productData){
+    res.redirect('/product')
+}   
+} catch (error) {
+    console.log(error.message);
+}
+}
 //to load edit category
 const loadEditCategory=async(req,res)=>{
         
