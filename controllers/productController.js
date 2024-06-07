@@ -124,7 +124,7 @@ const loadAddCategory=async(req,res)=>{
 
     try {
     
-        res.render('addcategory')
+        res.render('addCategory')
         
     } catch (error) {
         console.log(error.message);
@@ -190,11 +190,10 @@ const loadSubCategory=async(req,res)=>{
         
         try {
             const categoryId=req.body.catid
-           const product=await Product.findOne({Category:categoryId})
-
+          
             const catData=await Category.findOne({_id:categoryId})
            
-            if(catData.Is_delete && !product){
+            if(catData.Is_delete){
         
              await Category.updateOne({_id:categoryId},{$set:{Is_delete:0}})
               res.json({success:true,message:"Unlisted"})
