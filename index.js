@@ -5,7 +5,7 @@ const mongoose=require("mongoose");
 mongoose.connect(process.env.mongoconnect).then(()=>{console.log("DB Connected");}).catch((err)=>{console.log("DB Not connected",err);})
 
 const express=require("express")
-const bodyParser = require('body-parser');
+
 const cors = require('cors');
 const nocache=require("nocache")
 
@@ -15,8 +15,7 @@ const Swal=require("sweetalert2")
 
 
 const app=express()
-app.use(bodyParser.json({ limit: '10mb' }));
-app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
+
 app.use(cors());
 app.use(cors({
       origin: ['https://www.freshbay.online',],

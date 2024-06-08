@@ -2,8 +2,12 @@ const express=require("express")
 const {v4:uuidv4}=require('uuid')
 const session=require("express-session")
 const multer=require("multer")
+const bodyParser = require('body-parser');
 const path=require("path")
 const product_route=express()
+
+product_route.use(bodyParser.json({ limit: '50mb' }));
+product_route.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 product_route.use(session({
     secret:uuidv4(),
     saveUninitialized:false,
