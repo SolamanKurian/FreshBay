@@ -6,8 +6,8 @@ const bodyParser = require('body-parser');
 const path=require("path")
 const product_route=express()
 
-product_route.use(bodyParser.json({ limit: '50mb' }));
-product_route.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+product_route.use(bodyParser.json({ limit: '100mb' }));
+product_route.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
 product_route.use(session({
     secret:uuidv4(),
     saveUninitialized:false,
