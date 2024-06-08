@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
     limits: { fileSize: 10 * 1024 * 1024 } // 10MB file size limit
   });
 
-product_route.post('/upload-cropped-image', upload.single('croppedImage'), (req, res) => {
+product_route.post('/upload-cropped-image', upload.array('croppedImage',3), (req, res) => {
     res.json({ filePath: `/public/productimages/${req.file.filename}` });
   });
 //
