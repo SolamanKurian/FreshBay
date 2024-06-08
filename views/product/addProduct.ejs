@@ -44,28 +44,52 @@
             <!-- Images -->
             <div class="form-group">
               <label>File upload (Images only, up to 3)</label>
-              <input type="file" name="images" id="image-input" class="form-control file-upload-default" accept="image/*" multiple style="display: none;">
-              <div class="input-group col-xs-12">
-                <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Images">
-                <span class="input-group-append">
-                  <button class="file-upload-browse btn btn-gradient-primary" type="button" id="img-upload-btn">Upload</button>
-                </span>
+              <!-- Image Upload and Cropper Section 1 -->
+              <div class="image-upload-section">
+                <input type="file" name="images" id="image-input1" class="form-control file-upload-default" accept="image/*" style="display: none;">
+                <div class="input-group col-xs-12">
+                  <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image 1">
+                  <span class="input-group-append">
+                    <button class="file-upload-browse btn btn-gradient-primary" type="button" id="img-upload-btn1">Upload Image 1</button>
+                  </span>
+                </div>
+                <div class="preview-container">
+                  <div id="image-preview1" class="preview-image"></div>
+                  <button type="button" id="crop-btn1" class="btn btn-primary crop-button" style="display: none;">Crop Image 1</button>
+                  <button type="button" id="remove-btn1" class="btn btn-danger remove-button" style="display: none;">Remove Image 1</button>
+                </div>
               </div>
-              <span id="image-error-message" class="error-message text-danger"></span>
-            </div>
-            <!-- Image Previews and Cropper -->
-            <div class="preview-container">
-              <div class="image-container">
-                <div id="image-preview1" class="preview-image"></div>
-                <button type="button" id="crop-btn1" class="btn btn-primary crop-button" style="display: none;">Crop Image 1</button>
+
+              <!-- Image Upload and Cropper Section 2 -->
+              <div class="image-upload-section">
+                <input type="file" name="images" id="image-input2" class="form-control file-upload-default" accept="image/*" style="display: none;">
+                <div class="input-group col-xs-12">
+                  <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image 2">
+                  <span class="input-group-append">
+                    <button class="file-upload-browse btn btn-gradient-primary" type="button" id="img-upload-btn2">Upload Image 2</button>
+                  </span>
+                </div>
+                <div class="preview-container">
+                  <div id="image-preview2" class="preview-image"></div>
+                  <button type="button" id="crop-btn2" class="btn btn-primary crop-button" style="display: none;">Crop Image 2</button>
+                  <button type="button" id="remove-btn2" class="btn btn-danger remove-button" style="display: none;">Remove Image 2</button>
+                </div>
               </div>
-              <div class="image-container">
-                <div id="image-preview2" class="preview-image"></div>
-                <button type="button" id="crop-btn2" class="btn btn-primary crop-button" style="display: none;">Crop Image 2</button>
-              </div>
-              <div class="image-container">
-                <div id="image-preview3" class="preview-image"></div>
-                <button type="button" id="crop-btn3" class="btn btn-primary crop-button" style="display: none;">Crop Image 3</button>
+
+              <!-- Image Upload and Cropper Section 3 -->
+              <div class="image-upload-section">
+                <input type="file" name="images" id="image-input3" class="form-control file-upload-default" accept="image/*" style="display: none;">
+                <div class="input-group col-xs-12">
+                  <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image 3">
+                  <span class="input-group-append">
+                    <button class="file-upload-browse btn btn-gradient-primary" type="button" id="img-upload-btn3">Upload Image 3</button>
+                  </span>
+                </div>
+                <div class="preview-container">
+                  <div id="image-preview3" class="preview-image"></div>
+                  <button type="button" id="crop-btn3" class="btn btn-primary crop-button" style="display: none;">Crop Image 3</button>
+                  <button type="button" id="remove-btn3" class="btn btn-danger remove-button" style="display: none;">Remove Image 3</button>
+                </div>
               </div>
             </div>
 
@@ -89,8 +113,7 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const imageInput = document.getElementById('image-input');
-    const imgUploadBtn = document.getElementById('img-upload-btn');
+   
     const previewContainers = [
       document.getElementById('image-preview1'),
       document.getElementById('image-preview2'),
@@ -101,12 +124,27 @@
       document.getElementById('crop-btn2'),
       document.getElementById('crop-btn3')
     ];
+    const removeButtons = [
+      document.getElementById('remove-btn1'),
+      document.getElementById('remove-btn2'),
+      document.getElementById('remove-btn3')
+    ];
+    const imageInputs = [
+      document.getElementById('image-input1'),
+      document.getElementById('image-input2'),
+      document.getElementById('image-input3')
+    ];
+    const imgUploadBtns = [
+      document.getElementById('img-upload-btn1'),
+      document.getElementById('img-upload-btn2'),
+      document.getElementById('img-upload-btn3')
+    ];
 
     let croppers = [];
 
     // Function to initialize Cropper.js for each image
-    function initCropper(input, previewContainer, cropButton, index) {
-      const file = input.files[index];
+    function initCropper(input, previewContainer, cropButton, removeButton, index) {
+      const file = input.files[0];
       const reader = new FileReader();
 
       reader.onload = function (event) {
@@ -122,24 +160,27 @@
           autoCropArea: 1,
         });
 
-        croppers.push(cropper);
+        croppers[index] = cropper;
 
-        // Show crop button for this preview container
+        // Show crop and remove buttons for this preview container
         cropButton.style.display = 'block';
+        removeButton.style.display = 'block';
       };
 
       reader.readAsDataURL(file);
     }
 
     // Event listeners for uploading images and initializing Cropper.js
-    imgUploadBtn.addEventListener('click', () => {
-      imageInput.click();
+    imgUploadBtns.forEach((btn, index) => {
+      btn.addEventListener('click', () => {
+        imageInputs[index].click();
+      });
     });
 
-    imageInput.addEventListener('change', () => {
-      for (let i = 0; i < imageInput.files.length; i++) {
-        initCropper(imageInput, previewContainers[i], cropButtons[i], i);
-      }
+    imageInputs.forEach((input, index) => {
+      input.addEventListener('change', () => {
+        initCropper(input, previewContainers[index], cropButtons[index], removeButtons[index], index);
+      });
     });
 
     // Event listeners for crop buttons
@@ -152,24 +193,92 @@
         if (canvas) {
           canvas.toBlob((blob) => {
             const croppedUrl = URL.createObjectURL(blob);
-            const croppedImage = new Image();
-            croppedImage.src = croppedUrl;
-            croppedImage.width = 100; // Set width of the preview image
-            croppedImage.height = 100; // Set height of the preview image
-            previewContainers[index].innerHTML = '';
-            previewContainers[index].appendChild(croppedImage);
+            previewContainers[index].innerHTML = `<img src="${croppedUrl}" class="preview-image">`;
+            const croppedInput = document.createElement('input');
+            croppedInput.type = 'hidden';
+            croppedInput.name = `croppedImage${index + 1}`;
+            croppedInput.value = croppedUrl;
+            document.getElementById('cropped-images-container').appendChild(croppedInput);
           });
         }
       });
     });
-  });
-</script>
 
+    // Event listeners for remove buttons
+    removeButtons.forEach((button, index) => {
+      button.addEventListener('click', () => {
+        imageInputs[index].value = '';
+        previewContainers[index].innerHTML = '';
+        cropButtons[index].style.display = 'none';
+        removeButtons[index].style.display = 'none';
+        croppers[index] = null;
+      });
+    });
+    // validation and submission
+    const form = document.querySelector('.forms-product');
+  const nameInput = document.getElementById('name');
+  const priceInput = document.getElementById('price-input');
+  const quantityInput = document.getElementById('quantity-input');
+  const imagesInputs = [
+    document.getElementById('image-input1'),
+    document.getElementById('image-input2'),
+    document.getElementById('image-input3')
+  ];
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault(); // Prevent the form from submitting initially
+    
+    const name = nameInput.value.trim();
+    const price = priceInput.value.trim();
+    const quantity = quantityInput.value.trim();
+    
+    const nameErrorMessage = document.getElementById('name-error-message');
+    const priceErrorMessage = document.getElementById('price-error-msg');
+    const quantityErrorMessage = document.getElementById('quantity-error-message');
+    
+    
+    nameErrorMessage.textContent = '';
+    priceErrorMessage.textContent = '';
+    quantityErrorMessage.textContent = '';
+    
+    let isValid = true;
+    
+    // Name Validation
+    if (name === '') {
+      isValid = false;
+      nameErrorMessage.textContent = 'Please enter a valid name';
+    }
+
+    // Price Validation
+    if (!price.match(/^\d+(\.\d{1,2})?$/)) {
+      isValid = false;
+      priceErrorMessage.textContent = 'Please enter a valid price (numbers only)';
+    }
+
+    // Quantity Validation
+    if (!quantity.match(/^\d+(\.\d{1,2})?$/)) {
+      isValid = false;
+      quantityErrorMessage.textContent = 'Please enter a valid quantity (numbers only)';
+    }
+
+   
+
+    if (isValid) {
+      // If all validations pass, submit the form
+      form.submit();
+    }
+  });
+
+});
+
+
+</script>
 
 <style>
   .preview-container {
     display: flex;
     gap: 20px; /* Adjust as needed */
+    align-items: center; /* Center align items vertically */
   }
 
   .preview-image {
@@ -179,16 +288,19 @@
     border-radius: 5px;
     cursor: pointer; /* Add cursor pointer for interactivity */
     transition: transform 0.2s ease; /* Add smooth transition on hover */
-    margin-right: 120px; /* Add margin for horizontal alignment */
+    margin-right: 10px; /* Add margin for horizontal alignment */
   }
 
   .preview-image:hover {
     transform: scale(1.1); /* Scale up the image on hover */
   }
 
-  .crop-button {
-    width: 10px; /* Adjust button width */
-    height: 10px;
+  .crop-button,
+  .remove-button {
     margin-top: 10px; /* Add margin for vertical alignment */
+  }
+
+  .crop-button {
+    margin-right: 10px; /* Add margin to separate crop and remove buttons */
   }
 </style>

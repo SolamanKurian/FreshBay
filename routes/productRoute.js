@@ -21,6 +21,11 @@ cb(null,name)
 const upload=multer({storage:productstore})
 //upto here
 
+
+
+
+
+
 product_route.set('view engine','ejs')
 product_route.set('views','./views/product')
 const productController=require("../controllers/productController")
