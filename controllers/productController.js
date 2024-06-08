@@ -301,7 +301,7 @@ try {
        return res.render('addProduct',{message:'Product name already exists',cat:categoryData})
     }
 
-console.log(req.files);
+
    
     const category=await Category.findOne({Name:req.body.category})
     const product=new Product({
@@ -329,7 +329,7 @@ console.log(req.files);
       } 
       
     const productData=await product.save()
-    console.log(productData);
+    
     if(productData){
 
         for (let j = 0; j < req.files.length; j++) {

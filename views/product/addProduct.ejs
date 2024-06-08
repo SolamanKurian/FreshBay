@@ -68,7 +68,7 @@
     </div>
   </div>
 </div>
-  <!-- Modal -->
+<!-- Modal -->
 <div id="cropModal" class="modal fade" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
@@ -91,162 +91,152 @@
   </div>
 </div>
 <link href="https://unpkg.com/cropperjs/dist/cropper.css" rel="stylesheet">
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-  <script src="https://unpkg.com/cropperjs"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-
-
-
-<%- include('../layouts/adminFooter')-%>
-
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://unpkg.com/cropperjs"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 
 <script>
-   let cropper;
-    let currentFileIndex = -1;
-    let files = [];
-    let images = [];
+  let cropper;
+  let currentFileIndex = -1;
+  let files = [];
+  let images = [];
 
-    function handleFileSelect(event) {
-      const preview = document.getElementById('imagePreview');
-      preview.innerHTML = '';
+  function handleFileSelect(event) {
+    const preview = document.getElementById('imagePreview');
+    preview.innerHTML = '';
 
-      files = Array.from(event.target.files);
-      images = files.slice();
-      const filesAmount = files.length;
+    files = Array.from(event.target.files);
+    images = files.slice();
+    const filesAmount = files.length;
 
-      document.getElementById('fileCount').value = filesAmount + ' files selected';
+    document.getElementById('fileCount').value = filesAmount + ' files selected';
 
-      for (let i = 0; i < filesAmount; i++) {
-        const reader = new FileReader();
+    for (let i = 0; i < filesAmount; i++) {
+      const reader = new FileReader();
 
-        reader.onload = function(event) {
-          const imageWrapper = document.createElement('div');
-          imageWrapper.style.position = 'relative';
-          imageWrapper.style.display = 'inline-block';
-          imageWrapper.style.marginRight = '10px';
+      reader.onload = function(event) {
+        const imageWrapper = document.createElement('div');
+        imageWrapper.style.position = 'relative';
+        imageWrapper.style.display = 'inline-block';
+        imageWrapper.style.marginRight = '10px';
 
-          const imageElement = document.createElement('img');
-          imageElement.src = event.target.result;
-          imageElement.style.width = '100px';
-          imageElement.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.1)';
-
-          const removeButton = document.createElement('button');
-          removeButton.innerText = 'x';
-          removeButton.style.position = 'absolute';
-          removeButton.style.top = '0';
-          removeButton.style.right = '0';
-          removeButton.style.color = 'rgb(255, 255, 255)';
-          removeButton.style.backgroundColor = 'rgb(255, 0, 0)';
-          removeButton.style.border = 'none';
-          removeButton.style.borderRadius = '50%';
-          removeButton.style.cursor = 'pointer';
-          removeButton.onclick = function() {
-            const newFiles = images.filter((_, index) => index !== i);
-            const fileList = new DataTransfer();
-
-            newFiles.forEach(file => {
-              fileList.items.add(file);
-            });
-
-            images = newFiles;
-            document.getElementById('imageInput').files = fileList.files;
-            handleFileSelect({
-              target: {
-                files: fileList.files
-              }
-            });
-
-            document.getElementById('imageInput').value = '';
-          };
-
-          const cropButton = document.createElement('button');
-          cropButton.type = 'button';
-          cropButton.innerText = 'Crop';
-          cropButton.style.position = 'absolute';
-          cropButton.style.bottom = '0';
-          cropButton.style.right = '30px';
-          cropButton.style.color = 'white';
-          cropButton.style.backgroundColor = 'green';
-          cropButton.style.border = 'none';
-          cropButton.style.borderRadius = '5px';
-          cropButton.style.cursor = 'pointer';
-          cropButton.onclick = function() {
-            currentFileIndex = i;
-            document.getElementById('cropperImage').src = event.target.result;
-            $('#cropModal').modal('show');
-            initializeCropper();
-          };
-
-          imageWrapper.appendChild(imageElement);
-          imageWrapper.appendChild(removeButton);
-          imageWrapper.appendChild(cropButton);
-          preview.appendChild(imageWrapper);
-        };
-
-        reader.readAsDataURL(files[i]);
-      }
-    }
-    function initializeCropper() {
-      const image = document.getElementById('cropperImage');
-      cropper = new Cropper(image, {
-        aspectRatio: 1,
-        viewMode: 1,
-        autoCropArea: 1,
-      });
-    }
-    
-    document.getElementById('cropButton').addEventListener('click', function(event) {
-      event.preventDefault(); 
-      const canvas = cropper.getCroppedCanvas({
-        width: 600,
-        height: 600,
-      });
-
-      canvas.toBlob(function(blob) {
-        const newFile = new File([blob], images[currentFileIndex].name, {
-          type: 'image/png'
-        });
-        images[currentFileIndex] = newFile;
-
-        const fileList = new DataTransfer();
-        images.forEach(file => {
-          fileList.items.add(file);
-        });
-
-        document.getElementById('imageInput').files = fileList.files;
-
-        const url = URL.createObjectURL(blob);
         const imageElement = document.createElement('img');
-        imageElement.src = url;
+        imageElement.src = event.target.result;
         imageElement.style.width = '100px';
         imageElement.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.1)';
 
-        const preview = document.getElementById('imagePreview');
-        const imageWrappers = preview.getElementsByTagName('div');
+        const removeButton = document.createElement('button');
+        removeButton.innerText = 'x';
+        removeButton.style.position = 'absolute';
+        removeButton.style.top = '0';
+        removeButton.style.right = '0';
+        removeButton.style.color = 'rgb(255, 255, 255)';
+        removeButton.style.backgroundColor = 'rgb(255, 0, 0)';
+        removeButton.style.border = 'none';
+        removeButton.style.borderRadius = '50%';
+        removeButton.style.cursor = 'pointer';
+        removeButton.onclick = function() {
+          const newFiles = images.filter((_, index) => index !== i);
+          const fileList = new DataTransfer();
 
-        imageWrappers[currentFileIndex].replaceChild(imageElement, imageWrappers[currentFileIndex].getElementsByTagName('img')[0]);
+          newFiles.forEach(file => {
+            fileList.items.add(file);
+          });
 
-        $('#cropModal').modal('hide');
-        cropper.destroy();
+          images = newFiles;
+          document.getElementById('imageInput').files = fileList.files;
+          handleFileSelect({
+            target: {
+              files: fileList.files
+            }
+          });
+
+          document.getElementById('imageInput').value = '';
+        };
+
+        const cropButton = document.createElement('button');
+        cropButton.type = 'button';
+        cropButton.innerText = 'Crop';
+        cropButton.style.position = 'absolute';
+        cropButton.style.bottom = '0';
+        cropButton.style.right = '30px';
+        cropButton.style.color = 'white';
+        cropButton.style.backgroundColor = 'green';
+        cropButton.style.border = 'none';
+        cropButton.style.borderRadius = '5px';
+        cropButton.style.cursor = 'pointer';
+        cropButton.onclick = function() {
+          currentFileIndex = i;
+          document.getElementById('cropperImage').src = event.target.result;
+          $('#cropModal').modal('show');
+          initializeCropper();
+        };
+
+        imageWrapper.appendChild(imageElement);
+        imageWrapper.appendChild(removeButton);
+        imageWrapper.appendChild(cropButton);
+        preview.appendChild(imageWrapper);
+      };
+
+      reader.readAsDataURL(files[i]);
+    }
+  }
+
+  function initializeCropper() {
+    const image = document.getElementById('cropperImage');
+    cropper = new Cropper(image, {
+      aspectRatio: 1,
+      viewMode: 1,
+      autoCropArea: 1,
+    });
+  }
+
+  document.getElementById('cropButton').addEventListener('click', function(event) {
+    event.preventDefault();
+    const canvas = cropper.getCroppedCanvas({
+      width: 600,
+      height: 600,
+    });
+
+    canvas.toBlob(function(blob) {
+      const newFile = new File([blob], images[currentFileIndex].name, {
+        type: 'image/png'
       });
+      images[currentFileIndex] = newFile;
+
+      const fileList = new DataTransfer();
+      images.forEach(file => {
+        fileList.items.add(file);
+      });
+
+      document.getElementById('imageInput').files = fileList.files;
+
+      const url = URL.createObjectURL(blob);
+      const imageElement = document.createElement('img');
+      imageElement.src = url;
+      imageElement.style.width = '100px';
+      imageElement.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.1)';
+
+      const preview = document.getElementById('imagePreview');
+      const imageWrappers = preview.getElementsByTagName('div');
+
+      imageWrappers[currentFileIndex].replaceChild(imageElement, imageWrappers[currentFileIndex].getElementsByTagName('img')[0]);
+
+      $('#cropModal').modal('hide');
+      cropper.destroy();
     });
-    document.getElementById('imageInput').addEventListener('click', function() {
-      this.value = '';
+  });
+
+  document.getElementById('imageInput').addEventListener('click', function() {
+    this.value = '';
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    $('#cropModal').on('hidden.bs.modal', function() {
+      cropper.destroy();
     });
-
-    document.addEventListener('DOMContentLoaded', function () {
-      
-    })
-
-
-
-
-
-
-
-
-  
+  });
 </script>
 <style>
   .preview-container {
@@ -278,3 +268,4 @@
     margin-right: 10px; /* Add margin to separate crop and remove buttons */
   }
 </style>
+<%- include('../layouts/adminFooter')-%>

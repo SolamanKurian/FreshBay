@@ -16,7 +16,7 @@ const storage = multer.diskStorage({
         cb(null, path.join(__dirname, "../public/productimages"));
     },
     filename: (req, file, cb) => {
-        console.log("dsafsadf");
+        
         const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
         cb(null, 'cropped-' + uniqueSuffix + path.extname(file.originalname));
     }
