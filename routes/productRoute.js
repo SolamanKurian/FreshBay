@@ -11,19 +11,23 @@ product_route.use(session({
 }))
 //settings for file upload storage
 
-const productstore=multer.diskStorage({destination:(req,file,cb)=>{
-    cb(null,path.join(__dirname, '../public/productimages'))
-}, filename:(req,file,cb)=>{
-    const unique=Date.now()+"-"+Math.round(Math.random()*1e9);
-const name=file.originalname+"-"+unique;
-cb(null,name)
-}});
-const upload=multer({storage:productstore})
-//upto here
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, "../public/productimages"));
+    },
+    filename: (req, file, cb) => {
+        console.log("dsafsadf");
+        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
+        cb(null, 'cropped-' + uniqueSuffix + path.extname(file.originalname));
+    }
+  });
+  
+  const upload = multer({ storage: storage });
 
-
-
-
+product_route.post('/upload-cropped-image', upload.single('croppedImage'), (req, res) => {
+    res.json({ filePath: `/public/productimages/${req.file.filename}` });
+  });
+//
 
 
 product_route.set('view engine','ejs')

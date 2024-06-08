@@ -6,6 +6,7 @@ const Poffer=require("../models/productofferModel")
 const Coffer=require("../models/categoryofferModel")
 const sharp=require('sharp')
 const fs=require("fs")
+const path=require('path')
 const bcrypt=require("bcrypt")
 const axios=require("axios")
 const Swal=require("sweetalert2")
@@ -300,7 +301,7 @@ try {
        return res.render('addProduct',{message:'Product name already exists',cat:categoryData})
     }
 
-
+console.log(req.files);
    
     const category=await Category.findOne({Name:req.body.category})
     const product=new Product({
@@ -311,15 +312,9 @@ try {
         Pdesc:req.body.description,
         Date: new Date(),
     })
-    //image cropping
+    
     for(let i=0;i<req.files.length;i++){
-        const date = new Date();
-        const timestamp = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}_${date.getHours().toString().padStart(2, '0')}${date.getMinutes().toString().padStart(2, '0')}${date.getSeconds().toString().padStart(2, '0')}`;
-        const filename = `croped-${timestamp}-${req.files[i].originalname}`;
-        await sharp(req.files[i].path)
-        .resize({width:600,height:600,fit:"cover"})
-        .toFile(`./public/productimages/${filename}`);
-        product.Image.push(filename)
+        product.Image.push(req.files[i].filename);
     }
     //to check the offer price
     const coffer = await Coffer.find().populate('categoryId');
@@ -334,6 +329,7 @@ try {
       } 
       
     const productData=await product.save()
+    console.log(productData);
     if(productData){
 
         for (let j = 0; j < req.files.length; j++) {
