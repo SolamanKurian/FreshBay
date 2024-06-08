@@ -16,18 +16,15 @@ const storage = multer.diskStorage({
         cb(null, path.join(__dirname, "../public/productimages"));
     },
     filename: (req, file, cb) => {
-        
+
         const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
         cb(null, 'cropped-' + uniqueSuffix + path.extname(file.originalname));
     }
   });
   
-  const upload = multer({
-    storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 } // 10MB file size limit
-  });
+  const upload = multer({ storage: storage });
 
-product_route.post('/upload-cropped-image', upload.array('croppedImage',3), (req, res) => {
+product_route.post('/upload-cropped-image', upload.single('croppedImage'), (req, res) => {
     res.json({ filePath: `/public/productimages/${req.file.filename}` });
   });
 //
