@@ -195,12 +195,7 @@
             reader.onloadend = () => {
               const croppedUrl = reader.result;
               previewContainers[index].innerHTML = `<img src="${croppedUrl}" class="preview-image">`;
-              const croppedInput = document.createElement('input');
-              croppedInput.type = 'hidden';
-              croppedInput.name = `croppedImage${index + 1}`;
-              croppedInput.value = croppedUrl;
-              imageInputs[index].value = croppedUrl;
-              document.getElementById('cropped-images-container').appendChild(croppedInput);
+              imageInputs[index].value = croppedUrl; // Set the value of the original input to the cropped image data
             };
             reader.readAsDataURL(blob);
           });
@@ -261,32 +256,8 @@
       }
 
       if (isValid) {
-        // If all validations pass, update the input values with cropped images and submit the form
-        croppers.forEach((cropper, index) => {
-          if (cropper) {
-            const canvas = cropper.getCroppedCanvas({
-              width: 200, // Set the desired width
-              height: 200, // Set the desired height
-            });
-            if (canvas) {
-              canvas.toBlob((blob) => {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                  const croppedUrl = reader.result;
-                  const croppedInput = document.createElement('input');
-                  croppedInput.type = 'hidden';
-                  croppedInput.name = `croppedImage${index + 1}`;
-                  croppedInput.value = croppedUrl;
-                  form.appendChild(croppedInput); // Append the hidden input to the form
-                };
-                reader.readAsDataURL(blob);
-              });
-            }
-          }
-        });
-
-        // Submit the form after updating the input values with cropped images
-        setTimeout(() => form.submit(), 1000); // Adding a delay to ensure all inputs are appended
+        // Submit the form after all validations pass
+        form.submit();
       }
     });
   });
