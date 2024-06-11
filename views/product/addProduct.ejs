@@ -101,199 +101,198 @@
 <%- include('../layouts/adminFooter')-%>
 
 <script>
-   let cropper;
-let currentFileIndex = -1;
-let files = [];
-let images = [];
+  let cropper;
+  let currentFileIndex = -1;
+  let files = [];
+  let images = [];
 
-function handleFileSelect(event) {
-  const preview = document.getElementById('imagePreview');
-  preview.innerHTML = '';
-
-  files = Array.from(event.target.files);
-  images = files.slice();
-  const filesAmount = files.length;
-
-  document.getElementById('fileCount').value = filesAmount + ' files selected';
-
-  for (let i = 0; i < filesAmount; i++) {
-    const reader = new FileReader();
-
-    reader.onload = function(event) {
-      const imageWrapper = document.createElement('div');
-      imageWrapper.style.position = 'relative';
-      imageWrapper.style.display = 'inline-block';
-      imageWrapper.style.marginRight = '10px';
-
-      const imageElement = document.createElement('img');
-      imageElement.src = event.target.result;
-      imageElement.style.width = '100px';
-      imageElement.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.1)';
-
-      const removeButton = document.createElement('button');
-      removeButton.innerText = 'x';
-      removeButton.style.position = 'absolute';
-      removeButton.style.top = '0';
-      removeButton.style.right = '0';
-      removeButton.style.color = 'rgb(255, 255, 255)';
-      removeButton.style.backgroundColor = 'rgb(255, 0, 0)';
-      removeButton.style.border = 'none';
-      removeButton.style.borderRadius = '50%';
-      removeButton.style.cursor = 'pointer';
-      removeButton.onclick = function() {
-        const newFiles = images.filter((_, index) => index !== i);
-        const fileList = new DataTransfer();
-
-        newFiles.forEach(file => {
-          fileList.items.add(file);
-        });
-
-        images = newFiles;
-        document.getElementById('imageInput').files = fileList.files;
-        handleFileSelect({
-          target: {
-            files: fileList.files
-          }
-        });
-
-        document.getElementById('imageInput').value = '';
-      };
-
-      const cropButton = document.createElement('button');
-      cropButton.type = 'button';
-      cropButton.innerText = 'Crop';
-      cropButton.style.position = 'absolute';
-      cropButton.style.bottom = '0';
-      cropButton.style.right = '30px';
-      cropButton.style.color = 'white';
-      cropButton.style.backgroundColor = 'green';
-      cropButton.style.border = 'none';
-      cropButton.style.borderRadius = '5px';
-      cropButton.style.cursor = 'pointer';
-      cropButton.onclick = function() {
-        currentFileIndex = i;
-        document.getElementById('cropperImage').src = event.target.result;
-        $('#cropModal').modal('show');
-        initializeCropper();
-      };
-
-      imageWrapper.appendChild(imageElement);
-      imageWrapper.appendChild(removeButton);
-      imageWrapper.appendChild(cropButton);
-      preview.appendChild(imageWrapper);
-    };
-
-    reader.readAsDataURL(files[i]);
-  }
-}
-
-function initializeCropper() {
-  const image = document.getElementById('cropperImage');
-  cropper = new Cropper(image, {
-    aspectRatio: 1,
-    viewMode: 1,
-    autoCropArea: 1,
-  });
-}
-
-document.getElementById('cropButton').addEventListener('click', function(event) {
-  event.preventDefault(); 
-  const canvas = cropper.getCroppedCanvas({
-    width: 400,
-    height: 400,
-  });
-
-  canvas.toBlob(function(blob) {
-    const newFile = new File([blob], images[currentFileIndex].name, {
-      type: 'image/jpeg', // Use JPEG for better compression
-    });
-
-    images[currentFileIndex] = newFile;
-
-    const fileList = new DataTransfer();
-    images.forEach(file => {
-      fileList.items.add(file);
-    });
-
-    document.getElementById('imageInput').files = fileList.files;
-
-    const url = URL.createObjectURL(blob);
-    const imageElement = document.createElement('img');
-    imageElement.src = url;
-    imageElement.style.width = '100px';
-    imageElement.style.marginRight = '10px';
-
+  function handleFileSelect(event) {
     const preview = document.getElementById('imagePreview');
-    preview.children[currentFileIndex].replaceChild(imageElement, preview.children[currentFileIndex].firstChild);
-    cropper.destroy();
-    cropper = null;
-    $('#cropModal').modal('hide');
-  });
-});
+    preview.innerHTML = '';
 
-function validateForm() {
-  let isValid = true;
+    files = Array.from(event.target.files);
+    images = files.slice();
+    const filesAmount = files.length;
 
-  // Validate name
-  const name = document.getElementById('name').value.trim();
-  const nameError = document.getElementById('name-error-message');
-  if (name === '') {
-    nameError.textContent = 'Name is required';
-    isValid = false;
-  } else if (/\s/.test(name)) {
-    nameError.textContent = 'Name should not contain spaces';
-    isValid = false;
-  } else {
-    nameError.textContent = '';
-  }
+    document.getElementById('fileCount').value = filesAmount + ' files selected';
 
-  // Validate price
-  const price = document.getElementById('price-input').value.trim();
-  const priceError = document.getElementById('price-error-msg');
-  if (price === '') {
-    priceError.textContent = 'Price is required';
-    isValid = false;
-  } else if (!/^\d+$/.test(price)) {
-    priceError.textContent = 'Price should contain only numbers';
-    isValid = false;
-  } else {
-    priceError.textContent = '';
-  }
+    for (let i = 0; i < filesAmount; i++) {
+      const reader = new FileReader();
 
-  // Validate quantity
-  const quantity = document.getElementById('quantity-input').value.trim();
-  const quantityError = document.getElementById('quantity-error-message');
-  if (quantity === '') {
-    quantityError.textContent = 'Quantity is required';
-    isValid = false;
-  } else if (!/^\d+$/.test(quantity)) {
-    quantityError.textContent = 'Quantity should contain only numbers';
-    isValid = false;
-  } else {
-    quantityError.textContent = '';
-  }
+      reader.onload = function(event) {
+        const imageWrapper = document.createElement('div');
+        imageWrapper.style.position = 'relative';
+        imageWrapper.style.display = 'inline-block';
+        imageWrapper.style.marginRight = '10px';
 
-  // Validate images
-  const imageInput = document.getElementById('imageInput');
-  const imageError = document.getElementById('imageError');
-  const files = imageInput.files;
-  const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.webp)$/i;
-  if (files.length === 0) {
-    imageError.textContent = 'At least one image is required';
-    isValid = false;
-  } else {
-    for (let i = 0; i < files.length; i++) {
-      if (!allowedExtensions.exec(files[i].name)) {
-        imageError.textContent = 'Invalid file type. Only jpg, jpeg, png, and webp files are allowed';
-        isValid = false;
-        break;
-      } else {
-        imageError.textContent = '';
-      }
+        const imageElement = document.createElement('img');
+        imageElement.src = event.target.result;
+        imageElement.style.width = '100px';
+        imageElement.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.1)';
+
+        const removeButton = document.createElement('button');
+        removeButton.innerText = 'x';
+        removeButton.style.position = 'absolute';
+        removeButton.style.top = '0';
+        removeButton.style.right = '0';
+        removeButton.style.color = 'rgb(255, 255, 255)';
+        removeButton.style.backgroundColor = 'rgb(255, 0, 0)';
+        removeButton.style.border = 'none';
+        removeButton.style.borderRadius = '50%';
+        removeButton.style.cursor = 'pointer';
+        removeButton.onclick = function() {
+          const newFiles = images.filter((_, index) => index !== i);
+          const fileList = new DataTransfer();
+
+          newFiles.forEach(file => {
+            fileList.items.add(file);
+          });
+
+          images = newFiles;
+          document.getElementById('imageInput').files = fileList.files;
+          handleFileSelect({
+            target: {
+              files: fileList.files
+            }
+          });
+
+          document.getElementById('imageInput').value = '';
+        };
+
+        const cropButton = document.createElement('button');
+        cropButton.type = 'button';
+        cropButton.innerText = 'Crop';
+        cropButton.style.position = 'absolute';
+        cropButton.style.bottom = '0';
+        cropButton.style.right = '30px';
+        cropButton.style.color = 'white';
+        cropButton.style.backgroundColor = 'green';
+        cropButton.style.border = 'none';
+        cropButton.style.borderRadius = '5px';
+        cropButton.style.cursor = 'pointer';
+        cropButton.onclick = function() {
+          currentFileIndex = i;
+          document.getElementById('cropperImage').src = event.target.result;
+          $('#cropModal').modal('show');
+          initializeCropper();
+        };
+
+        imageWrapper.appendChild(imageElement);
+        imageWrapper.appendChild(removeButton);
+        imageWrapper.appendChild(cropButton);
+        preview.appendChild(imageWrapper);
+      };
+
+      reader.readAsDataURL(files[i]);
     }
   }
 
-  return isValid;
-}
+  function initializeCropper() {
+    const image = document.getElementById('cropperImage');
+    cropper = new Cropper(image, {
+      aspectRatio: 1,
+      viewMode: 1,
+      autoCropArea: 1,
+    });
+  }
 
+  document.getElementById('cropButton').addEventListener('click', function(event) {
+    event.preventDefault(); 
+    const canvas = cropper.getCroppedCanvas({
+      width: 400,
+      height: 400,
+    });
+
+    canvas.toBlob(function(blob) {
+      const newFile = new File([blob], images[currentFileIndex].name, {
+        type: 'image/jpeg', // Use JPEG for better compression
+      });
+
+      images[currentFileIndex] = newFile;
+
+      const fileList = new DataTransfer();
+      images.forEach(file => {
+        fileList.items.add(file);
+      });
+
+      document.getElementById('imageInput').files = fileList.files;
+
+      const url = URL.createObjectURL(blob);
+      const imageElement = document.createElement('img');
+      imageElement.src = url;
+      imageElement.style.width = '100px';
+      imageElement.style.marginRight = '10px';
+
+      const preview = document.getElementById('imagePreview');
+      preview.children[currentFileIndex].replaceChild(imageElement, preview.children[currentFileIndex].firstChild);
+      cropper.destroy();
+      cropper = null;
+      $('#cropModal').modal('hide');
+    });
+  });
+
+  function validateForm() {
+    let isValid = true;
+
+    // Validate name
+    const name = document.getElementById('name').value.trim();
+    const nameError = document.getElementById('name-error-message');
+    if (name === '') {
+      nameError.textContent = 'Name is required';
+      isValid = false;
+    } else if (/\s/.test(name)) {
+      nameError.textContent = 'Name should not contain spaces';
+      isValid = false;
+    } else {
+      nameError.textContent = '';
+    }
+
+    // Validate price
+    const price = document.getElementById('price-input').value.trim();
+    const priceError = document.getElementById('price-error-msg');
+    if (price === '') {
+      priceError.textContent = 'Price is required';
+      isValid = false;
+    } else if (!/^\d+$/.test(price)) {
+      priceError.textContent = 'Price should contain only numbers';
+      isValid = false;
+    } else {
+      priceError.textContent = '';
+    }
+
+    // Validate quantity
+    const quantity = document.getElementById('quantity-input').value.trim();
+    const quantityError = document.getElementById('quantity-error-message');
+    if (quantity === '') {
+      quantityError.textContent = 'Quantity is required';
+      isValid = false;
+    } else if (!/^\d+$/.test(quantity)) {
+      quantityError.textContent = 'Quantity should contain only numbers';
+      isValid = false;
+    } else {
+      quantityError.textContent = '';
+    }
+
+    // Validate images
+    const imageInput = document.getElementById('imageInput');
+    const imageError = document.getElementById('imageError');
+    const files = imageInput.files;
+    const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.webp)$/i;
+    if (files.length === 0) {
+      imageError.textContent = 'At least one image is required';
+      isValid = false;
+    } else {
+      for (let i = 0; i < files.length; i++) {
+        if (!allowedExtensions.exec(files[i].name)) {
+          imageError.textContent = 'Invalid file type. Only jpg, jpeg, png, and webp files are allowed';
+          isValid = false;
+          break;
+        } else {
+          imageError.textContent = '';
+        }
+      }
+    }
+
+    return isValid;
+  }
 </script>
