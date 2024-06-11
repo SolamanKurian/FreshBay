@@ -104,8 +104,7 @@
       for (let i = 0; i < maxPreviewImages && i < files.length; i++) {
         const reader = new FileReader();
 
-        reader.onload = (e)
-        => {
+        reader.onload = (e)=> {
           const imageElement = document.createElement('img');
           imageElement.src = e.target.result;
           imageElement.classList.add('preview-image');
