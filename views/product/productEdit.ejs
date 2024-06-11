@@ -287,10 +287,6 @@ const form=document.getElementById("edit-form");
         removedImageIndices = [];
       }
 
-
-
-
-
   // Validate name
   const name = document.getElementById('name').value.trim();
   const nameError = document.getElementById('name-error-message');
@@ -335,10 +331,7 @@ const form=document.getElementById("edit-form");
   const imageError = document.getElementById('imageError');
   const files = imageInput.files;
   const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.webp)$/i;
-  if (files.length === 0) {
-    imageError.textContent = 'At least one image is required';
-    isValid = false;
-  } else {
+ 
     for (let i = 0; i < files.length; i++) {
       if (!allowedExtensions.exec(files[i].name)) {
         imageError.textContent = 'Invalid file type. Only jpg, jpeg, png, and webp files are allowed';
@@ -348,7 +341,7 @@ const form=document.getElementById("edit-form");
         imageError.textContent = '';
       }
     }
-  }
+  
 
   return isValid;
 }
