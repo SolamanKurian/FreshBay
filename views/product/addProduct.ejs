@@ -12,7 +12,7 @@
               <%= message %>
             </span>
           <% } %>
-          <form class="forms-product" action="/product/AddProduct" method="post" enctype="multipart/form-data">
+          <form class="forms-product" action="/product/AddProduct" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
             <!-- Name -->
             <div class="form-group">
               <label for="exampleInputName1">Name</label>
@@ -99,7 +99,6 @@
 
 
 <%- include('../layouts/adminFooter')-%>
-
 
 <script>
    let cropper;
@@ -222,54 +221,79 @@ document.getElementById('cropButton').addEventListener('click', function(event) 
     const imageElement = document.createElement('img');
     imageElement.src = url;
     imageElement.style.width = '100px';
-    imageElement.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.1)';
+    imageElement.style.marginRight = '10px';
 
     const preview = document.getElementById('imagePreview');
-    const imageWrappers = preview.getElementsByTagName('div');
-
-    imageWrappers[currentFileIndex].replaceChild(imageElement, imageWrappers[currentFileIndex].getElementsByTagName('img')[0]);
-
-    $('#cropModal').modal('hide');
+    preview.children[currentFileIndex].replaceChild(imageElement, preview.children[currentFileIndex].firstChild);
     cropper.destroy();
-  }, 'image/jpeg', 0.6); // Adjust the quality if needed (0.7 = 70%)
+    cropper = null;
+    $('#cropModal').modal('hide');
+  });
 });
 
-document.getElementById('imageInput').addEventListener('click', function() {
-  this.value = '';
-});
+function validateForm() {
+  let isValid = true;
 
-document.addEventListener('DOMContentLoaded', function () {
-  // Initialize any needed functionalities here
-});
+  // Validate name
+  const name = document.getElementById('name').value.trim();
+  const nameError = document.getElementById('name-error-message');
+  if (name === '') {
+    nameError.textContent = 'Name is required';
+    isValid = false;
+  } else if (/\s/.test(name)) {
+    nameError.textContent = 'Name should not contain spaces';
+    isValid = false;
+  } else {
+    nameError.textContent = '';
+  }
+
+  // Validate price
+  const price = document.getElementById('price-input').value.trim();
+  const priceError = document.getElementById('price-error-msg');
+  if (price === '') {
+    priceError.textContent = 'Price is required';
+    isValid = false;
+  } else if (!/^\d+$/.test(price)) {
+    priceError.textContent = 'Price should contain only numbers';
+    isValid = false;
+  } else {
+    priceError.textContent = '';
+  }
+
+  // Validate quantity
+  const quantity = document.getElementById('quantity-input').value.trim();
+  const quantityError = document.getElementById('quantity-error-message');
+  if (quantity === '') {
+    quantityError.textContent = 'Quantity is required';
+    isValid = false;
+  } else if (!/^\d+$/.test(quantity)) {
+    quantityError.textContent = 'Quantity should contain only numbers';
+    isValid = false;
+  } else {
+    quantityError.textContent = '';
+  }
+
+  // Validate images
+  const imageInput = document.getElementById('imageInput');
+  const imageError = document.getElementById('imageError');
+  const files = imageInput.files;
+  const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.webp)$/i;
+  if (files.length === 0) {
+    imageError.textContent = 'At least one image is required';
+    isValid = false;
+  } else {
+    for (let i = 0; i < files.length; i++) {
+      if (!allowedExtensions.exec(files[i].name)) {
+        imageError.textContent = 'Invalid file type. Only jpg, jpeg, png, and webp files are allowed';
+        isValid = false;
+        break;
+      } else {
+        imageError.textContent = '';
+      }
+    }
+  }
+
+  return isValid;
+}
 
 </script>
-<style>
-  .preview-container {
-    display: flex;
-    gap: 20px; /* Adjust as needed */
-    align-items: center; /* Center align items vertically */
-  }
-
-  .preview-image {
-    width: 100px; /* Adjust the size of the cropped images */
-    height: 100px;
-    object-fit: cover;
-    border-radius: 5px;
-    cursor: pointer; /* Add cursor pointer for interactivity */
-    transition: transform 0.2s ease; /* Add smooth transition on hover */
-    margin-right: 10px; /* Add margin for horizontal alignment */
-  }
-
-  .preview-image:hover {
-    transform: scale(1.1); /* Scale up the image on hover */
-  }
-
-  .crop-button,
-  .remove-button {
-    margin-top: 10px; /* Add margin for vertical alignment */
-  }
-
-  .crop-button {
-    margin-right: 10px; /* Add margin to separate crop and remove buttons */
-  }
-</style>
