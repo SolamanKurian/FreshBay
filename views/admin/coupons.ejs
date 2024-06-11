@@ -92,8 +92,9 @@ nextPageBtn.addEventListener('click', async () => {
 // load coupon 
 
 document.addEventListener('DOMContentLoaded',async function(){
-try {
   const table=document.getElementById("coupon-table")
+try {
+  
 axios.get(`https://freshbay.online/admin/couponsToPage`).then((response)=>{
 
     
@@ -147,6 +148,7 @@ if (couponData.length > 0) {
   //get coupon with pagination
 
   async function goToPage(currentPage){
+    const table=document.getElementById("coupon-table")
     try {
   let buttonHtml;
   let status=0
