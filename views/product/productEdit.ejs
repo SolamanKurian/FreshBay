@@ -72,36 +72,6 @@
             <!-- Image Previews -->
             <div id="image-preview" class="preview-container"></div><br>
 
-            <style>
-              .image-container {
-                position: relative;
-              }
-              .remove-image-btn {
-                position: absolute;
-                top: -10px;
-                right: 0px;
-                background-color: transparent;
-                border: none;
-                color: red;
-                font-size: 20px;
-                cursor: pointer;
-                z-index: 1;
-              }
-              .remove-image-btn:hover {
-                color: darkred;
-              }
-              .preview-container {
-                display: flex;
-                gap: 10px;
-              }
-              .preview-image {
-                width: 100px;
-                height: 100px;
-                object-fit: cover;
-                border-radius: 5px;
-              }
-            </style>
-
             <!-- Description -->
             <div class="form-group">
               <label>Product Description</label>
@@ -119,12 +89,45 @@
 
 <%- include('../layouts/adminFooter') %>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('.forms-product');
+    const imageInput = document.getElementById('image-input');
+    const imagePreview = document.getElementById('image-preview');
+    let cropper;
+
+    imageInput.addEventListener('change', () => {
+      if (cropper) {
+        cropper.destroy();
+      }
+
+      const files = imageInput.files;
+      const maxPreviewImages = 3;
+
+      imagePreview.innerHTML = '';
+
+      for (let i = 0; i < maxPreviewImages && i < files.length; i++) {
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.classList.add('preview-image');
+          imagePreview.appendChild(img);
+
+          cropper = new Cropper(img, {
+            aspectRatio: 1,
+            viewMode: 1,
+            background: false,
+          });
+        };
+
+        reader.readAsDataURL(files[i]);
+      }
+    });
 
     form.addEventListener('submit', (e) => {
-      // Trim inputs and get values
       const nameInput = document.getElementById('name');
       const priceInput = document.getElementById('price-input');
       const quantityInput = document.getElementById('quantity-input');
@@ -138,16 +141,16 @@
       const name = nameInput.value.trim();
       const price = priceInput.value.trim();
       const quantity = quantityInput.value.trim();
+      const allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'JPG', 'JPEG', 'WEBP'];
+      const files = imagesInput.files;
 
-      // Clear previous error messages
+      let isValid = true;
+
       nameErrorMessage.textContent = '';
       priceErrorMessage.textContent = '';
       quantityErrorMessage.textContent = '';
       imagesErrorMessage.textContent = '';
 
-      let isValid = true;
-
-      // Name Validation
       if (name === '') {
         isValid = false;
         nameErrorMessage.textContent = 'Please enter a valid name';
@@ -155,7 +158,6 @@
         nameInput.value = name;
       }
 
-      // Price Validation
       if (!price.match(/^\d+(\.\d{1,2})?$/)) {
         isValid = false;
         priceErrorMessage.textContent = 'Please enter a valid price (numbers only)';
@@ -163,90 +165,84 @@
         priceInput.value = price;
       }
 
-      // Quantity Validation
       if (!quantity.match(/^\d+(\.\d{1,2})?$/)) {
         isValid = false;
         quantityErrorMessage.textContent = 'Please enter a valid quantity (numbers only)';
       } else {
         quantityInput.value = quantity;
       }
-
-      // File Upload Validation
-      const allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'JPG', 'JPEG', 'WEBP'];
-      const files = imagesInput.files;
       let fileIsValid = true;
 
-      for (let i = 0; i < files.length; i++) {
-        const fileName = files[i].name;
-        const fileExtension = fileName.split('.').pop().toLowerCase();
+for (let i = 0; i < files.length; i++) {
+  const fileName = files[i].name;
+  const fileExtension = fileName.split('.').pop().toLowerCase();
 
-        if (!allowedExtensions.includes(fileExtension)) {
-          fileIsValid = false;
-          break;
-        }
-      }
+  if (!allowedExtensions.includes(fileExtension)) {
+    fileIsValid = false;
+    break;
+  }
+}
 
-      if (!fileIsValid) {
-        isValid = false;
-        imagesErrorMessage.textContent = 'Please upload only JPG, JPEG, PNG, or WEBP files';
-      }
+if (!fileIsValid) {
+  isValid = false;
+  imagesErrorMessage.textContent = 'Please upload only JPG, JPEG, PNG, or WEBP files';
+}
 
-      if (!isValid) {
-        e.preventDefault();
-      }
-    });
+if (!isValid) {
+  e.preventDefault();
+  if (cropper) {
+    cropper.destroy();
+  }
+  return;
+}
 
-    // JavaScript for removing images
-    let removedImageIndices = [];
-    const removeImageButtons = document.querySelectorAll('.remove-image-btn');
-    const imagePreview = document.querySelector('.image-preview');
+// Prepare cropped images for submission
+const croppedImages = [];
+const croppedCanvas = cropper.getCroppedCanvas({ width: 300, height: 300 }); // Adjust dimensions as needed
 
-    removeImageButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        const indexToRemove = button.dataset.index;
-        removedImageIndices.push(indexToRemove);
-        imagePreview.removeChild(button.parentElement);
-      });
-    });
+if (croppedCanvas) {
+  croppedCanvas.toBlob((blob) => {
+    const croppedFile = new File([blob], 'cropped_image.jpg', { type: 'image/jpeg', lastModified: Date.now() });
+    croppedImages.push(croppedFile);
 
-    form.addEventListener('submit', (e) => {
-      if (removedImageIndices.length > 0) {
-        const deletedIndicesInput = document.createElement('input');
-        deletedIndicesInput.type = "hidden";
-        deletedIndicesInput.name = "deletedIndices";
-        deletedIndicesInput.value = JSON.stringify(removedImageIndices);
-        form.appendChild(deletedIndicesInput);
-        removedImageIndices = [];
-      }
-    });
-
-    // JavaScript for Image Preview
-    document.querySelector('.file-upload-browse').addEventListener("click", () => {
-      document.querySelector('#image-input').click();
-    });
-
-    function previewImages() {
-      const previewContainer = document.getElementById('image-preview');
-      const files = document.getElementById('image-input').files;
-      const maxPreviewImages = 3;
-
-      previewContainer.innerHTML = '';
-
-      for (let i = 0; i < maxPreviewImages && i < files.length; i++) {
-        const file = files[i];
-        const reader = new FileReader();
-
-        reader.onload = function (e) {
-          const img = document.createElement('img');
-          img.src = e.target.result;
-          img.classList.add('preview-image');
-          previewContainer.appendChild(img);
-        };
-
-        reader.readAsDataURL(file);
-      }
+    // Append cropped images to the form data
+    const formData = new FormData(form);
+    for (const image of croppedImages) {
+      formData.append('croppedImages', image);
     }
 
-    document.getElementById('image-input').addEventListener('change', previewImages);
-  });
+    // Submit the form with cropped images
+    fetch(form.action, {
+      method: form.method,
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        // Handle response as needed
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        // Handle error
+      });
+  }, 'image/jpeg');
+} else {
+  // No images cropped
+  const formData = new FormData(form);
+  fetch(form.action, {
+    method: form.method,
+    body: formData,
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      // Handle response as needed
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      // Handle error
+    });
+}
+});
+});
 </script>
