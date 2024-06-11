@@ -889,7 +889,7 @@ const loadCouponsToPage=async(req,res,next)=>{
            }
        
            const coupons=await Coupon.find()
-            let finalcouponData=orderData.slice((page - 1) * 5, page * 5);
+            let finalcouponData=coupons.slice((page - 1) * 5, page * 5);
             res.json({coupons:finalcouponData})
         
         
