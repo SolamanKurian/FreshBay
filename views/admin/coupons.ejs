@@ -107,10 +107,7 @@ if (couponData.length > 0) {
   couponData.forEach(coupon=> {
     
     const row = document.createElement('tr');
-    row.innerHTML = `
-    
-        
-                                         
+    row.innerHTML = `                 
                       <td> ${coupon.couponcode}</td>  
                       <td> ${coupon.percentage}</td>  
                      <td>${formatDate(coupon.date)}</td>
@@ -119,16 +116,9 @@ if (couponData.length > 0) {
                       
 
                           <a  onclick="deleteCoupon('${coupon._id}')"><label class="badge badge-gradient-danger">Remove</label></a>
-    
-                       
-
                         <a href="/admin/editCoupon?couponId=${coupon._id}"><label class="badge badge-gradient-success">Edit</label></a> 
                       </td>                       
-               
-                    
 
-
- 
       `;
     table.appendChild(row);
     function formatDate(dateString) {
@@ -154,11 +144,78 @@ if (couponData.length > 0) {
 
   })
 
+//get coupon with pagination
+
+  async function goToPage(currentPage){
+    try {
+  let buttonHtml;
+  let status=0
+axios.get(`https://freshbay.online/admin/couponsToPage?&cp=${currentPage}`).then((response)=>{
+  let couponData=response.data.coupons
+
+// Clear existing rows
+table.innerHTML = '';
+
+if (couponData.length > 0) {
+  couponData.forEach(coupon=> {
+    
+    const row = document.createElement('tr');
+    row.innerHTML = `
+    
+        
+                                         
+                      <td> ${coupon.couponcode}</td>  
+                      <td> ${coupon.percentage}</td>  
+                     <td>${formatDate(coupon.date)}</td>
+                       <td> ${coupon.maxlimit}</td>  
+                       <td> ${coupon.minlimit}</td>  
+                      
+
+                          <a  onclick="deleteCoupon('${coupon._id}')"><label class="badge badge-gradient-danger">Remove</label></a>
+    
+                       
+
+                        <a href="/admin/editCoupon?couponId=${coupon._id}"><label class="badge badge-gradient-success">Edit</label></a> 
+                      </td>                       
+
+ 
+      `;
+    table.appendChild(row);
+    function formatDate(dateString) {
+  const date = new Date(dateString);
+  return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`; // Format as dd/mm/yyyy
+}
+  } 
+ 
+
+);
+} else {
+  const row = document.createElement('tr');
+  row.innerHTML = `<td colspan="5" class="text-center">coupon not found</td>`;
+  table.appendChild(row);
+}
+
+
+})
+
+      
+    } catch (error) {
+      console.log(error.message);
+    }
+
+
+  }
 
 
 
 
-   
+
+
+
+
+
+
+
    async function deleteCoupon(couponId) {
     const confirmation = await Swal.fire({
         icon: 'warning',

@@ -879,8 +879,19 @@ const loadCoupons=async(req,res,next)=>{
 
 const loadCouponsToPage=async(req,res,next)=>{
     try {
-        const coupons=await Coupon.find()
-        res.json({coupons:coupons})
+
+        let page ;
+         
+        if(req.query.cp){
+            page=req.query.cp;
+           }else{
+            page=1;
+           }
+       
+           const coupons=await Coupon.find()
+            let finalcouponData=orderData.slice((page - 1) * 5, page * 5);
+            res.json({coupons:finalcouponData})
+        
         
     } catch (error) {
         next(error)
