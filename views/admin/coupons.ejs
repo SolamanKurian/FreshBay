@@ -131,10 +131,11 @@ if (couponData.length > 0) {
  
       `;
     table.appendChild(row);
-  }, function formatDate(dateString) {
+    function formatDate(dateString) {
   const date = new Date(dateString);
   return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`; // Format as dd/mm/yyyy
 }
+  } 
  
 
 );
