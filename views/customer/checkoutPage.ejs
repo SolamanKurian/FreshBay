@@ -199,6 +199,7 @@
     </div> 
 </div>
 <p hidden id="disc"><%= coupon %></p>
+<p hidden id="max"><%= maxOffer %></p>
                     <!--payment end-->
                     <form id="placeform" action="/order/createOrder" method="post">
                         <input type="hidden" id="selectedadd" name="addressId">
@@ -375,6 +376,7 @@ addressBox.innerHTML = '';
     let discount=0;
     let coupon=0;
     let newsubtotal=0;
+    let maxOffer=0;
 let total=0;
     // to load the cart details when page load
 const table=document.getElementById("cart-body")
@@ -402,9 +404,17 @@ if (cartData.cart.items.length > 0) {
 
 // to calculate the gtotal
 const discountBox = document.getElementById("disc")
-if(discountBox){
+const maxBox=document.getElementById("max")
+if(discountBox && maxBox){
     coupon=discountBox.innerHTML;
-    discount=(total*coupon)/100;
+    maxOffer=maxBox.innerHTML;
+
+    discountTest=(total*coupon)/100;
+    if(discountTest>maxOffer){
+        discount=maxOffer;
+    }else{
+        discount=discountTest;
+    }
    
 }
 newsubtotal=total-discount;

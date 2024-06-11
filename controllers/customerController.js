@@ -1071,13 +1071,16 @@ const loadCheckout=async(req,res,next)=>{
         if(req.body.coupon){
             let coupon=await Coupon.findOne({couponcode:req.body.coupon});
                 let value=coupon.percentage;
+                let maxOffer=coupon.maxlimit;
 
         req.session.discount=value;
+        req.session.maxOffer=maxOffer;
         }
         let coupon=req.session.discount?req.session.discount:0;
+        let maxOffer=req.session.maxOffer?req.session.maxOffer:0;
         const wallet= await Wallet.findOne({customerId:req.session.customer_id})
         const customer=await Customer.findOne({_id:req.session.customer_id})
-            res.render('checkoutPage',{customer:customer,wallet:wallet,coupon:coupon})
+            res.render('checkoutPage',{customer:customer,wallet:wallet,coupon:coupon,maxOffer:maxOffer})
         
     } catch (error) {
         next(error)
