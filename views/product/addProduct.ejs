@@ -12,7 +12,7 @@
               <%= message %>
             </span>
           <% } %>
-          <form class="forms-product" enctype="multipart/form-data" method="POST" action="/product/editProduct?pid=<%= product._id %>">
+          <form class="forms-product" enctype="multipart/form-data" method="POST" action="/product/editProduct?pid=<%= product._id %>" onsubmit="return validateForm()">
             <!-- Name -->
             <div class="form-group">
               <label for="exampleInputName1">Name</label>
@@ -51,6 +51,12 @@
             <div class="form-group">
               <label>File upload (Images only)</label>
               <input type="file" name="images" id="image-input" class="form-control file-upload-default" multiple accept="image/*">
+              <div class="input-group col-xs-12">
+                <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image">
+                <span class="input-group-append">
+                  <button class="file-upload-browse btn btn-gradient-primary" type="button" id="img-upload-btn">Upload</button>
+                </span>
+              </div>
               <span id="image-error-message" class="error-message text-danger"></span>
               <!-- Existing Image with Cross Marks -->
               <div class="image-preview d-flex mt-2">
@@ -104,103 +110,101 @@
       for (let i = 0; i < maxPreviewImages && i < files.length; i++) {
         const reader = new FileReader();
 
-        reader.onload = (e)=> {
-          const imageElement = document.createElement('img');
-          imageElement.src = e.target.result;
-          imageElement.classList.add('preview-image');
-          imagePreview.appendChild(imageElement);
+        reader.onload = (e) => {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.classList.add('preview-image');
+          imagePreview.appendChild(img);
+
+          cropper = new Cropper(img, {
+            aspectRatio: 1,
+            viewMode: 1,
+            background: false,
+          });
         };
 
         reader.readAsDataURL(files[i]);
       }
-
-      if (files.length > maxPreviewImages) {
-        const message = document.createElement('span');
-        message.textContent = `Showing only first ${maxPreviewImages} images`;
-        imagePreview.appendChild(message);
-      }
     });
 
     form.addEventListener('submit', (e) => {
-      const name = document.getElementById('name').value.trim();
-      const price = document.getElementById('price-input').value.trim();
-      const quantity = document.getElementById('quantity-input').value.trim();
-      const category = document.getElementById('categorySelect').value;
-      const images = imageInput.files;
-      const description = document.getElementById('exampleTextarea1').value.trim();
+      const nameInput = document.getElementById('name');
+      const priceInput = document.getElementById('price-input');
+      const quantityInput = document.getElementById('quantity-input');
+      const imagesInput = document.getElementById('image-input');
+
+      const nameErrorMessage = document.getElementById('name-error-message');
+      const priceErrorMessage = document.getElementById('price-error-msg');
+      const quantityErrorMessage = document.getElementById('quantity-error-message');
+      const imagesErrorMessage = document.getElementById('image-error-message');
+
+      const name = nameInput.value.trim();
+      const price = priceInput.value.trim();
+      const quantity = quantityInput.value.trim();
+      const allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'JPG', 'JPEG', 'WEBP'];
+      const files = imagesInput.files;
 
       let isValid = true;
 
-      // Name validation
+      nameErrorMessage.textContent = '';
+      priceErrorMessage.textContent = '';
+      quantityErrorMessage.textContent = '';
+      imagesErrorMessage.textContent = '';
+
       if (name === '') {
-        document.getElementById('name-error-message').textContent = 'Name is required';
         isValid = false;
+        nameErrorMessage.textContent = 'Please enter a valid name';
       } else {
-        document.getElementById('name-error-message').textContent = '';
+        nameInput.value = name;
+      }
+      if (!price.match(/^\d+(\.\d{1,2})?$/)) {
+        isValid = false;
+        priceErrorMessage.textContent = 'Please enter a valid price';
+      } else {
+        priceInput.value = price;
       }
 
-      // Price validation
-      if (price === '') {
-        document.getElementById('price-error-msg').textContent = 'Price is required';
+      if (!quantity.match(/^\d+$/)) {
         isValid = false;
+        quantityErrorMessage.textContent = 'Please enter a valid quantity';
       } else {
-        document.getElementById('price-error-msg').textContent = '';
+        quantityInput.value = quantity;
       }
 
-      // Quantity validation
-      if (quantity === '') {
-        document.getElementById('quantity-error-message').textContent = 'Quantity is required';
+      if (files.length === 0) {
         isValid = false;
+        imagesErrorMessage.textContent = 'Please upload at least one image';
       } else {
-        document.getElementById('quantity-error-message').textContent = '';
-      }
-
-      // Category validation
-      if (category === '') {
-        document.getElementById('category-error-message').textContent = 'Category is required';
-        isValid = false;
-      } else {
-        document.getElementById('category-error-message').textContent = '';
-      }
-
-      // Image validation
-      if (images.length === 0) {
-        document.getElementById('image-error-message').textContent = 'At least one image is required';
-        isValid = false;
-      } else {
-        document.getElementById('image-error-message').textContent = '';
-      }
-
-      // Description validation
-      if (description === '') {
-        document.getElementById('description-error-message').textContent = 'Description is required';
-        isValid = false;
-      } else {
-        document.getElementById('description-error-message').textContent = '';
+        for (const file of files) {
+          const extension = file.name.split('.').pop().toLowerCase();
+          if (!allowedExtensions.includes(extension)) {
+            isValid = false;
+            imagesErrorMessage.textContent = 'Invalid file format. Please upload images only';
+            break;
+          }
+        }
       }
 
       if (!isValid) {
-        e.preventDefault(); // Prevent form submission if validation fails
+        e.preventDefault(); // Prevent form submission
       }
     });
 
-    // Remove image button functionality
-    const previewContainer = document.querySelector('.image-preview');
-    previewContainer.addEventListener('click', (e) => {
+    // Remove image preview on click of remove button
+    imagePreview.addEventListener('click', (e) => {
       if (e.target.classList.contains('remove-image-btn')) {
-        const index = e.target.dataset.index;
-        const images = imageInput.files;
-        const newFiles = Array.from(images).filter((file, i) => i != index);
+        const index = parseInt(e.target.dataset.index);
+        const previewImages = document.querySelectorAll('.preview-image');
+        const newImages = [...previewImages].filter((img, i) => i !== index);
 
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const previewImages = document.querySelectorAll('.preview-image');
-          previewImages[index].src = event.target.result;
-        };
+        imagePreview.innerHTML = ''; // Clear current previews
 
-        reader.readAsDataURL(newFiles[index]);
-        imageInput.files = newFiles;
-        e.target.parentElement.remove();
+        newImages.forEach((img, i) => {
+          img.dataset.index = i;
+          imagePreview.appendChild(img);
+        });
+
+        imageInput.value = ''; // Clear selected files to avoid re-uploading on form submission
       }
     });
   });
