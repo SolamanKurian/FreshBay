@@ -141,7 +141,22 @@
         removeButton.style.borderRadius = '50%';
         removeButton.style.cursor = 'pointer';
         removeButton.onclick = function() {
-          removeImage(i);
+          const newFiles = images.filter((_, index) => index !== i);
+          const fileList = new DataTransfer();
+
+          newFiles.forEach(file => {
+            fileList.items.add(file);
+          });
+
+          images = newFiles;
+          document.getElementById('imageInput').files = fileList.files;
+          handleFileSelect({
+            target: {
+              files: fileList.files
+            }
+          });
+
+          document.getElementById('imageInput').value = '';
         };
 
         const cropButton = document.createElement('button');
@@ -170,23 +185,6 @@
 
       reader.readAsDataURL(files[i]);
     }
-  }
-
-  function removeImage(index) {
-    images.splice(index, 1);
-    const fileList = new DataTransfer();
-    images.forEach(file => {
-      fileList.items.add(file);
-    });
-
-    document.getElementById('imageInput').files = fileList.files;
-    handleFileSelect({
-      target: {
-        files: fileList.files
-      }
-    });
-
-    document.getElementById('imageInput').value = '';
   }
 
   function initializeCropper() {
@@ -219,16 +217,74 @@
 
       document.getElementById('imageInput').files = fileList.files;
 
-      const url = URL.createObjectURL(newFile);
-      const preview = document.getElementById('imagePreview').children[currentFileIndex].children[0];
-      preview.src = url;
+      const url = URL.createObjectURL(blob);
+      const imageElement = document.createElement('img');
+      imageElement.src = url;
+      imageElement.style.width = '100px';
+      imageElement.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.1)';
+      
+      const preview = document.getElementById('imagePreview');
+      preview.childNodes[currentFileIndex].replaceChild(imageElement, preview.childNodes[currentFileIndex].firstChild);
 
-      $('#cropModal').modal('hide');
       cropper.destroy();
-    }, 'image/jpeg');
+      $('#cropModal').modal('hide');
+    });
   });
 
   function validateForm() {
-    // Your existing form validation logic
+    let isValid = true;
+    // Reset previous error messages
+    document.getElementById('name-error-message').textContent = '';
+    document.getElementById('price-error-msg').textContent = '';
+    document.getElementById('category-error-message').textContent = '';
+    document.getElementById('quantity-error-message').textContent = '';
+    document.getElementById('imageError').textContent = '';
+
+    // Validate name field
+    const nameInput = document.getElementById('name');
+    if (nameInput.value.trim() === '') {
+      document.getElementById('name-error-message').textContent = 'Name is required';
+      isValid = false;
+    }
+
+    // Validate price field
+    const priceInput = document.getElementById('price-input');
+    if (priceInput.value.trim() === '' || isNaN(priceInput.value)) {
+      document.getElementById('price-error-msg').textContent = 'Valid price is required';
+      isValid = false;
+    }
+
+    // Validate quantity field
+    const quantityInput = document.getElementById('quantity-input');
+    if (quantityInput.value.trim() === '' || isNaN(quantityInput.value)) {
+      document.getElementById('quantity-error-message').textContent = 'Valid quantity is required';
+      isValid = false;
+    }
+
+    // Validate category field
+    const categorySelect = document.getElementById('categorySelect');
+    if (categorySelect.value.trim() === '') {
+      document.getElementById('category-error-message').textContent = 'Category is required';
+      isValid = false;
+    }
+
+    // Validate images field
+    const imageInput = document.getElementById('imageInput');
+    if (imageInput.files.length === 0) {
+      document.getElementById('imageError').textContent = 'At least one image is required';
+      isValid = false;
+    } else {
+      const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.webp)$/i;
+      for (let i = 0; i < imageInput.files.length; i++) {
+        if (!allowedExtensions.exec(imageInput.files[i].name)) {
+          document.getElementById('imageError').textContent = 'Invalid file type';
+          isValid = false;
+          break;
+        }
+      }
+    }
+
+    return isValid;
   }
+
 </script>
