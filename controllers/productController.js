@@ -406,16 +406,11 @@ for(let index of deletedIndices){
 }
 
 }
-for(let i=0;i<req.files.length;i++){
 
-    const date = new Date();
-    const timestamp = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}_${date.getHours().toString().padStart(2, '0')}${date.getMinutes().toString().padStart(2, '0')}${date.getSeconds().toString().padStart(2, '0')}`;
-    const filename = `croped-${timestamp}-${req.files[i].originalname}`;
-    await sharp(req.files[i].path)
-    .resize({width:600,height:600,fit:"cover"})
-    .toFile(`./public/productimages/${filename}`);
-    product.Image.push(filename)
-}
+    for(let i=0;i<req.files.length;i++){
+        product.Image.push(req.files[i].filename);
+    }
+
 
   //to check the offer price
   const coffer = await Coffer.find().populate('categoryId');
