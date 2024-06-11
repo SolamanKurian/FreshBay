@@ -12,7 +12,7 @@
               <%= message %>
             </span>
           <% } %>
-          <form class="forms-product" action="/product/editProduct?pid=<%= product._id %>" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+          <form id="edit-form" class="forms-product" action="/product/editProduct?pid=<%= product._id %>" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
             <!-- Name -->
             <div class="form-group">
               <label for="exampleInputName1">Name</label>
@@ -277,7 +277,7 @@ document.getElementById('cropButton').addEventListener('click', function(event) 
 
 function validateForm() {
   let isValid = true;
-
+const form=document.getElementById("edit-form");
   if (removedImageIndices.length > 0) {
         const deletedIndicesInput = document.createElement('input');
         deletedIndicesInput.type = "hidden";
