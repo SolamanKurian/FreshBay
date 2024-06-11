@@ -49,6 +49,7 @@ admin_route.post('/deleteCoffer',adminAuth.isSession,adminController.deleteCateg
 admin_route.get('/editCoffer',adminAuth.isSession,adminController.loadEditcoffer)
 admin_route.post('/editCoffer',adminAuth.isSession,adminController.editcoffer)
 admin_route.get('/coupons',adminAuth.isSession,adminController.loadCoupons)
+admin_route.get('/couponsToPage',adminAuth.isSession,adminController.loadCouponsToPage)
 admin_route.get('/addCoupon',adminAuth.isSession,adminController.loadAddCoupon)
 admin_route.post('/addCoupon',adminAuth.isSession,adminController.addCoupon)
 admin_route.post('/deleteCoupon',adminAuth.isSession,adminController.deleteCoupon)

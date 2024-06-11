@@ -199,8 +199,75 @@ function handleFileSelect(event) {
             files: fileList.files
           }
         });
+        removeButton.onclick = function() {
+          const newFiles = images.filter((_, index) => index !== i);
+          const fileList = new DataTransfer();
 
-        // document.getElementById('imageInput').value = '';
+          newFiles.forEach(file => {
+            fileList.items.add(file);
+          });
+
+          images = newFiles;
+          document.getElementById('imageInput').files = fileList.files;
+          handleFileSelect({
+            target: {
+              files: fileList.files
+            }
+          });
+
+          
+        }; removeButton.onclick = function() {
+          const newFiles = images.filter((_, index) => index !== i);
+          const fileList = new DataTransfer();
+
+          newFiles.forEach(file => {
+            fileList.items.add(file);
+          });
+
+          images = newFiles;
+          document.getElementById('imageInput').files = fileList.files;
+          handleFileSelect({
+            target: {
+              files: fileList.files
+            }
+          });
+
+          
+        }; removeButton.onclick = function() {
+          const newFiles = images.filter((_, index) => index !== i);
+          const fileList = new DataTransfer();
+
+          newFiles.forEach(file => {
+            fileList.items.add(file);
+          });
+
+          images = newFiles;
+          document.getElementById('imageInput').files = fileList.files;
+          handleFileSelect({
+            target: {
+              files: fileList.files
+            }
+          });
+
+          
+        }; removeButton.onclick = function() {
+          const newFiles = images.filter((_, index) => index !== i);
+          const fileList = new DataTransfer();
+
+          newFiles.forEach(file => {
+            fileList.items.add(file);
+          });
+
+          images = newFiles;
+          document.getElementById('imageInput').files = fileList.files;
+          handleFileSelect({
+            target: {
+              files: fileList.files
+            }
+          });
+
+          
+        };
       };
 
       const cropButton = document.createElement('button');

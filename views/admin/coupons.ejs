@@ -27,30 +27,22 @@
                         <th> Action</th>
                       </tr>
                     </thead>
-                    <% if(coupons.length > 0 ) { %>
-                        
-                      <% for(let i=0; i<coupons.length; i++) { %>
-                      
-                    <tr>
-                                         
-                      <td> <%=coupons[i].couponcode %> </td>  
-                      <td> <%=coupons[i].percentage %> </td>   
-                      <td> <%=coupons[i].date.toLocaleDateString()%> </td> 
-                      <td> <%=coupons[i].maxlimit%> </td>   
-                      <td> <%=coupons[i].minlimit%> </td>                                                                          
-                      <td> 
+                    <tbody id="coupon-table">
 
-                          <a  onclick="deleteCoupon('<%= coupons[i]._id %>')"><label class="badge badge-gradient-danger">Remove</label></a>
-    
-                       
 
-                        <a href="/admin/editCoupon?couponId=<%= coupons[i]._id %>"><label class="badge badge-gradient-success">Edit</label></a> 
-                      </td>                       
-                    </tr>
-                    <% } %>
-                    <% } %>
-                    
+                    </tbody>
+
+
+
                   </table>
+
+                  <div id="pagination" class="text-center mt-4">
+                    <button id="prevPage" class="btn btn-success me-1">&lt; Prev</button>
+                    <span id="currentPage">1</span>
+                    <button id="nextPage" class="btn btn-success ms-1">Next &gt;</button>
+                </div>
+
+
                 </div>
               </div>
             </div>
@@ -66,6 +58,99 @@
 <!--product list-->
 
 <script>
+
+//pagination setup
+const prevPageBtn = document.getElementById("prevPage");
+  const nextPageBtn = document.getElementById("nextPage");
+  const currentPageSpan = document.getElementById("currentPage");
+  let srch="";
+  let currentPage =Number(currentPageSpan.innerHTML);
+  prevPageBtn.addEventListener('click', async () => {
+  
+  if (currentPage > 1) {
+  
+    currentPage=currentPage - 1;
+    
+    currentPageSpan.innerHTML=currentPage
+  }
+goToPage(currentPage)
+});
+nextPageBtn.addEventListener('click', async () => {
+  
+  
+  if (currentPage >= 1) {
+
+    currentPage=currentPage + 1;
+    currentPageSpan.innerHTML=currentPage
+    
+  }
+  
+  goToPage(currentPage)
+});
+
+
+// load coupon 
+
+document.addEventListener('DOMContentLoaded',async function(){
+try {
+  const table=document.getElementById("coupon-table")
+axios.get(`https://freshbay.online/admin/couponsToPage`).then((response)=>{
+
+    
+   
+   let couponData=response.data.coupons
+
+// Clear existing rows
+table.innerHTML = '';
+
+if (couponData.length > 0) {
+  couponData.forEach(coupon=> {
+    
+    const row = document.createElement('tr');
+    row.innerHTML = `
+    
+          ${order.orderId}
+                                         
+                      <td> ${coupon.couponcode}</td>  
+                      <td> ${coupon.percentage}</td>  
+                      <td> ${coupon.date.toLocaleDateString()}</td>  
+                       <td> ${coupon.maxlimit}</td>  
+                       <td> ${coupon.minlimit}</td>  
+                      
+
+                          <a  onclick="deleteCoupon('${coupon._id}')"><label class="badge badge-gradient-danger">Remove</label></a>
+    
+                       
+
+                        <a href="/admin/editCoupon?couponId=${coupon._id}"><label class="badge badge-gradient-success">Edit</label></a> 
+                      </td>                       
+               
+                    
+
+
+ 
+      `;
+    table.appendChild(row);
+  });
+} else {
+  const row = document.createElement('tr');
+  row.innerHTML = `<td colspan="5" class="text-center">Order not found</td>`;
+  table.appendChild(row);
+}
+})
+
+      
+    } catch (error) {
+      console.log(error.message);
+    }
+
+
+  })
+
+
+
+
+
    
    async function deleteCoupon(couponId) {
     const confirmation = await Swal.fire({

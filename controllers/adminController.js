@@ -874,6 +874,18 @@ const loadCoupons=async(req,res,next)=>{
         next(error)
     }
 }
+//to load coupons to page
+// to load coupon page
+
+const loadCouponsToPage=async(req,res,next)=>{
+    try {
+        const coupons=await Coupon.find()
+        res.json({coupons:coupons})
+        
+    } catch (error) {
+        next(error)
+    }
+}
 
 // to load add coupon page
 const loadAddCoupon =async(req,res,next)=>{
@@ -1288,7 +1300,8 @@ module.exports={
     reportTopage,
     takeTop,
     growthSearch,
-    markAsCancelled
+    markAsCancelled,
+    loadCouponsToPage
    
   
 }
