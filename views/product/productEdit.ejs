@@ -1,111 +1,70 @@
 <%- include('../layouts/adminHead')-%>
 <%- include('../layouts/adminSidebarNoS')-%>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+
 <div class="main-panel">
   <div class="content-wrapper">
     <div class="col-12 grid-margin stretch-card">
       <div class="card">
         <div class="card-body">
-          <h4 class="card-title">Edit Product</h4>
+          <h4 class="card-title">Edit product</h4>
           <% if (locals.message) { %>
-            <span style="color: red;">
-              <%= message %>
-            </span>
+            <span style="color: red;"><%= message %></span>
           <% } %>
-          <form class="forms-product" enctype="multipart/form-data" method="POST" action="/product/editProduct?pid=<%= product._id %>">
+          <form class="forms-product" action="/product/EditProduct/<%= product._id %>" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
             <!-- Name -->
             <div class="form-group">
               <label for="exampleInputName1">Name</label>
-              <input type="text" class="form-control" id="name" name="name" value="<%= product.Name %>" title="Please enter letters and spaces only">
+              <input type="text" class="form-control" id="name" name="name" value="<%= product.name %>">
               <span class="error-message text-danger" id="name-error-message"></span>
             </div>
-
-            <!-- Unit Price -->
+            <!-- Unit price -->
             <div class="form-group">
               <label for="price">Unit Price</label>
-              <input type="text" class="form-control" name="price" id="price-input" value="<%= product.Price %>">
+              <input type="text" class="form-control" name="price" id="price-input" placeholder="Enter numbers only" value="<%= product.price %>">
               <span class="error-message text-danger" id="price-error-msg"></span>
             </div>
-
             <!-- Category -->
             <div class="form-group">
               <label for="category">Category</label>
               <select class="form-control" name="category" id="categorySelect">
-                <% for (let i = 0; i < cat.length; i++) { %>
-                  <option <%= cat[i].Name === product.Category.Name ? 'selected' : '' %>>
-                    <%= cat[i].Name %>
-                  </option>
+                <% for(let i=0; i<cat.length; i++){ %>
+                  <option value="<%= cat[i].Name %>" <%= cat[i].Name === product.category ? 'selected' : '' %>><%= cat[i].Name %></option>
                 <% } %>
               </select>
               <span class="error-message text-danger" id="category-error-message"></span>
             </div>
-
             <!-- Quantity -->
             <div class="form-group">
               <label for="quantity">Quantity in Kg</label>
-              <input type="text" class="form-control" name="quantity" id="quantity-input" value="<%= product.Quantity %>">
+              <input type="text" class="form-control" name="quantity" id="quantity-input" placeholder="Enter numbers only" value="<%= product.quantity %>">
               <span class="error-message text-danger" id="quantity-error-message"></span>
             </div>
-
             <!-- Images -->
             <div class="form-group">
-              <label>File upload (Images only)</label>
-              <input type="file" name="images" id="image-input" class="form-control file-upload-default" multiple accept="image/*" onchange="handleFileSelect(event)">
+              <label>Images</label>
+              <input type="file" name="images" class="file-upload-default" accept="image/*" multiple onchange="handleFileSelect(event)" id="imageInput">
               <div class="input-group col-xs-12">
                 <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image" id="fileCount" value="">
                 <span class="input-group-append">
-                  <button class="file-upload-browse btn btn-gradient-primary" type="button" id="img-upload-btn" onclick="document.getElementById('image-input').click()">Upload</button>
+                  <button class="file-upload-browse btn btn-gradient-light" type="button" onclick="document.getElementById('imageInput').click()">Upload</button>
                 </span>
               </div>
-              <span id="image-error-message" class="error-message text-danger"></span>
-              <!-- Existing Image with Cross Marks -->
-              <div class="image-preview d-flex mt-2">
-                <% for (let i = 0; i < product.Image.length; i++) { %>
-                  <div class="mr-2 image-container">
-                    <button class="remove-image-btn" data-index="<%= i %>" type="button">&times;</button>
-                    <img src="/productimages/<%= product.Image[i] %>" width="100px">
+              <div id="imagePreview">
+                <% for(let i=0; i<product.images.length; i++){ %>
+                  <div style="position: relative; display: inline-block; margin-right: 10px;">
+                    <img src="/productimages/<%= product.images[i] %>" style="width: 100px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+                    <button type="button" style="position: absolute; top: 0; right: 0; color: white; background-color: red; border: none; border-radius: 50%; cursor: pointer;" onclick="removeImage('<%= product.images[i] %>')">x</button>
                   </div>
                 <% } %>
               </div>
+              <small id="imageError" class="text-danger"></small>
             </div>
-
-            <!-- Image Previews -->
-            <div id="image-preview" class="preview-container"></div><br>
-
-            <style>
-              .image-container {
-                position: relative;
-              }
-              .remove-image-btn {
-                position: absolute;
-                top: -10px;
-                right: 0px;
-                background-color: transparent;
-                border: none;
-                color: red;
-                font-size: 20px;
-                cursor: pointer;
-                z-index: 1;
-              }
-              .remove-image-btn:hover {
-                color: darkred;
-              }
-              .preview-container {
-                display: flex;
-                gap: 10px;
-              }
-              .preview-image {
-                width: 100px;
-                height: 100px;
-                object-fit: cover;
-                border-radius: 5px;
-              }
-            </style>
 
             <!-- Description -->
             <div class="form-group">
               <label>Product Description</label>
-              <textarea class="form-control" name="description" id="exampleTextarea1" rows="4"><%= product.Description %></textarea>
+              <textarea class="form-control" name="description" id="exampleTextarea1" rows="4"><%= product.description %></textarea>
             </div>
             <button type="submit" class="btn btn-gradient-success mr-2">Submit</button>
             <button class="btn btn-light" onclick="location.href='/product'">Cancel</button>
@@ -145,123 +104,187 @@
 <script src="https://unpkg.com/cropperjs"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 
+<%- include('../layouts/adminFooter')-%>
+
 <script>
-let cropper;
-let currentFileIndex = -1;
-let files = [];
-let images = [];
+  let cropper;
+  let currentFileIndex = -1;
+  let files = [];
+  let images = [];
 
-function handleFileSelect(event) {
-  const preview = document.getElementById('image-preview');
-  preview.innerHTML = '';
+  function handleFileSelect(event) {
+    const preview = document.getElementById('imagePreview');
+    preview.innerHTML = '';
 
-  files = Array.from(event.target.files);
-  images = files.slice();
-  const filesAmount = files.length;
+    files = Array.from(event.target.files);
+    images = files.slice();
+    const filesAmount = files.length;
 
-  document.getElementById('fileCount').value = filesAmount + ' files selected';
+    document.getElementById('fileCount').value = filesAmount + ' files selected';
 
-  for (let i = 0; i < filesAmount; i++) {
-    const reader = new FileReader();
+    for (let i = 0; i < filesAmount; i++) {
+      const reader = new FileReader();
 
-    reader.onload = function(event) {
-      const imageWrapper = document.createElement('div');
-      imageWrapper.style.position = 'relative';
-      imageWrapper.style.display = 'inline-block';
-      imageWrapper.style.marginRight = '10px';
+      reader.onload = function(event) {
+        const imageWrapper = document.createElement('div');
+        imageWrapper.style.position = 'relative';
+        imageWrapper.style.display = 'inline-block';
+        imageWrapper.style.marginRight = '10px';
+
+        const imageElement = document.createElement('img');
+        imageElement.src = event.target.result;
+        imageElement.style.width = '100px';
+        imageElement.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.1)';
+
+        const removeButton = document.createElement('button');
+        removeButton.innerText = 'x';
+        removeButton.style.position = 'absolute';
+        removeButton.style.top = '0';
+        removeButton.style.right = '0';
+        removeButton.style.color = 'rgb(255, 255, 255)';
+        removeButton.style.backgroundColor = 'rgb(255, 0, 0)';
+        removeButton.style.border = 'none';
+        removeButton.style.borderRadius = '50%';
+        removeButton.style.cursor = 'pointer';
+        removeButton.onclick = function() {
+          const newFiles = images.filter((_, index) => index !== i);
+          const fileList = new DataTransfer();
+
+          newFiles.forEach(file => {
+            fileList.items.add(file);
+          });
+
+          images = newFiles;
+          document.getElementById('imageInput').files = fileList.files;
+          handleFileSelect({
+            target: {
+              files: fileList.files
+            }
+          });
+
+          document.getElementById('imageInput').value = '';
+        };
+
+        const cropButton = document.createElement('button');
+        cropButton.type = 'button';
+        cropButton.innerText = 'Crop';
+        cropButton.style.position = 'absolute';
+        cropButton.style.bottom = '0';
+        cropButton.style.right = '30px';
+        cropButton.style.color = 'white';
+        cropButton.style.backgroundColor = 'green';
+        cropButton.style.border = 'none';
+        cropButton.style.borderRadius = '5px';
+        cropButton.style.cursor = 'pointer';
+        cropButton.onclick = function() {
+          currentFileIndex = i;
+          document.getElementById('cropperImage').src = event.target.result;
+          $('#cropModal').modal('show');
+        };
+
+        imageWrapper.appendChild(imageElement);
+        imageWrapper.appendChild(removeButton);
+        imageWrapper.appendChild(cropButton);
+        preview.appendChild(imageWrapper);
+      };
+
+      reader.readAsDataURL(files[i]);
+    }
+  }
+
+  $('#cropModal').on('shown.bs.modal', function() {
+    const image = document.getElementById('cropperImage');
+    cropper = new Cropper(image, {
+      aspectRatio: 1,
+      viewMode: 1,
+    });
+  }).on('hidden.bs.modal', function() {
+    cropper.destroy();
+    cropper = null;
+  });
+
+  document.getElementById('cropButton').addEventListener('click', function() {
+    cropper.getCroppedCanvas().toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const file = new File([blob], 'cropped.jpg', {
+        type: 'image/jpeg',
+      });
+      images[currentFileIndex] = file;
 
       const imageElement = document.createElement('img');
-      imageElement.src = event.target.result;
+      imageElement.src = url;
       imageElement.style.width = '100px';
       imageElement.style.boxShadow = '0px 4px 6px rgba(0, 0, 0, 0.1)';
 
-      const removeButton = document.createElement('button');
-      removeButton.innerText = 'x';
-      removeButton.style.position = 'absolute';
-      removeButton.style.top = '0';
-      removeButton.style.right = '0';
-      removeButton.style.color = 'rgb(255, 255, 255)';
-      removeButton.style.backgroundColor = 'rgb(255, 0, 0)';
-      removeButton.style.border = 'none';
-      removeButton.style.borderRadius = '50%';
-      removeButton.style.cursor = 'pointer';
-      removeButton.onclick = function() {
-        const newFiles = images.filter((_, index) => index !== i);
-        const fileList = new DataTransfer();
+      const imagePreview = document.getElementById('imagePreview');
+      const existingImageWrappers = imagePreview.children;
 
-        newFiles.forEach(file => {
-          fileList.items.add(file);
-        });
+      for (let i = 0; i < existingImageWrappers.length; i++) {
+        if (i === currentFileIndex) {
+          const imageWrapper = existingImageWrappers[i];
+          const existingImageElement = imageWrapper.querySelector('img');
+          imageWrapper.replaceChild(imageElement, existingImageElement);
+        }
+      }
 
-        images = newFiles;
-        document.getElementById('image-input').files = fileList.files;
-        handleFileSelect({
-          target: {
-            files: fileList.files
-          }
-        });
+      $('#cropModal').modal('hide');
+    }, 'image/jpeg');
+  });
 
-        document.getElementById('image-input').value = '';
-      };
-
-      const cropButton = document.createElement('button');
-      cropButton.type = 'button';
-      cropButton.innerText = 'Crop';
-      cropButton.style.position = 'absolute';
-      cropButton.style.bottom = '0';
-      cropButton.style.right = '30px';
-      cropButton.style.color = 'white';
-      cropButton.style.backgroundColor = 'green';
-      cropButton.style.border = 'none';
-      cropButton.style.borderRadius = '5px';
-      cropButton.style.cursor = 'pointer';
-      cropButton.onclick = function() {
-        currentFileIndex = i;
-        document.getElementById('cropperImage').src = event.target.result;
-        $('#cropModal').modal('show');
-      };
-
-      imageWrapper.appendChild(imageElement);
-      imageWrapper.appendChild(removeButton);
-      imageWrapper.appendChild(cropButton);
-      preview.appendChild(imageWrapper);
-    };
-
-    reader.readAsDataURL(files[i]);
+  function removeImage(imageName) {
+    // Implement the logic to remove the image from the database or file system
   }
-}
 
-document.getElementById('cropModal').addEventListener('shown.bs.modal', function () {
-  const image = document.getElementById('cropperImage');
-  cropper = new Cropper(image, {
-    aspectRatio: 1,
-    viewMode: 2
-  });
-});
+  function validateForm() {
+    const name = document.getElementById('name').value.trim();
+    const price = document.getElementById('price-input').value;
+    const category = document.getElementById('categorySelect').value;
+    const quantity = document.getElementById('quantity-input').value;
+    const images = document.getElementById('imageInput').files;
 
-document.getElementById('cropModal').addEventListener('hidden.bs.modal', function () {
-  cropper.destroy();
-  cropper = null;
-});
+    const nameErrorMessage = document.getElementById('name-error-message');
+    const priceErrorMessage = document.getElementById('price-error-msg');
+    const categoryErrorMessage = document.getElementById('category-error-message');
+    const quantityErrorMessage = document.getElementById('quantity-error-message');
+    const imageErrorMessage = document.getElementById('imageError');
 
-document.getElementById('cropButton').addEventListener('click', function () {
-  const canvas = cropper.getCroppedCanvas();
-  canvas.toBlob(function (blob) {
-    const url = URL.createObjectURL(blob);
-    const newImage = new File([blob], files[currentFileIndex].name, {
-      type: 'image/jpeg',
-      lastModified: Date.now()
-    });
+    let isValid = true;
 
-    images[currentFileIndex] = newImage;
+    if (!name) {
+      nameErrorMessage.textContent = 'Name is required.';
+      isValid = false;
+    } else {
+      nameErrorMessage.textContent = '';
+    }
 
-    const newFileList = new DataTransfer();
-    images.forEach(file => newFileList.items.add(file));
-    document.getElementById('image-input').files = newFileList.files;
+    if (!/^\d+$/.test(price)) {
+      priceErrorMessage.textContent = 'Price must be a number.';
+      isValid = false;
+    } else {
+      priceErrorMessage.textContent = '';
+    }
 
-    document.getElementById('image-preview').children[currentFileIndex].querySelector('img').src = url;
+    if (!category) {
+      categoryErrorMessage.textContent = 'Category is required.';
+      isValid = false;
+    } else {
+      categoryErrorMessage.textContent = '';
+    }
 
-    $('#cropModal').modal('hide');
-  });
-});
+    if (!/^\d+$/.test(quantity)) {
+      quantityErrorMessage.textContent = 'Quantity must be a number.';
+      isValid = false;
+    } else {
+      quantityErrorMessage.textContent = '';
+    }
+
+    if (images.length === 0) {
+      imageErrorMessage.textContent = 'At least one image is required.';
+      isValid = false;
+    } else {
+      imageErrorMessage.textContent = '';
+    }
+
+    return isValid;
+  }
 </script>
