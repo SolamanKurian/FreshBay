@@ -113,7 +113,7 @@ if (couponData.length > 0) {
                                          
                       <td> ${coupon.couponcode}</td>  
                       <td> ${coupon.percentage}</td>  
-                      
+                     <td>${formatDate(coupon.date)}</td>
                        <td> ${coupon.maxlimit}</td>  
                        <td> ${coupon.minlimit}</td>  
                       
@@ -131,7 +131,13 @@ if (couponData.length > 0) {
  
       `;
     table.appendChild(row);
-  });
+  }, function formatDate(dateString) {
+  const date = new Date(dateString);
+  return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`; // Format as dd/mm/yyyy
+}
+ 
+
+);
 } else {
   const row = document.createElement('tr');
   row.innerHTML = `<td colspan="5" class="text-center">coupon not found</td>`;
