@@ -12,17 +12,17 @@
               <%= message %>
             </span>
           <% } %>
-          <form class="forms-product" action="/product/AddProduct" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+          <form class="forms-product" action="/product/editProduct?pid=<%= product._id %>" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
             <!-- Name -->
             <div class="form-group">
               <label for="exampleInputName1">Name</label>
-              <input type="text" class="form-control" id="name" name="name">
+              <input type="text" class="form-control" id="name" name="name"value="<%= product.Name %>" title="Please enter letters and spaces only">
               <span class="error-message text-danger" id="name-error-message"></span>
             </div>
             <!-- Unit price -->
             <div class="form-group">
               <label for="price">Unit Price</label>
-              <input type="text" class="form-control" name="price" id="price-input" placeholder="Enter numbers only">
+              <input type="text" class="form-control" name="price" id="price-input" placeholder="Enter numbers only" value="<%= product.Price %>">
               <span class="error-message text-danger" id="price-error-msg"></span>
             </div>
             <!-- Category -->
@@ -30,7 +30,9 @@
               <label for="category">Category</label>
               <select class="form-control" name="category" id="categorySelect">
                 <% for(let i=0; i<cat.length; i++){ %>
-                  <option><%= cat[i].Name %></option>
+                  <option <%= cat[i].Name === product.Category.Name ? 'selected' : '' %>>
+                    <%= cat[i].Name %>
+                  </option>
                 <% } %>
               </select>
               <span class="error-message text-danger" id="category-error-message"></span>
@@ -38,7 +40,7 @@
             <!-- Quantity -->
             <div class="form-group">
               <label for="quantity">Quantity in Kg</label>
-              <input type="text" class="form-control" name="quantity" id="quantity-input" placeholder="Enter numbers only">
+              <input type="text" class="form-control" name="quantity" id="quantity-input" placeholder="Enter numbers only" value="<%= product.Quantity %>">
               <span class="error-message text-danger" id="quantity-error-message"></span>
             </div>
             <!-- Images -->
@@ -54,11 +56,53 @@
               <div id="imagePreview"></div>
               <small id="imageError" class="text-danger"></small>
             </div>
+ <!-- preview images -->
+            <div class="image-preview d-flex mt-2">
+              <% for (let i = 0; i < product.Image.length; i++) { %>
+                <div class="mr-2 image-container">
+                  <button class="remove-image-btn" data-index="<%= i %>" type="button">&times;</button>
+                  <img src="/productimages/<%= product.Image[i] %>" width="100px">
+                </div>
+              <% } %>
+            </div>
+<!-- Image Previews -->
+<div id="image-preview" class="preview-container"></div><br>
+
+<style>
+  .image-container {
+    position: relative;
+  }
+  .remove-image-btn {
+    position: absolute;
+    top: -10px;
+    right: 0px;
+    background-color: transparent;
+    border: none;
+    color: red;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 1;
+  }
+  .remove-image-btn:hover {
+    color: darkred;
+  }
+  .preview-container {
+    display: flex;
+    gap: 10px;
+  }
+  .preview-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+</style>
+
 
             <!-- Description -->
             <div class="form-group">
               <label>Product Description</label>
-              <textarea class="form-control" name="description" id="exampleTextarea1" rows="4"></textarea>
+              <textarea class="form-control" name="description" id="exampleTextarea1" rows="4"><%= product.Pdesc %></textarea>
             </div>
             <button type="submit" class="btn btn-gradient-success mr-2">Submit</button>
             <button class="btn btn-light" onclick="location.href='/product'">Cancel</button>
@@ -234,6 +278,19 @@ document.getElementById('cropButton').addEventListener('click', function(event) 
 function validateForm() {
   let isValid = true;
 
+  if (removedImageIndices.length > 0) {
+        const deletedIndicesInput = document.createElement('input');
+        deletedIndicesInput.type = "hidden";
+        deletedIndicesInput.name = "deletedIndices";
+        deletedIndicesInput.value = JSON.stringify(removedImageIndices);
+        form.appendChild(deletedIndicesInput);
+        removedImageIndices = [];
+      }
+
+
+
+
+
   // Validate name
   const name = document.getElementById('name').value.trim();
   const nameError = document.getElementById('name-error-message');
@@ -295,5 +352,21 @@ function validateForm() {
 
   return isValid;
 }
+
+// JavaScript for removing images
+let removedImageIndices = [];
+const removeImageButtons = document.querySelectorAll('.remove-image-btn');
+const imagePreview = document.querySelector('.image-preview');
+
+removeImageButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const indexToRemove = button.dataset.index;
+    removedImageIndices.push(indexToRemove);
+    imagePreview.removeChild(button.parentElement);
+  });
+});
+
+
+
 
 </script>
