@@ -109,7 +109,7 @@ if (couponData.length > 0) {
     const row = document.createElement('tr');
     row.innerHTML = `
     
-          ${order.orderId}
+        
                                          
                       <td> ${coupon.couponcode}</td>  
                       <td> ${coupon.percentage}</td>  
@@ -134,7 +134,7 @@ if (couponData.length > 0) {
   });
 } else {
   const row = document.createElement('tr');
-  row.innerHTML = `<td colspan="5" class="text-center">Order not found</td>`;
+  row.innerHTML = `<td colspan="5" class="text-center">coupon not found</td>`;
   table.appendChild(row);
 }
 })
